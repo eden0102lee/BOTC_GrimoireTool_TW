@@ -1,5 +1,5 @@
 <template>
-  <li :style="zoom">
+  <li :style="zoom" :class="seatHighlightClass">
     <div
       ref="player"
       class="player"
@@ -10,13 +10,26 @@
           'no-vote': player.isVoteless,
           you: session.sessionId && player.id && player.id === session.playerId,
           'vote-yes': session.votes[index],
-          'vote-lock': voteLocked
+          'vote-lock': voteLocked,
+          'battle-log-pending': hasOpenPending,
+          'battle-log-preview': hasPreviewEffects,
         },
         player.role.team
       ]"
     >
       <div class="shroud" @click="toggleStatus()"></div>
+      <div
+        v-if="previewDead && !player.isDead"
+        class="shroud preview-ghost"
+        aria-hidden="true"
+      ></div>
       <div class="life" @click="toggleStatus()"></div>
+      <span
+        v-if="hasOpenPending && linkedMode"
+        class="pending-badge"
+        :title="$t('recorder.pendingSeatHint')"
+        >?</span
+      >
 
       <div
         class="night-order first"
@@ -188,6 +201,22 @@
         <span class="text">{{ reminder.name }}</span>
       </div>
     </template>
+    <div
+      v-for="(ghost, gi) in previewReminders"
+      :key="'ghost-' + gi"
+      class="reminder preview-ghost-reminder"
+      :class="[ghost.reminder.role]"
+    >
+      <span
+        class="icon"
+        :style="{
+          backgroundImage: `url(${require('../assets/icons/' +
+            (ghost.reminder.imageAlt || ghost.reminder.role) +
+            '.png')})`
+        }"
+      ></span>
+      <span class="text">{{ ghost.reminder.name }}</span>
+    </div>
     <div class="reminder add" @click="$emit('trigger', ['openReminderModal'])">
       <span class="icon"></span>
     </div>
@@ -212,10 +241,38 @@ export default {
   computed: {
     ...mapState("players", ["players"]),
     ...mapState(["grimoire", "session"]),
+    ...mapState("battleLog", ["linkedMode", "previewEffects"]),
     ...mapGetters(["hideRolesOnBoard"]),
     ...mapGetters({ nightOrder: "players/nightOrder" }),
+    ...mapGetters("battleLog", {
+      pendingForPlayer: "pendingForPlayerIndex",
+      previewForPlayer: "previewForPlayerIndex",
+    }),
     index: function() {
       return this.players.indexOf(this.player);
+    },
+    hasOpenPending() {
+      if (!this.linkedMode) return false;
+      return this.pendingForPlayer(this.index).length > 0;
+    },
+    hasPreviewEffects() {
+      if (!this.linkedMode) return false;
+      return this.previewForPlayer(this.index).length > 0;
+    },
+    previewDead() {
+      return this.previewForPlayer(this.index).some(
+        (e) => e.type === "setDead" && e.value,
+      );
+    },
+    previewReminders() {
+      return this.previewForPlayer(this.index)
+        .filter((e) => e.type === "addReminder")
+        .map((e) => ({ reminder: e.reminder }));
+    },
+    seatHighlightClass() {
+      if (this.hasOpenPending) return "seat-pending";
+      if (this.hasPreviewEffects) return "seat-preview";
+      return "";
     },
     voteLocked: function() {
       const session = this.session;
@@ -890,5 +947,60 @@ li.move:not(.from) .player .overlay svg.move {
 #townsquare.hide-roles .reminder {
   opacity: 0;
   pointer-events: none;
+}
+
+.circle li.seat-pending > .player {
+  box-shadow: 0 0 0 3px rgba(255, 140, 60, 0.85),
+    0 0 12px rgba(255, 100, 0, 0.45);
+  border-radius: 50%;
+}
+
+.circle li.seat-preview > .player {
+  box-shadow: 0 0 0 2px rgba(120, 200, 255, 0.75),
+    0 0 10px rgba(70, 213, 255, 0.35);
+  border-radius: 50%;
+}
+
+.circle .player.battle-log-pending .token {
+  filter: drop-shadow(0 0 6px rgba(255, 140, 60, 0.8));
+}
+
+.circle .pending-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  z-index: 5;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(200, 80, 0, 0.95);
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 18px;
+  text-align: center;
+  pointer-events: none;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+}
+
+.circle .shroud.preview-ghost:before {
+  opacity: 0.45 !important;
+  animation: battleLogPulse 1.2s ease-in-out infinite;
+}
+
+.circle .reminder.preview-ghost-reminder {
+  opacity: 0.45;
+  pointer-events: none;
+  animation: battleLogPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes battleLogPulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.65;
+  }
 }
 </style>

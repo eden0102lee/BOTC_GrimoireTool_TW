@@ -15,6 +15,54 @@
       />
     </div>
 
+    <div class="linked-mode-row">
+      <label class="linked-toggle">
+        <input
+          type="checkbox"
+          :checked="linkedMode"
+          @change="toggleLinkedMode($event.target.checked)"
+        />
+        <span>{{ $t("recorder.linkedMode") }}</span>
+      </label>
+    </div>
+
+    <div class="new-game-row">
+      <span class="new-game-label">{{ $t("recorder.newGame") }}</span>
+      <div class="new-game-actions">
+        <button
+          type="button"
+          class="new-game-btn export"
+          :title="$t('recorder.exportBattleLog')"
+          @click="exportBattleLog"
+        >
+          {{ $t("recorder.exportBattleLog") }}
+        </button>
+        <button
+          type="button"
+          class="new-game-btn import"
+          :title="$t('recorder.importBattleLog')"
+          @click="pickImportFile"
+        >
+          {{ $t("recorder.importBattleLog") }}
+        </button>
+        <input
+          ref="importFile"
+          type="file"
+          accept=".json,application/json"
+          hidden
+          @change="onImportFile"
+        />
+        <button
+          type="button"
+          class="new-game-btn delete"
+          :title="$t('recorder.deleteBattleLog')"
+          @click="deleteBattleLog"
+        >
+          {{ $t("recorder.deleteBattleLog") }}
+        </button>
+      </div>
+    </div>
+
     <div class="recorder-header">
       <div class="tabs">
         <button
@@ -72,6 +120,39 @@
       </template>
 
       <template v-else>
+      <div v-if="linkedMode && openPendingFacts.length" class="pending-block">
+        <div class="pending-title">
+          <font-awesome-icon icon="exclamation-triangle" />
+          {{ $t("recorder.pendingTitle", { n: openPendingFacts.length }) }}
+        </div>
+        <div
+          v-for="fact in openPendingFacts"
+          :key="fact.id"
+          class="pending-row"
+          :class="{ recommended: isRecommended(fact) }"
+        >
+          <span class="pending-label">{{ pendingLabel(fact) }}</span>
+          <div class="pending-actions">
+            <button
+              type="button"
+              class="pending-dismiss"
+              :title="$t('recorder.dismissPending')"
+              @click="dismissPending(fact)"
+            >
+              <font-awesome-icon icon="times" />
+            </button>
+            <button
+              type="button"
+              class="pending-action"
+              :class="{ primary: isRecommended(fact) }"
+              @click="commitPending(fact)"
+            >
+              {{ pendingActionLabel(fact) }}
+            </button>
+          </div>
+        </div>
+      </div>
+
       <p class="phase-hint">{{ displayLabel }}</p>
 
       <template v-if="isNight">
@@ -87,6 +168,9 @@
           <ManualLogCard
             v-else-if="row.type === 'manualSlot' && manualFormOpen"
             :players="players"
+            :script-roles="scriptRoles"
+            :linked-mode="linkedMode"
+            :initial-tokens="manualPrefillTokens"
             @record="onManualRecord"
             @dismiss="closeManualForm"
           />
@@ -94,6 +178,14 @@
             v-else-if="row.type === 'manualRecorded' && !isEditingManual(row.entry)"
             class="manual-recorded-card"
           >
+            <button
+              type="button"
+              class="record-delete-btn"
+              :title="$t('recorder.deleteRecord')"
+              @click="confirmDeleteRecord(row.entry)"
+            >
+              <font-awesome-icon icon="trash-alt" />
+            </button>
             <div class="manual-label">{{ $t("recorder.manualTitle") }}</div>
             <div class="manual-summary">{{ row.entry.message }}</div>
             <span class="manual-detail" v-if="row.entry.detail"
@@ -109,7 +201,10 @@
           </div>
           <ManualLogCard
             v-else-if="row.type === 'manualRecorded' && isEditingManual(row.entry)"
+            :key="'edit-night-' + row.entry.id"
             :players="players"
+            :script-roles="scriptRoles"
+            :linked-mode="linkedMode"
             :edit-entry-id="row.entry.id"
             :initial-tokens="manualEditTokens(row.entry)"
             @record="onManualRecord"
@@ -145,6 +240,15 @@
               'dead-vote': entry.category === 'deadVote',
             }"
           >
+            <button
+              v-if="entry.category === 'manual'"
+              type="button"
+              class="record-delete-btn"
+              :title="$t('recorder.deleteRecord')"
+              @click="confirmDeleteRecord(entry)"
+            >
+              <font-awesome-icon icon="trash-alt" />
+            </button>
             <div class="manual-label">
               {{
                 entry.category === "vote"
@@ -190,6 +294,8 @@
             v-else
             :key="'edit-' + (entry.manualKey || entry.id)"
             :players="players"
+            :script-roles="scriptRoles"
+            :linked-mode="linkedMode"
             :edit-entry-id="entry.id"
             :initial-tokens="manualEditTokens(entry)"
             @record="onManualRecord"
@@ -222,6 +328,7 @@
         <DeadVoteLogCard
           v-else-if="isVoting && deadVoteFormOpen"
           :players="players"
+          :initial-snapshot="deadVotePrefill"
           @record="onDeadVoteRecord"
           @dismiss="closeDeadVoteForm"
         />
@@ -236,6 +343,9 @@
         <ManualLogCard
           v-else
           :players="players"
+          :script-roles="scriptRoles"
+          :linked-mode="linkedMode"
+          :initial-tokens="manualPrefillTokens"
           @record="onManualRecord"
           @dismiss="closeManualForm"
         />
@@ -266,6 +376,7 @@ import {
   buildRoleCardKey,
 } from "../store/roleInputConfig";
 import { formatLogMessage } from "../store/modules/battleLog";
+import { pendingLabelKey, FACT_TYPES } from "../store/battleLogEffects";
 
 const MANUAL_END = "__end__";
 
@@ -280,6 +391,8 @@ export default {
       voteFormOpen: false,
       deadVoteFormOpen: false,
       editingManualId: null,
+      manualPrefillTokens: null,
+      deadVotePrefill: null,
     };
   },
   watch: {
@@ -288,19 +401,26 @@ export default {
       this.voteFormOpen = false;
       this.deadVoteFormOpen = false;
       this.editingManualId = null;
+      this.manualPrefillTokens = null;
+      this.deadVotePrefill = null;
+      this.$store.dispatch("battleLog/clearPreviewEffects");
     },
   },
   computed: {
     ...mapState(["session", "roles"]),
     ...mapState("players", ["players"]),
-    ...mapState("battleLog", ["entries", "gameMeta"]),
+    ...mapState("battleLog", ["entries", "gameMeta", "linkedMode"]),
     ...mapGetters("gamePhase", [
       "displayLabel",
       "currentPhase",
       "nightNumber",
       "subPhase",
     ]),
-    ...mapGetters("battleLog", ["entryByRoleCardKey", "gameHeader"]),
+    ...mapGetters("battleLog", [
+      "entryByRoleCardKey",
+      "gameHeader",
+      "openPendingFacts",
+    ]),
     previewSections() {
       const byPhase = new Map();
       this.entries.forEach((entry) => {
@@ -491,6 +611,132 @@ export default {
     },
   },
   methods: {
+    toggleLinkedMode(checked) {
+      this.$store.dispatch("battleLog/setLinkedMode", checked);
+      if (!checked) {
+        this.$store.dispatch("battleLog/clearPreviewEffects");
+      }
+    },
+    downloadFile(filename, content, mime) {
+      const blob = new Blob([content], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    },
+    exportBattleLog() {
+      const meta = this.gameMeta || {};
+      const namePart = (meta.gameName || "戰報").replace(/[\\/:*?"<>|]/g, "_");
+      Promise.resolve(this.$store.dispatch("battleLog/exportJson")).then(
+        (data) => {
+          this.downloadFile(
+            `${namePart}_${Date.now()}.json`,
+            data,
+            "application/json",
+          );
+        },
+      );
+    },
+    pickImportFile() {
+      const input = this.$refs.importFile;
+      if (input) {
+        input.value = "";
+        input.click();
+      }
+    },
+    onImportFile(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const hasEntries =
+            this.entries && this.entries.length > 0;
+          if (
+            hasEntries &&
+            !window.confirm(this.$t("recorder.confirmImportReplace"))
+          ) {
+            return;
+          }
+          this.$store.dispatch("battleLog/importBattleLog", reader.result);
+        } catch (e) {
+          window.alert(this.$t("recorder.importFailed"));
+          console.warn("import battle log failed", e);
+        }
+      };
+      reader.readAsText(file, "utf-8");
+    },
+    deleteBattleLog() {
+      if (!window.confirm(this.$t("recorder.confirmDeleteBattleLog"))) return;
+      this.$store.dispatch("battleLog/resetForNewGame");
+      this.manualFormOpen = false;
+      this.voteFormOpen = false;
+      this.deadVoteFormOpen = false;
+      this.editingManualId = null;
+      this.manualPrefillTokens = null;
+      this.deadVotePrefill = null;
+    },
+    pendingLabel(fact) {
+      const key = pendingLabelKey(fact.factType);
+      return this.$t(key, { name: fact.playerName || "?" });
+    },
+    pendingActionLabel(fact) {
+      if (fact.factType === FACT_TYPES.DEAD_VOTE) {
+        return this.$t("recorder.writeDeadVote");
+      }
+      return this.$t("recorder.writeSource");
+    },
+    isRecommended(fact) {
+      return (
+        fact.factType === FACT_TYPES.DEAD_VOTE ||
+        (fact.recommend && fact.recommend.card === "deadVote")
+      );
+    },
+    dismissPending(fact) {
+      if (!fact || !fact.id) return;
+      this.$store.dispatch("battleLog/dismissPendingFact", fact.id);
+    },
+    commitPending(fact) {
+      const rec = fact.recommend || {};
+      if (rec.card === "deadVote" || fact.factType === FACT_TYPES.DEAD_VOTE) {
+        this.manualFormOpen = false;
+        this.voteFormOpen = false;
+        this.editingManualId = null;
+        this.deadVotePrefill = {
+          players: (rec.prefill && rec.prefill.players) || [
+            fact.playerName,
+          ].filter(Boolean),
+        };
+        this.deadVoteFormOpen = true;
+        return;
+      }
+      this.deadVoteFormOpen = false;
+      this.voteFormOpen = false;
+      this.editingManualId = null;
+      this.manualPrefillTokens =
+        rec.prefill && rec.prefill.tokens
+          ? rec.prefill.tokens
+          : [
+              { type: "player", value: fact.playerName },
+              {
+                type: "status",
+                value:
+                  fact.factType === FACT_TYPES.REVIVE
+                    ? "復活"
+                    : fact.factType === FACT_TYPES.EVENT_POISON
+                      ? "中毒"
+                      : fact.factType === FACT_TYPES.IDENTITY_DRUNK ||
+                          fact.factType === FACT_TYPES.EVENT_DRUNK
+                        ? "醉酒"
+                        : fact.factType === FACT_TYPES.ABILITY_LOST
+                          ? "失去能力"
+                          : "死亡",
+              },
+            ];
+      this.manualFormOpen = true;
+    },
     updateMeta(field, value) {
       this.$store.commit("battleLog/setGameMeta", { [field]: value });
     },
@@ -498,10 +744,13 @@ export default {
       this.editingManualId = null;
       this.voteFormOpen = false;
       this.deadVoteFormOpen = false;
+      this.manualPrefillTokens = null;
       this.manualFormOpen = true;
     },
     closeManualForm() {
       this.manualFormOpen = false;
+      this.manualPrefillTokens = null;
+      this.$store.dispatch("battleLog/clearPreviewEffects");
     },
     openVoteForm() {
       this.editingManualId = null;
@@ -516,10 +765,12 @@ export default {
       this.editingManualId = null;
       this.manualFormOpen = false;
       this.voteFormOpen = false;
+      this.deadVotePrefill = null;
       this.deadVoteFormOpen = true;
     },
     closeDeadVoteForm() {
       this.deadVoteFormOpen = false;
+      this.deadVotePrefill = null;
     },
     isEditingManual(entry) {
       return entry && this.editingManualId === entry.id;
@@ -530,8 +781,13 @@ export default {
     manualEditTokens(entry) {
       const tokens =
         entry && entry.formSnapshot && entry.formSnapshot.tokens;
-      if (Array.isArray(tokens) && tokens.length) return tokens;
-      // Fallback: single input token from message
+      if (Array.isArray(tokens) && tokens.length) {
+        return tokens.map((t) => ({
+          type: t.type,
+          value: t.value != null ? t.value : "",
+          roleId: t.roleId || null,
+        }));
+      }
       if (entry && entry.message) {
         return [{ type: "input", value: entry.message }];
       }
@@ -555,6 +811,7 @@ export default {
     },
     closeManualEdit() {
       this.editingManualId = null;
+      this.$store.dispatch("battleLog/clearPreviewEffects");
     },
     onRoleRecord(payload) {
       const idx = payload
@@ -575,6 +832,8 @@ export default {
       });
       this.manualFormOpen = false;
       this.editingManualId = null;
+      this.manualPrefillTokens = null;
+      this.$store.dispatch("battleLog/clearPreviewEffects");
     },
     onVoteRecord(payload) {
       this.$store.dispatch("battleLog/recordVoteCard", payload);
@@ -585,6 +844,7 @@ export default {
       this.$store.dispatch("battleLog/recordDeadVoteCard", payload);
       this.deadVoteFormOpen = false;
       this.editingManualId = null;
+      this.deadVotePrefill = null;
     },
     onDeleteManual(entryId) {
       if (!entryId) return;
@@ -593,6 +853,11 @@ export default {
       this.manualFormOpen = false;
       this.voteFormOpen = false;
       this.deadVoteFormOpen = false;
+    },
+    confirmDeleteRecord(entry) {
+      if (!entry || !entry.id) return;
+      if (!window.confirm(this.$t("recorder.confirmCancelRecord"))) return;
+      this.onDeleteManual(entry.id);
     },
     formatTime(ts) {
       if (!ts) return "";
@@ -609,6 +874,165 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.linked-mode-row {
+  padding: 4px 8px 2px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.new-game-row {
+  padding: 4px 8px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.new-game-label {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: bold;
+  color: rgba(255, 214, 153, 0.85);
+  margin-bottom: 4px;
+  letter-spacing: 0.3px;
+}
+
+.new-game-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.new-game-btn {
+  flex: 1 1 auto;
+  min-width: 72px;
+  padding: 4px 6px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.4);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.65rem;
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap;
+  &:hover {
+    filter: brightness(1.12);
+  }
+  &.export {
+    border-color: rgba(140, 255, 160, 0.45);
+    color: #b8ffc8;
+  }
+  &.import {
+    border-color: rgba(70, 213, 255, 0.45);
+    color: #9ae8ff;
+  }
+  &.delete {
+    border-color: rgba(206, 1, 0, 0.45);
+    color: #ffaaaa;
+  }
+}
+
+.linked-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  input {
+    accent-color: #ffd699;
+  }
+}
+
+.pending-block {
+  margin-bottom: 10px;
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(90, 40, 0, 0.45);
+  border: 1px solid rgba(255, 140, 60, 0.55);
+  text-align: left;
+}
+
+.pending-title {
+  font-size: 0.72rem;
+  font-weight: bold;
+  color: #ffb366;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pending-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  &:last-child {
+    border-bottom: none;
+  }
+  &.recommended {
+    .pending-label {
+      color: #d4a8ff;
+    }
+  }
+}
+
+.pending-label {
+  font-size: 0.72rem;
+  color: #ffe0b3;
+  flex: 1;
+  word-break: break-word;
+}
+
+.pending-actions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pending-dismiss {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  &:hover {
+    color: #ff6b6b;
+    background: rgba(255, 0, 0, 0.15);
+  }
+}
+
+.pending-action {
+  flex-shrink: 0;
+  padding: 3px 8px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 200, 80, 0.45);
+  background: rgba(80, 50, 0, 0.65);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: bold;
+  cursor: pointer;
+  &:hover {
+    background: rgba(120, 75, 0, 0.85);
+  }
+  &.primary {
+    border-color: rgba(200, 140, 255, 0.65);
+    background: rgba(80, 40, 100, 0.75);
+    &:hover {
+      background: rgba(100, 50, 120, 0.9);
+    }
+  }
+}
+
 .phase-recorder {
   min-width: 280px;
   max-width: 340px;
@@ -805,6 +1229,7 @@ export default {
 }
 
 .manual-recorded-card {
+  position: relative;
   background: rgba(40, 30, 0, 0.45);
   border: 1px solid rgba(255, 200, 80, 0.35);
   border-radius: 8px;
@@ -829,10 +1254,36 @@ export default {
   }
 }
 
+.record-delete-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 1;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  filter: none;
+  opacity: 1;
+  &:hover {
+    color: #ff6b6b;
+    background: rgba(255, 0, 0, 0.15);
+  }
+}
+
 .manual-label {
   font-size: 0.65rem;
   color: #ffd699;
   margin-bottom: 4px;
+  padding-right: 28px;
   filter: none;
 }
 

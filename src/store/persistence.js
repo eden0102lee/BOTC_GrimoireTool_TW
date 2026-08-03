@@ -11,6 +11,8 @@ export default (store) => {
         entries: state.battleLog.entries,
         gameMeta: state.battleLog.gameMeta,
         gamePhase: state.gamePhase,
+        linkedMode: state.battleLog.linkedMode,
+        pendingFacts: state.battleLog.pendingFacts,
       }),
     );
   };
@@ -95,6 +97,12 @@ export default (store) => {
           nightNumber: saved.nightNumber ?? 0,
           subPhase: "night",
         });
+      }
+      if (saved.linkedMode != null) {
+        store.commit("battleLog/loadLinkedMode", saved.linkedMode);
+      }
+      if (saved.pendingFacts) {
+        store.commit("battleLog/loadPendingFacts", saved.pendingFacts);
       }
     } catch (e) {
       console.warn("could not restore battle log", e);
@@ -239,6 +247,15 @@ export default (store) => {
       case "battleLog/loadEntries":
       case "battleLog/setGameMeta":
       case "battleLog/loadGameMeta":
+      case "battleLog/setLinkedMode":
+      case "battleLog/loadLinkedMode":
+      case "battleLog/upsertPendingFact":
+      case "battleLog/resolvePendingForEntry":
+      case "battleLog/resolvePendingByEntry":
+      case "battleLog/clearPendingResolvedByEntry":
+      case "battleLog/removePendingForPlayerFact":
+      case "battleLog/removePendingFact":
+      case "battleLog/loadPendingFacts":
       case "gamePhase/restore":
       case "gamePhase/reset":
       case "gamePhase/setSubPhase":

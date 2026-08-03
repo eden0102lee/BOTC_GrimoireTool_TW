@@ -6,6 +6,9 @@
       <button type="button" class="add-btn player" @click="addToken('player')">
         {{ $t("recorder.addPlayer") }}
       </button>
+      <button type="button" class="add-btn role" @click="addToken('role')">
+        {{ $t("recorder.addRole") }}
+      </button>
       <button type="button" class="add-btn action" @click="addToken('action')">
         {{ $t("recorder.addAction") }}
       </button>
@@ -41,6 +44,21 @@
           <option value="">{{ $t("recorder.pickPlayer") }}</option>
           <option v-for="(p, i) in players" :key="i" :value="label(p, i)">
             {{ label(p, i) }}
+          </option>
+        </select>
+        <select
+          v-else-if="token.type === 'role'"
+          v-model="token.value"
+          class="token-control role-select"
+          @change="onRoleChange(token)"
+        >
+          <option value="">{{ $t("recorder.pickRole") }}</option>
+          <option
+            v-for="r in scriptRoles"
+            :key="r.id"
+            :value="r.name || r.id"
+          >
+            {{ r.name || r.id }}
           </option>
         </select>
         <select
@@ -113,6 +131,7 @@
 
 <script>
 import { formatPlayerRoleLabel } from "../store/roleInputConfig";
+import { previewEffectsFromTokens } from "../store/battleLogEffects";
 
 let tokenSeq = 0;
 
@@ -120,8 +139,10 @@ export default {
   name: "ManualLogCard",
   props: {
     players: { type: Array, required: true },
+    scriptRoles: { type: Array, default: () => [] },
     initialTokens: { type: Array, default: null },
     editEntryId: { type: String, default: null },
+    linkedMode: { type: Boolean, default: false },
   },
   data() {
     return {
@@ -155,26 +176,69 @@ export default {
     },
   },
   watch: {
-    initialTokens: {
+    editEntryId: {
       immediate: true,
-      handler(tokens) {
-        if (Array.isArray(tokens) && tokens.length) {
-          this.tokens = tokens.map((t) => ({
-            id: t.id || `t-${Date.now()}-${tokenSeq++}`,
-            type: t.type,
-            value: t.value != null ? t.value : "",
-          }));
-        }
+      handler() {
+        this.syncTokensFromInitial();
+      },
+    },
+    linkedMode() {
+      this.updatePreview();
+    },
+    tokens: {
+      deep: true,
+      handler() {
+        this.updatePreview();
       },
     },
   },
+  beforeDestroy() {
+    this.clearPreview();
+  },
   methods: {
+    syncTokensFromInitial() {
+      const tokens = this.initialTokens;
+      if (Array.isArray(tokens) && tokens.length) {
+        this.tokens = tokens.map((t) => ({
+          id: t.id || `t-${Date.now()}-${tokenSeq++}`,
+          type: t.type,
+          value: t.value != null ? t.value : "",
+          roleId: t.roleId || null,
+        }));
+      } else if (!this.editEntryId) {
+        this.tokens = [];
+      }
+    },
     label(p, i) {
       return formatPlayerRoleLabel(p, i);
+    },
+    onRoleChange(token) {
+      const role = this.scriptRoles.find(
+        (r) => (r.name || r.id) === token.value,
+      );
+      token.roleId = role ? role.id : null;
+      this.updatePreview();
+    },
+    updatePreview() {
+      if (!this.linkedMode) {
+        this.clearPreview();
+        return;
+      }
+      const snapshot = this.tokens.map((t) => ({
+        type: t.type,
+        value: t.value,
+        roleId: t.roleId,
+      }));
+      const effects = previewEffectsFromTokens(snapshot, this.players);
+      this.$store.dispatch("battleLog/setPreviewEffects", effects);
+    },
+    clearPreview() {
+      this.$store.dispatch("battleLog/clearPreviewEffects");
     },
     addToken(type) {
       const defaults = {
         player: "",
+        role: "",
         action: "選擇",
         status: "死亡",
         input: "",
@@ -183,6 +247,7 @@ export default {
         id: `t-${Date.now()}-${tokenSeq++}`,
         type,
         value: defaults[type] != null ? defaults[type] : "",
+        roleId: null,
       });
     },
     removeToken(idx) {
@@ -198,6 +263,7 @@ export default {
     },
     reset() {
       this.tokens = [];
+      this.clearPreview();
     },
     onDismiss() {
       this.reset();
@@ -241,6 +307,7 @@ export default {
           tokens: this.tokens.map((t) => ({
             type: t.type,
             value: t.value,
+            roleId: t.roleId || null,
           })),
         },
         editEntryId: this.editEntryId || null,
@@ -293,6 +360,9 @@ export default {
   &.player {
     border-color: rgba(70, 213, 255, 0.55);
   }
+  &.role {
+    border-color: rgba(140, 255, 160, 0.55);
+  }
   &.action {
     border-color: rgba(255, 214, 153, 0.55);
   }
@@ -325,6 +395,9 @@ export default {
   &.player {
     border-color: rgba(70, 213, 255, 0.45);
   }
+  &.role {
+    border-color: rgba(140, 255, 160, 0.45);
+  }
   &.action {
     border-color: rgba(255, 214, 153, 0.45);
   }
@@ -348,7 +421,8 @@ export default {
   font-size: 0.72rem;
 }
 
-.token-chip.input .token-control {
+.token-chip.input .token-control,
+.token-chip.role .token-control {
   max-width: none;
   width: 100%;
   flex: 1;
