@@ -1,7 +1,8 @@
 module.exports = {
-  // if the app is supposed to run on Github Pages in a subfolder, use the following config:
-  // publicPath: process.env.NODE_ENV === "production" ? "/townsquare/" : "/"
-  publicPath: process.env.NODE_ENV === "production" ? "/" : "/",
+  // GitHub Pages project site: https://<user>.github.io/<repo>/
+  publicPath:
+    process.env.VUE_APP_PUBLIC_PATH ||
+    (process.env.NODE_ENV === "production" ? "/BOTC_GrimoireTool_TW/" : "/"),
   lintOnSave: false,
   devServer: {
     host: "0.0.0.0",

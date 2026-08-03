@@ -60,6 +60,20 @@ function handleHttpRequest(req, res) {
     register.metrics().then(out => res.end(out));
     return;
   }
+  if (CLOUD && (req.url === "/" || req.url === "/index.html")) {
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(`<!DOCTYPE html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><title>Clocktower WS</title></head>
+<body style="font-family:sans-serif;max-width:36em;margin:2em auto;line-height:1.5">
+<h1>WebSocket 房間伺服器運作中</h1>
+<p>此網址只提供即時連線（WebSocket），<strong>不是</strong>魔典操作介面。</p>
+<p>請用 GitHub Pages 開啟魔典：</p>
+<p><a href="https://eden0102lee.github.io/BOTC_GrimoireTool_TW/">https://eden0102lee.github.io/BOTC_GrimoireTool_TW/</a></p>
+<p>健康檢查：<a href="/health">/health</a></p>
+</body></html>`);
+    return;
+  }
   // Legacy prod served Prometheus on every path; keep that for HTTPS mode only via /metrics
   res.writeHead(404);
   res.end();
