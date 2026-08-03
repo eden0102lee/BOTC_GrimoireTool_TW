@@ -1,11 +1,13 @@
 <template>
   <Modal v-if="modals.role && availableRoles.length" @close="close">
     <h3>
-      Choose a new character for
       {{
-        playerIndex >= 0 && players.length
-          ? players[playerIndex].name
-          : "bluffing"
+        $t("role.chooseFor", {
+          name:
+            playerIndex >= 0 && players.length
+              ? players[playerIndex].name
+              : $t("role.bluffing")
+        })
       }}
     </h3>
     <ul class="tokens" v-if="tab === 'editionRoles' || !otherTravelers.size">
@@ -36,13 +38,13 @@
         class="button"
         :class="{ townsfolk: tab === 'editionRoles' }"
         @click="tab = 'editionRoles'"
-        >Edition Roles</span
+        >{{ $t("role.editionRoles") }}</span
       >
       <span
         class="button"
         :class="{ townsfolk: tab === 'otherTravelers' }"
         @click="tab = 'otherTravelers'"
-        >Other Travelers</span
+        >{{ $t("role.otherTravelers") }}</span
       >
     </div>
   </Modal>
@@ -61,7 +63,6 @@ export default {
       const availableRoles = [];
       const players = this.$store.state.players.players;
       this.$store.state.roles.forEach(role => {
-        // don't show bluff roles that are already assigned to players
         if (
           this.playerIndex >= 0 ||
           (this.playerIndex < 0 &&
@@ -85,14 +86,12 @@ export default {
   methods: {
     setRole(role) {
       if (this.playerIndex < 0) {
-        // assign to bluff slot (index < 0)
         this.$store.commit("players/setBluff", {
           index: this.playerIndex * -1 - 1,
           role
         });
       } else {
         if (this.session.isSpectator && role.team === "traveler") return;
-        // assign to player
         const player = this.$store.state.players.players[this.playerIndex];
         this.$store.commit("players/update", {
           player,

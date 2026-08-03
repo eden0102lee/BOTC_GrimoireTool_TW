@@ -1,8 +1,19 @@
-module.exports = store => {
-  const updatePagetitle = isPublic =>
-    (document.title = `Blood on the Clocktower ${
-      isPublic ? "Town Square" : "Grimoire"
-    }`);
+﻿import { t } from "../i18n";
+
+export default (store) => {
+  const updatePagetitle = () =>
+    (document.title = `${t("pageTitle.base")} — ${t("pageTitle.grimoire")}`);
+
+  const persistBattleLog = (state) => {
+    localStorage.setItem(
+      "battleLog",
+      JSON.stringify({
+        entries: state.battleLog.entries,
+        gameMeta: state.battleLog.gameMeta,
+        gamePhase: state.gamePhase,
+      }),
+    );
+  };
 
   // initialize data
   if (localStorage.getItem("background")) {
@@ -20,10 +31,10 @@ module.exports = store => {
   if (localStorage.getItem("zoom")) {
     store.commit("setZoom", parseFloat(localStorage.getItem("zoom")));
   }
-  if (localStorage.getItem("isGrimoire")) {
-    store.commit("toggleGrimoire", false);
-    updatePagetitle(false);
+  if (localStorage.getItem("rolesHidden")) {
+    store.commit("toggleRolesHidden", true);
   }
+  updatePagetitle();
   if (localStorage.roles !== undefined) {
     store.commit("setCustomRoles", JSON.parse(localStorage.roles));
     store.commit("setEdition", { id: "custom" });
@@ -36,27 +47,27 @@ module.exports = store => {
     JSON.parse(localStorage.bluffs).forEach((role, index) => {
       store.commit("players/setBluff", {
         index,
-        role: store.state.roles.get(role) || {}
+        role: store.state.roles.get(role) || {},
       });
     });
   }
   if (localStorage.fabled !== undefined) {
     store.commit("players/setFabled", {
       fabled: JSON.parse(localStorage.fabled).map(
-        fabled => store.state.fabled.get(fabled.id) || fabled
-      )
+        (fabled) => store.state.fabled.get(fabled.id) || fabled,
+      ),
     });
   }
   if (localStorage.players) {
     store.commit(
       "players/set",
-      JSON.parse(localStorage.players).map(player => ({
+      JSON.parse(localStorage.players).map((player) => ({
         ...player,
         role:
           store.state.roles.get(player.role) ||
           store.getters.rolesJSONbyId.get(player.role) ||
-          {}
-      }))
+          {},
+      })),
     );
   }
   /**** Session related data *****/
@@ -68,17 +79,47 @@ module.exports = store => {
     store.commit("session/setSpectator", spectator);
     store.commit("session/setSessionId", sessionId);
   }
+  // Prefer unified battleLog key; fall back to legacy split keys
+  if (localStorage.getItem("battleLog")) {
+    try {
+      const saved = JSON.parse(localStorage.getItem("battleLog"));
+      store.commit("battleLog/loadEntries", saved.entries || []);
+      if (saved.gameMeta) {
+        store.commit("battleLog/loadGameMeta", saved.gameMeta);
+      }
+      if (saved.gamePhase) {
+        store.commit("gamePhase/restore", saved.gamePhase);
+      } else {
+        store.commit("gamePhase/restore", {
+          dayNumber: saved.dayNumber || 1,
+          nightNumber: saved.nightNumber ?? 0,
+          subPhase: "night",
+        });
+      }
+    } catch (e) {
+      console.warn("could not restore battle log", e);
+    }
+  } else {
+    if (localStorage.battleLogEntries) {
+      store.commit(
+        "battleLog/loadEntries",
+        JSON.parse(localStorage.battleLogEntries),
+      );
+    }
+    if (localStorage.battleLogPhase) {
+      const legacy = JSON.parse(localStorage.battleLogPhase);
+      store.commit("gamePhase/restore", {
+        dayNumber: legacy.dayNumber || 1,
+        nightNumber: legacy.nightNumber ?? 0,
+        subPhase: "night",
+      });
+    }
+  }
 
   // listen to mutations
   store.subscribe(({ type, payload }, state) => {
     switch (type) {
-      case "toggleGrimoire":
-        if (!state.grimoire.isPublic) {
-          localStorage.setItem("isGrimoire", 1);
-        } else {
-          localStorage.removeItem("isGrimoire");
-        }
-        updatePagetitle(state.grimoire.isPublic);
+      case "session/setSpectator":
         break;
       case "setBackground":
         if (payload) {
@@ -115,6 +156,13 @@ module.exports = store => {
           localStorage.removeItem("zoom");
         }
         break;
+      case "toggleRolesHidden":
+        if (state.grimoire.rolesHidden) {
+          localStorage.setItem("rolesHidden", 1);
+        } else {
+          localStorage.removeItem("rolesHidden");
+        }
+        break;
       case "setEdition":
         localStorage.setItem("edition", JSON.stringify(payload));
         if (state.edition.isOfficial) {
@@ -131,17 +179,17 @@ module.exports = store => {
       case "players/setBluff":
         localStorage.setItem(
           "bluffs",
-          JSON.stringify(state.players.bluffs.map(({ id }) => id))
+          JSON.stringify(state.players.bluffs.map(({ id }) => id)),
         );
         break;
       case "players/setFabled":
         localStorage.setItem(
           "fabled",
           JSON.stringify(
-            state.players.fabled.map(fabled =>
-              fabled.isCustom ? fabled : { id: fabled.id }
-            )
-          )
+            state.players.fabled.map((fabled) =>
+              fabled.isCustom ? fabled : { id: fabled.id },
+            ),
+          ),
         );
         break;
       case "players/add":
@@ -155,12 +203,12 @@ module.exports = store => {
           localStorage.setItem(
             "players",
             JSON.stringify(
-              state.players.players.map(player => ({
+              state.players.players.map((player) => ({
                 ...player,
                 // simplify the stored data
-                role: player.role.id || {}
-              }))
-            )
+                role: player.role.id || {},
+              })),
+            ),
           );
         } else {
           localStorage.removeItem("players");
@@ -170,7 +218,7 @@ module.exports = store => {
         if (payload) {
           localStorage.setItem(
             "session",
-            JSON.stringify([state.session.isSpectator, payload])
+            JSON.stringify([state.session.isSpectator, payload]),
           );
         } else {
           localStorage.removeItem("session");
@@ -182,6 +230,21 @@ module.exports = store => {
         } else {
           localStorage.removeItem("playerId");
         }
+        break;
+      case "battleLog/addEntry":
+      case "battleLog/updateEntry":
+      case "battleLog/removeEntry":
+      case "battleLog/removeByRoleCardKey":
+      case "battleLog/clearLog":
+      case "battleLog/loadEntries":
+      case "battleLog/setGameMeta":
+      case "battleLog/loadGameMeta":
+      case "gamePhase/restore":
+      case "gamePhase/reset":
+      case "gamePhase/setSubPhase":
+      case "gamePhase/advanceDay":
+      case "gamePhase/retreatDay":
+        persistBattleLog(state);
         break;
     }
   });

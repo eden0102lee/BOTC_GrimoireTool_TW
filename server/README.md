@@ -1,53 +1,57 @@
 ## Live session server
-This is the home of the NodeJS live session backend.
-It allows a Storyteller and their player to communicate through
-a Websocket interface with each other.
 
-In order to run it, you need a recent NodeJS version (v12+) and a set
-of SSL Certificate and Key files in order to run the socket through
-a secured connection.
+Node.js WebSocket backend for Storyteller ↔ player live sessions.
+
+### Modes
+
+| Mode | How | Listen |
+| --- | --- | --- |
+| **Development / LAN** | `npm run serve:ws` or via `npm start` | `ws://0.0.0.0:8081` |
+| **Cloud (Render)** | `CLOUD=1 npm run start:ws` | HTTP + WS on `$PORT` (TLS at the platform edge) |
+| **Legacy self-hosted HTTPS** | `cert.pem` + `key.pem` in cwd, no `CLOUD` | HTTPS on port 8080 |
 
 ### Local setup
 
-To run the backend locally, use the following commands from the project root:
+From the project root:
 
 ```shell
 npm install
-cd server/
-NODE_ENV=development node index.js
+npm run serve:ws
 ```
 
-This will open the backend server on `localhost:8081` and you
-need to adjust your `/src/store/socket.js` file to connect to
-the localhost backend.
+Or:
 
-### Live setup
+```shell
+NODE_ENV=development LOCAL_PLAY=1 node server/index.js
+```
 
-Generate a `cert.pem` and `key.pem` file for the domain that your
-live session backend will be available under, for example with [Let's Encrypt](https://letsencrypt.org/).
-Copy or symlink these 2 files into your `server/` folder and then run
-the following commands from the project root:
+The frontend connects to `hostname:8081` unless `VUE_APP_WS_URL` is set at build time.
+
+### Cloud setup (Render)
+
+See [`docs/online-hosting.md`](../docs/online-hosting.md) and root [`render.yaml`](../render.yaml).
+
+Required env:
+
+- `CLOUD=1` (also auto-detected when `RENDER=true`)
+- `ALLOWED_ORIGINS` — comma-separated page origins, e.g. `https://you.github.io`
+- Health check: `GET /health` → `ok`
+
+### Legacy HTTPS setup
+
+Generate `cert.pem` and `key.pem` (e.g. Let's Encrypt), place them in the working directory used to start the process, then from the project root:
 
 ```shell
 npm install
-cd server/
-node index.js
+node server/index.js
 ```
 
-This will make the backend server available at your domain on port 8080.
-If you want to have it automatically recover on crash or server restart,
-you could use [pm2](https://pm2.keymetrics.io/) with the provided `ecosystem.config.js`
+Optional: [pm2](https://pm2.keymetrics.io/) with `ecosystem.config.js`.
 
 ### Allowing access from different domains
 
-Currently the backend server only accepts connections coming from
-pages hosted on github.io or localhost. If you want to use your own
-domain for the page, make sure to adjust the domain whitelist pattern
-around line 15 in the `index.js`:
+Default whitelist matches `*.github.io`, localhost, private IPs, and upstream townsquare hosts. Override or extend with:
 
-```ecmascript 6
-  verifyClient: info =>
-    !!info.origin.match(
-      /^https?:\/\/([^.]+\.github\.io|localhost|live\.clocktower\.online|eddbra1nprivatetownsquare\.xyz)/i
-    )
+```text
+ALLOWED_ORIGINS=https://your.custom.domain,https://you.github.io
 ```

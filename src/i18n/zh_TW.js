@@ -1,0 +1,375 @@
+export default {
+  // Intro
+  "intro.welcome":
+    "歡迎使用 Blood on the Clocktower 的（非官方）線上魔典！",
+  "intro.addPlayers":
+    "請透過右上角的選單或按 [A] 新增座位；按 [C] 創建小鎮或 [J] 加入小鎮。",
+  "intro.footer":
+    "本專案為開源免費軟體，原始碼見 GitHub。與 Pandemonium Institute 無附屬關係。「Blood on the Clocktower」為 Steven Medway 與 The Pandemonium Institute 之商標。",
+
+  // Menu tabs / headlines
+  "menu.game": "遊戲",
+  "menu.grimoire": "魔典",
+  "menu.session": "連線",
+  "menu.players": "玩家",
+  "menu.characters": "角色",
+  "menu.help": "說明",
+
+  // Game / grimoire tab
+  "menu.enterDay": "進入白天",
+  "menu.createTown": "創建小鎮",
+  "menu.joinTown": "加入小鎮",
+  "menu.switchToNight": "切換至夜晚",
+  "menu.switchToDay": "切換至白天",
+  "menu.nightOrder": "夜間順序",
+  "menu.hideRoles": "隱藏角色",
+  "menu.showRoles": "顯示角色",
+  "menu.zoom": "縮放",
+  "menu.background": "背景圖",
+  "menu.showCustomImages": "允許自訂圖示",
+  "menu.disableAnimations": "關閉動畫",
+  "menu.muteSounds": "靜音",
+
+  // Session tab
+  "menu.hosting": "說書人",
+  "menu.playing": "玩家",
+  "menu.liveSession": "線上房間",
+  "menu.hostSession": "建立房間（說書人）",
+  "menu.joinSession": "加入房間（玩家）",
+  "menu.sessionHint": "創建／加入小鎮見「遊戲」分頁",
+  "menu.delayTo": "與{target}延遲",
+  "menu.host": "說書人",
+  "menu.playersLabel": "玩家",
+  "menu.lanUrl": "區網連結",
+  "menu.roomCode": "房間代碼",
+  "menu.copyLanLink": "複製區網連結",
+  "menu.battleLog": "戰報／復盤",
+  "menu.copyPlayerLink": "複製玩家連結",
+  "menu.sendCharacters": "發送角色",
+  "menu.voteHistory": "投票紀錄",
+  "menu.leaveSession": "離開房間",
+
+  // Players tab
+  "menu.addPlayer": "新增座位",
+  "menu.randomize": "隨機座位",
+  "menu.removeAllPlayers": "移除全部",
+
+  // Characters tab
+  "menu.selectEdition": "選擇劇本",
+  "menu.chooseAssign": "選擇並指派",
+  "menu.addFabled": "新增傳奇／奇遇",
+  "menu.removeAllRoles": "移除全部角色",
+
+  // Help tab
+  "menu.referenceSheet": "角色能力表",
+  "menu.nightOrderSheet": "夜間順序表",
+  "menu.gameStateJson": "遊戲狀態 JSON",
+  "menu.joinDiscord": "加入 Discord",
+  "menu.sourceCode": "原始碼",
+
+  // Prompts / confirms
+  "prompt.backgroundUrl": "輸入自訂背景圖片網址",
+  "prompt.sessionIdHost": "輸入房間代碼／名稱",
+  "prompt.sessionIdJoin": "輸入要加入的房間代碼／名稱",
+  "prompt.playerName": "玩家名稱",
+  "prompt.customReminder": "新增自訂提醒標記",
+  "prompt.customScriptUrl": "輸入 custom-script.json 的網址",
+  "confirm.distributeRoles":
+    "是否將已指派的角色發送給所有已就座玩家？",
+  "confirm.customImages":
+    "確定要允許自訂圖示？惡意劇本作者可能藉此追蹤你的 IP。",
+  "confirm.leaveSession": "確定要離開目前的線上房間？",
+  "confirm.randomizeSeatings": "確定要隨機打亂座位？",
+  "confirm.removeAllPlayers": "確定要移除所有玩家？",
+  "confirm.removeAllRoles": "確定要移除所有玩家角色？",
+  "confirm.removePlayer": "確定要移除 {name}？",
+
+  // Town info
+  "town.addMorePlayers": "請新增更多玩家！",
+  "town.nightPhase": "夜晚階段",
+  "town.by": "作者",
+
+  // Town square
+  "square.otherCharacters": "其他角色",
+  "square.demonBluffs": "惡魔偽裝",
+  "square.fabled": "傳奇／奇遇",
+
+  // Player menu
+  "player.defaultNamePrefix": "玩家",
+  "player.rename": "重新命名",
+  "player.move": "移動座位",
+  "player.swap": "交換座位",
+  "player.remove": "移除",
+  "player.emptySeat": "清空座位",
+  "player.nomination": "提名",
+  "player.claimSeat": "佔位",
+  "player.vacateSeat": "離座",
+  "player.seatOccupied": "座位已被佔用",
+  "player.ghostVote": "幽靈票",
+  "player.handUp": "舉手",
+  "player.handDown": "放下",
+  "player.cancel": "取消",
+  "player.swapSeats": "與此玩家交換座位",
+  "player.moveToSeat": "將玩家移至此座位",
+  "player.nominate": "提名此玩家",
+
+  // Vote
+  "vote.nominated": "{nominator} 提名了 {nominee}！",
+  "vote.inFavor": "票贊成",
+  "vote.votesInFavor": "{count} 票贊成",
+  "vote.vote": "票",
+  "vote.votes": "票",
+  "vote.majorityIs": "（過半數為 {count}）",
+  "vote.timePerPlayer": "每位玩家時間：",
+  "vote.countdown": "倒數",
+  "vote.start": "開始",
+  "vote.restart": "重新開始",
+  "vote.pause": "暫停",
+  "vote.resume": "繼續",
+  "vote.reset": "重置",
+  "vote.close": "關閉",
+  "vote.markExecution": "標記處決",
+  "vote.clearMark": "清除標記",
+  "vote.secondsBetween": "每票間隔 {seconds} 秒",
+  "vote.voteYes": "贊成",
+  "vote.voteNo": "反對",
+  "vote.waitingForHost": "等待說書人開始投票…",
+  "vote.claimSeat": "請先佔位才能投票。",
+
+  // Edition modal
+  "edition.select": "選擇劇本：",
+  "edition.custom": "自訂劇本／角色",
+  "edition.loadCustom": "載入自訂劇本／角色",
+  "edition.customHelp":
+    "若要使用自訂劇本，請在官方劇本工具或集石劇本工具中選擇角色，再於此上傳產生的 JSON 檔，或提供已託管的 JSON 網址。",
+  "edition.customCharsHelp":
+    "自訂角色格式請參閱專案說明。僅載入你信任來源的 JSON！",
+  "edition.popularScripts": "熱門自訂劇本：",
+  "edition.uploadJson": "上傳 JSON",
+  "edition.enterUrl": "輸入網址",
+  "edition.fromClipboard": "從剪貼簿貼上",
+  "edition.back": "返回",
+  "edition.scriptTool": "集石劇本工具",
+  "edition.officialScriptTool": "官方劇本工具",
+
+  // Roles modal
+  "roles.selectFor": "為 {count} 名玩家選擇角色：",
+  "roles.setupWarning":
+    "警告：已選擇會影響開局設定的角色！隨機指派不會處理這些角色。",
+  "roles.allowDuplicates": "允許重複角色",
+  "roles.assignRandom": "隨機指派 {count} 個角色",
+  "roles.shuffle": "重新洗牌",
+
+  // Reference / night order
+  "reference.title": "角色能力表",
+  "reference.customScript": "自訂劇本",
+  "reference.showNightOrder": "顯示夜間順序",
+  "reference.jinxed": "相剋",
+  "nightOrder.title": "夜間順序",
+  "nightOrder.showReference": "顯示角色能力表",
+  "nightOrder.firstNight": "首夜",
+  "nightOrder.otherNights": "其他夜晚",
+
+  // Reminder modal
+  "reminder.choose": "選擇提醒標記：",
+  "reminder.good": "善良",
+  "reminder.evil": "邪惡",
+  "reminder.customNote": "自訂備註",
+
+  // Fabled modal
+  "fabled.choose": "選擇要加入遊戲的傳奇或奇遇角色",
+
+  // Edition names
+  "edition.tb": "暗流湧動",
+  "edition.bmr": "黯月初升",
+  "edition.snv": "夢殞春宵",
+  "edition.luf": "Laissez un Faire",
+
+  // Team names
+  "team.townsfolk": "鎮民",
+  "team.outsider": "外來者",
+  "team.minion": "爪牙",
+  "team.demon": "惡魔",
+  "team.traveler": "旅行者",
+  "team.traveller": "旅行者",
+  "team.fabled": "傳奇",
+  "team.loric": "奇遇",
+
+  // Nomination log
+  "nomlog.recent": "{count} 筆近期提名",
+
+  // Edition modal errors
+  "edition.loadError": "讀取自訂劇本時發生錯誤：{error}",
+  "error.parseJson": "無法解析 JSON：{error}",
+  "error.loadScript": "載入自訂劇本時發生錯誤：{error}",
+
+  // Tooltips
+  "tooltip.sessionPlayers": "本房間另有 {count} 名玩家",
+  "tooltip.sessionLatency": "（延遲 {ms}ms）",
+
+  // Role modal
+  "role.chooseFor": "為 {name} 選擇新角色",
+  "role.bluffing": "惡魔偽裝",
+  "role.editionRoles": "劇本角色",
+  "role.otherTravelers": "其他旅行者",
+
+  // Game state modal
+  "gameState.title": "目前遊戲狀態",
+  "gameState.copyJson": "複製 JSON",
+  "gameState.loadState": "載入狀態",
+
+  // Vote history modal
+  "voteHistory.title": "投票紀錄",
+  "voteHistory.clearTitle": "清空投票紀錄",
+  "voteHistory.accessibleToPlayers": "開放玩家查看",
+  "voteHistory.clearForEveryone": "為所有人清空",
+  "voteHistory.time": "時間",
+  "voteHistory.nominator": "提名者",
+  "voteHistory.nominee": "被提名者",
+  "voteHistory.type": "類型",
+  "voteHistory.votes": "票數",
+  "voteHistory.majority": "過半數",
+  "voteHistory.voters": "投票者",
+  "voteHistory.exile": "流放",
+  "voteHistory.execution": "處決",
+
+  // Night order — 說書人提醒
+  "nightOrder.minionInfo": "爪牙資訊",
+  "nightOrder.demonInfo": "惡魔資訊與偽裝",
+  "nightOrder.minionReminder":
+    "• 若有多名爪牙，讓他們彼此對視。\n• 展示「這是惡魔」卡牌，指向惡魔。",
+  "nightOrder.demonReminder":
+    "• 展示「這些是你的爪牙」卡牌，逐一指向每名爪牙。\n• 展示「這些角色不在場」卡牌，展示 3 個不在場的善良角色標記。",
+  "nightOrder.firstNightLabel": "首夜",
+  "nightOrder.otherNightsLabel": "其他夜晚",
+
+  // Page title
+  "pageTitle.base": "Blood on the Clocktower",
+  "pageTitle.grimoire": "魔典",
+
+  // Socket
+  "socket.noRolesToDistribute":
+    "沒有可發送的角色：請確認玩家已就座，且已指派角色。",
+  "socket.missingRoles":
+    "此房間包含找不到的自訂角色。請在加入前先載入！缺少的角色：{roles}",
+
+  // Vote extras
+  "vote.go": "開始",
+  "vote.nominatedBy": "提名了",
+
+  // Keyboard shortcuts panel
+  "shortcuts.title": "快捷鍵",
+  "shortcuts.show": "顯示快捷鍵",
+  "shortcuts.hide": "隱藏快捷鍵",
+  "shortcuts.gstone": "集石官方",
+  "shortcuts.extras": "本專案擴充",
+  "shortcuts.addPlayer": "添加座位",
+  "shortcuts.createTown": "創建小鎮",
+  "shortcuts.joinTown": "加入小鎮",
+  "shortcuts.enterDay": "進入白天",
+  "shortcuts.previousPhase": "上一階段（晝夜退回）",
+  "shortcuts.reference": "角色能力表",
+  "shortcuts.nightOrder": "夜間順序",
+  "shortcuts.hideRoles": "隱藏角色（投影）",
+  "shortcuts.joinSession": "加入房間（玩家）",
+  "shortcuts.battleLog": "戰報／復盤",
+  "shortcuts.edition": "選擇劇本",
+  "shortcuts.voteHistory": "投票紀錄",
+  "shortcuts.fabled": "新增傳奇／奇遇",
+  "shortcuts.sendCharacters": "發送角色",
+  "shortcuts.closeModal": "關閉視窗",
+
+  // Battle log
+  "battleLog.title": "戰報／復盤",
+  "battleLog.currentPhase": "目前階段：{phase}",
+  "battleLog.all": "全部",
+  "battleLog.dayOnly": "僅日間",
+  "battleLog.nightOnly": "僅夜間",
+  "battleLog.allPhases": "所有階段",
+  "battleLog.notePlaceholder": "手動補記（玩家行為／發言摘要）",
+  "battleLog.noSeat": "不指定座位",
+  "battleLog.seat": "座位 {n}",
+  "battleLog.addNote": "新增筆記",
+  "battleLog.exportJson": "匯出 JSON",
+  "battleLog.exportMarkdown": "匯出 Markdown",
+  "battleLog.clear": "清空戰報",
+  "battleLog.empty": "尚無紀錄。",
+  "battleLog.exportReplay": "匯出覆盤文字檔",
+  "confirm.clearBattleLog": "確定要清空整份戰報？",
+
+  // Phase recorder (Laplace-style)
+  "recorder.title": "階段紀錄",
+  "recorder.tabPhase": "階段紀錄",
+  "recorder.tabPreview": "戰報總覽",
+  "recorder.previewEmpty": "尚無戰報紀錄。",
+  "recorder.gameName": "該場遊戲名",
+  "recorder.scriptName": "劇本名稱",
+  "recorder.playerCount": "人數",
+  "recorder.storyteller": "說書人名稱",
+  "recorder.gameHeaderEmpty": "請填寫該場遊戲名與說書人名稱",
+  "recorder.expand": "展開",
+  "recorder.collapse": "收合",
+  "recorder.write": "寫入",
+  "recorder.editRecord": "修改紀錄",
+  "recorder.updateRecord": "更新紀錄",
+  "recorder.deleteRecord": "刪除紀錄",
+  "recorder.cancelEdit": "取消修改",
+  "recorder.cancelRecord": "取消紀錄",
+  "recorder.recorded": "已記錄",
+  "recorder.abilityLost": "失去能力",
+  "recorder.abilityLostHint": "已失去能力，不計入戰報",
+  "recorder.manualTitle": "手動記錄",
+  "recorder.addManual": "+手動記錄",
+  "recorder.addVote": "+投票紀錄",
+  "recorder.addDeadVote": "+使用遺言票",
+  "recorder.voteTitle": "投票紀錄",
+  "recorder.deadVoteTitle": "使用遺言票",
+  "recorder.voteNominate": "提名",
+  "recorder.voteGot": "獲得",
+  "recorder.voteBallots": "票",
+  "recorder.voteVoters": "勾選投票玩家（0～玩家人數，帶入投票名單）",
+  "recorder.voteHint": "選擇提名者與被提名者，並勾選投出贊成票的玩家",
+  "recorder.deadVotePlayers": "勾選使用遺言票的玩家（0～玩家人數）",
+  "recorder.deadVoteHint": "勾選使用遺言票的玩家後寫入",
+  "recorder.votePhaseHint": "投票階段可用「+投票紀錄」「+使用遺言票」記錄。",
+  "recorder.dismissManual": "關閉",
+  "recorder.confirmCancelRecord": "確定要取消這筆紀錄嗎？此操作無法復原。",
+  "recorder.addPlayer": "+玩家",
+  "recorder.addAction": "+動作",
+  "recorder.addStatus": "+狀態",
+  "recorder.addInput": "+輸入",
+  "recorder.pickPlayer": "選擇玩家",
+  "recorder.pickAction": "選擇動作",
+  "recorder.pickStatus": "選擇狀態",
+  "recorder.removeToken": "移除字卡",
+  "recorder.moveTokenLeft": "向左移動",
+  "recorder.moveTokenRight": "向右移動",
+  "recorder.sentencePreview": "句子預覽",
+  "recorder.sentenceHint": "點上方按鈕加入字卡，再於下方選填拼接句子",
+  "recorder.clearTokens": "清空字卡",
+  "recorder.subject": "主詞",
+  "recorder.verb": "動詞",
+  "recorder.object": "受詞",
+  "recorder.status": "狀態",
+  "recorder.none": "無",
+  "recorder.note": "自行註解",
+  "recorder.notePlaceholder": "特殊備註（選填）",
+  "recorder.noNightActions": "本夜尚無可填選的角色行動（請先指派角色）。",
+  "recorder.dayHint": "日間請用「+手動記錄」記錄提名與白天行動。",
+
+  // Game phase tracker (ST-only)
+  "gamePhase.nextPhase": "下一階段",
+  "gamePhase.previousPhase": "上一階段",
+  "gamePhase.cannotRetreatEarlier": "已在開局階段，無法再往前退回",
+  "gamePhase.displayDay": "第{n}日 · {sub}",
+  "gamePhase.displayNight": "第{n}夜 · {sub}",
+  "gamePhase.dawn": "清晨",
+  "gamePhase.day-private": "白天-私聊環節",
+  "gamePhase.day-public": "白天-公聊環節",
+  "gamePhase.day-voting": "白天-投票環節",
+  "gamePhase.dusk": "黃昏",
+  "gamePhase.night": "黑夜",
+  "gamePhase.transitionEnd": "階段結束：{phase}",
+  "gamePhase.transitionStart": "進入 {phase}",
+  "gamePhase.transitionRetreat": "退回 {phase}"
+};

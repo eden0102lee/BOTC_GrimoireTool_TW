@@ -1,0 +1,150 @@
+[
+  {
+    "id": "bigwig",
+    "name": "首席律師",
+    "team": "loric",
+    "ability": "每個被提名者要選擇一名玩家：在投票前，只有他可以發言，並且他要“瘋狂”地證明被提名者是善良的，否則他可能死亡。",
+    "setup": false,
+    "reminders": [],
+    "firstNight": 0,
+    "otherNight": 0,
+    "firstNightReminder": "",
+    "otherNightReminder": ""
+  },
+  {
+    "id": "bootlegger",
+    "name": "私貨商人",
+    "team": "loric",
+    "ability": "這個劇本包含有自制角色或自制規則。",
+    "setup": true,
+    "reminders": [
+      "?",
+      "?"
+    ],
+    "firstNight": 0,
+    "otherNight": 0,
+    "firstNightReminder": "宣布私貨商人在遊戲中以及這場遊戲中使用的所有自定義角色和/或自定義規則。",
+    "otherNightReminder": ""
+  },
+  {
+    "id": "gardener",
+    "name": "園丁",
+    "team": "loric",
+    "ability": "由說書人來為一名或更多玩家派發角色。",
+    "setup": true,
+    "reminders": [],
+    "firstNight": 0,
+    "otherNight": 0,
+    "firstNightReminder": "",
+    "otherNightReminder": ""
+  },
+  {
+    "id": "godofug",
+    "name": "訥神",
+    "team": "loric",
+    "ability": "會有一顶訥帽。當玩家戴着訥帽的時候，只能说單音節詞，但投票算作兩票。如果違反规則，訥帽會被轉移。",
+    "setup": false,
+    "reminders": [
+      "訥帽"
+    ],
+    "firstNight": 0,
+    "otherNight": 0,
+    "firstNightReminder": "",
+    "otherNightReminder": ""
+  },
+  {
+    "id": "hindu",
+    "name": "印度教教徒",
+    "team": "loric",
+    "ability": "最先死亡的四名玩家會立刻以相同陣營的旅行者轉世重生。",
+    "setup": false,
+    "reminders": [],
+    "firstNight": 0,
+    "otherNight": 0,
+    "firstNightReminder": "",
+    "otherNightReminder": ""
+  },
+  {
+    "id": "knaves",
+    "name": "詭詐傑克",
+    "team": "loric",
+    "ability": "場上有兩位說書人：一人说真話，一人说假話。每局遊戲限一次，他們可能會在黃昏互換。",
+    "setup": false,
+    "reminders": [
+      "真",
+      "假"
+    ],
+    "firstNight": 0,
+    "otherNight": 0,
+    "firstNightReminder": "",
+    "otherNightReminder": ""
+  },
+  {
+    "id": "pope",
+    "name": "教皇",
+    "team": "loric",
+    "ability": "會有重複的善良角色在場。他們也可能是惡魔的偽裝。",
+    "setup": true,
+    "reminders": [],
+    "firstNight": 0,
+    "otherNight": 0,
+    "firstNightReminder": "",
+    "otherNightReminder": ""
+  },
+  {
+    "id": "stormcatcher",
+    "name": "暴風捕手",
+    "team": "loric",
+    "ability": "遊戲開始時，你要宣佈一個善良角色。如果該角色在場，他只能死於處決，但所有邪惡玩家會在首個夜晚得知他是哪一名玩家。",
+    "setup": false,
+    "reminders": [
+      "安全"
+    ],
+    "firstNight": 1,
+    "otherNight": 0,
+    "firstNightReminder": "在遊戲開始時，宣佈暴風捕手在場。將暴風捕手的角色標記放入魔典。宣佈暴風捕手對哪個善良角色“青睞有加”。如果被暴風捕手選擇的角色在場，使用暴風捕手的“不會死亡”提示標記標記那個角色。分別依次喚醒每個邪惡玩家。如果有善良角色標記了暴風捕手的“不會死亡”提示標記，對邪惡玩家展示“這名玩家是”信息標記，對應的善良角色標記，並指向對應的善良玩家。",
+    "otherNightReminder": ""
+  },
+  {
+    "id": "tor",
+    "name": "遺忘之門",
+    "team": "loric",
+    "ability": "玩家不知道自己的角色和陣營。當他們死亡時才會得知這些信息。",
+    "setup": true,
+    "reminders": [
+      "當日死亡"
+    ],
+    "firstNight": 19,
+    "otherNight": 74,
+    "firstNightReminder": "Skip Minion Info and Demon Info.",
+    "otherNightReminder": "If a player died tonight, show the *YOU ARE* info token, their character token, & give a thumb signal."
+  },
+  {
+    "id": "ventriloquist",
+    "name": "腹話術師",
+    "team": "loric",
+    "ability": "告発されたときに、新しいキャラクターだと狂言すれば、今日処刑されても死なないかもしれない。",
+    "setup": false,
+    "reminders": [
+      "瘋狂"
+    ],
+    "firstNight": 0,
+    "otherNight": 0,
+    "firstNightReminder": "",
+    "otherNightReminder": ""
+  },
+  {
+    "id": "zenomancer",
+    "name": "異術士",
+    "team": "loric",
+    "ability": "一名或多名玩家各自擁有一個目標。當達成目標後，他會獲得一條正確信息。",
+    "setup": false,
+    "reminders": [
+      "目標"
+    ],
+    "firstNight": 0,
+    "otherNight": 0,
+    "firstNightReminder": "",
+    "otherNightReminder": ""
+  }
+]

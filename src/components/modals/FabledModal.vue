@@ -1,13 +1,32 @@
 <template>
-  <Modal v-if="modals.fabled && fabled.length" @close="toggleModal('fabled')">
+  <Modal v-if="modals.fabled && available.length" @close="toggleModal('fabled')">
     <h3>
-      Choose a fabled character to add to the game
+      {{ $t("fabled.choose") }}
     </h3>
-    <ul class="tokens">
-      <li v-for="role in fabled" :key="role.id" @click="setFabled(role)">
-        <Token :role="role" />
-      </li>
-    </ul>
+    <template v-if="availableFabled.length">
+      <h4>{{ $t("team.fabled") }}</h4>
+      <ul class="tokens">
+        <li
+          v-for="role in availableFabled"
+          :key="role.id"
+          @click="setFabled(role)"
+        >
+          <Token :role="role" />
+        </li>
+      </ul>
+    </template>
+    <template v-if="availableLoric.length">
+      <h4>{{ $t("team.loric") }}</h4>
+      <ul class="tokens">
+        <li
+          v-for="role in availableLoric"
+          :key="role.id"
+          @click="setFabled(role)"
+        >
+          <Token :role="role" />
+        </li>
+      </ul>
+    </template>
   </Modal>
 </template>
 
@@ -19,18 +38,23 @@ import Token from "../Token";
 export default {
   components: { Token, Modal },
   computed: {
-    ...mapState(["modals", "fabled", "grimoire"]),
-    fabled() {
-      const fabled = [];
+    ...mapState(["modals", "grimoire"]),
+    available() {
+      const list = [];
       this.$store.state.fabled.forEach(role => {
-        // don't show fabled that are already in play
         if (
           !this.$store.state.players.fabled.some(fable => fable.id === role.id)
         ) {
-          fabled.push(role);
+          list.push(role);
         }
       });
-      return fabled;
+      return list;
+    },
+    availableFabled() {
+      return this.available.filter(r => r.team !== "loric");
+    },
+    availableLoric() {
+      return this.available.filter(r => r.team === "loric");
     }
   },
   methods: {
@@ -47,6 +71,15 @@ export default {
 
 <style scoped lang="scss">
 @import "../../vars.scss";
+
+h4 {
+  margin: 0.75rem 0 0.25rem;
+  font-size: 1rem;
+  color: $fabled;
+  &:nth-of-type(2) {
+    color: $loric;
+  }
+}
 
 ul.tokens li {
   border-radius: 50%;

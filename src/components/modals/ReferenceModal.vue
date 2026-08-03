@@ -8,12 +8,12 @@
       @click="toggleModal('nightOrder')"
       icon="cloud-moon"
       class="toggle"
-      title="Show Night Order"
+      :title="$t('reference.showNightOrder')"
     />
     <h3>
-      Character Reference
+      {{ $t("reference.title") }}
       <font-awesome-icon icon="address-card" />
-      {{ edition.name || "Custom Script" }}
+      {{ $editionName(edition) || $t("reference.customScript") }}
     </h3>
     <div
       v-for="(teamRoles, team) in rolesGrouped"
@@ -21,7 +21,7 @@
       :class="['team', team]"
     >
       <aside>
-        <h4>{{ team }}</h4>
+        <h4>{{ $teamName(team) }}</h4>
       </aside>
       <ul>
         <li v-for="role in teamRoles" :class="[team]" :key="role.id">
@@ -53,7 +53,7 @@
 
     <div class="team jinxed" v-if="jinxed.length">
       <aside>
-        <h4>Jinxed</h4>
+        <h4>{{ $t("reference.jinxed") }}</h4>
       </aside>
       <ul>
         <li v-for="(jinx, index) in jinxed" :key="index">
@@ -327,8 +327,8 @@ ul {
   }
 }
 
-/** hide players when town square is set to "public" **/
-#townsquare.public ~ .characters .modal .player {
+/** hide players when roles are hidden for projection **/
+#townsquare.hide-roles ~ .characters .modal .player {
   display: none;
 }
 </style>

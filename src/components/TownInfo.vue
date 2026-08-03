@@ -4,20 +4,16 @@
       class="edition"
       :class="['edition-' + edition.id]"
       :style="{
-        backgroundImage: `url(${
-          edition.logo && grimoire.isImageOptIn
-            ? edition.logo
-            : require('../assets/editions/' + edition.id + '.png')
-        })`
+        backgroundImage: `url(${editionLogo})`
       }"
     ></li>
     <li v-if="players.length - teams.traveler < 5">
-      Please add more players!
+      {{ $t("town.addMorePlayers") }}
     </li>
     <li>
       <span class="meta" v-if="!edition.isOfficial">
-        {{ edition.name }}
-        {{ edition.author ? "by " + edition.author : "" }}
+        {{ $editionName(edition) }}
+        {{ edition.author ? $t("town.by") + " " + edition.author : "" }}
       </span>
       <span>
         {{ players.length }} <font-awesome-icon class="players" icon="users" />
@@ -64,7 +60,7 @@
         />
       </span>
       <span v-if="grimoire.isNight">
-        Night phase
+        {{ $t("town.nightPhase") }}
         <font-awesome-icon :icon="['fas', 'cloud-moon']" />
       </span>
     </li>
@@ -74,9 +70,15 @@
 <script>
 import gameJSON from "./../game";
 import { mapState } from "vuex";
+import { editionLogoUrl } from "../edition-logos";
 
 export default {
   computed: {
+    editionLogo() {
+      return editionLogoUrl(this.edition, {
+        imageOptIn: this.grimoire.isImageOptIn
+      });
+    },
     teams: function() {
       const { players } = this.$store.state.players;
       const nonTravelers = this.$store.getters["players/nonTravelers"];
@@ -117,12 +119,12 @@ export default {
   li {
     font-weight: bold;
     width: 100%;
-    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.7));
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    text-shadow: 0 2px 1px black, 0 -2px 1px black, 2px 0 1px black,
-      -2px 0 1px black;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.8), 0 -1px 1px rgba(0, 0, 0, 0.8),
+      1px 0 1px rgba(0, 0, 0, 0.8), -1px 0 1px rgba(0, 0, 0, 0.8);
 
     span {
       white-space: nowrap;
@@ -170,7 +172,7 @@ export default {
     height: 200px;
     max-width: 100%;
     max-height: 100%;
-    background-position: 0 center;
+    background-position: center center;
     background-repeat: no-repeat;
     background-size: 100% auto;
     position: absolute;

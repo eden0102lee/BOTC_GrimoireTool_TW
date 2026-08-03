@@ -6,22 +6,19 @@
     </div>
     <div class="overlay">
       <audio src="../assets/sounds/countdown.mp3" preload="auto"></audio>
-      <em class="blue">{{ nominator.name }}</em> nominated
-      <em>{{ nominee.name }}</em
-      >!
+      {{ $t("vote.nominated", { nominator: nominator.name, nominee: nominee.name }) }}
       <br />
-      <em class="blue">
-        {{ voters.length }} vote{{ voters.length !== 1 ? "s" : "" }}
-      </em>
-      in favor
+      <em class="blue">{{ $t("vote.votesInFavor", { count: voters.length }) }}</em>
       <em v-if="nominee.role.team !== 'traveler'">
-        (majority is {{ Math.ceil(alive / 2) }})
+        {{ $t("vote.majorityIs", { count: Math.ceil(alive / 2) }) }}
       </em>
-      <em v-else>(majority is {{ Math.ceil(players.length / 2) }})</em>
+      <em v-else>{{
+        $t("vote.majorityIs", { count: Math.ceil(players.length / 2) })
+      }}</em>
 
       <template v-if="!session.isSpectator">
         <div v-if="!session.isVoteInProgress && session.lockedVote < 1">
-          Time per player:
+          {{ $t("vote.timePerPlayer") }}
           <font-awesome-icon
             @mousedown.prevent="setVotingSpeed(-500)"
             icon="minus-circle"
@@ -38,10 +35,10 @@
             v-if="!session.isVoteInProgress"
             @click="countdown"
           >
-            Countdown
+            {{ $t("vote.countdown") }}
           </div>
           <div class="button" v-if="!session.isVoteInProgress" @click="start">
-            {{ session.lockedVote ? "Restart" : "Start" }}
+            {{ session.lockedVote ? $t("vote.restart") : $t("vote.start") }}
           </div>
           <template v-else>
             <div
@@ -49,11 +46,11 @@
               :class="{ disabled: !session.lockedVote }"
               @click="pause"
             >
-              {{ voteTimer ? "Pause" : "Resume" }}
+              {{ voteTimer ? $t("vote.pause") : $t("vote.resume") }}
             </div>
-            <div class="button" @click="stop">Reset</div>
+            <div class="button" @click="stop">{{ $t("vote.reset") }}</div>
           </template>
-          <div class="button demon" @click="finish">Close</div>
+          <div class="button demon" @click="finish">{{ $t("vote.close") }}</div>
         </div>
         <div class="button-group mark" v-if="nominee.role.team !== 'traveler'">
           <div
@@ -63,16 +60,16 @@
             }"
             @click="setMarked"
           >
-            Mark for execution
+            {{ $t("vote.markExecution") }}
           </div>
           <div class="button" @click="removeMarked">
-            Clear mark
+            {{ $t("vote.clearMark") }}
           </div>
         </div>
       </template>
       <template v-else-if="canVote">
         <div v-if="!session.isVoteInProgress">
-          {{ session.votingSpeed / 1000 }} seconds between votes
+          {{ $t("vote.secondsBetween", { seconds: session.votingSpeed / 1000 }) }}
         </div>
         <div class="button-group">
           <div
@@ -80,19 +77,19 @@
             @click="vote(false)"
             :class="{ disabled: !currentVote }"
           >
-            Hand DOWN
+            {{ $t("vote.voteNo") }}
           </div>
           <div
             class="button demon"
             @click="vote(true)"
             :class="{ disabled: currentVote }"
           >
-            Hand UP
+            {{ $t("vote.voteYes") }}
           </div>
         </div>
       </template>
       <div v-else-if="!player">
-        Please claim a seat to vote.
+        {{ $t("vote.claimSeat") }}
       </div>
     </div>
     <transition name="blur">
@@ -103,7 +100,7 @@
         <span>3</span>
         <span>2</span>
         <span>1</span>
-        <span>GO</span>
+        <span>{{ $t("vote.go") }}</span>
         <audio
           :autoplay="!grimoire.isMuted"
           src="../assets/sounds/countdown.mp3"

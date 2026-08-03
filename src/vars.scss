@@ -1,6 +1,36 @@
-$fabled: #ffe91f;
-$townsfolk: #1f65ff;
-$outsider: #46d5ff;
-$minion: #ff6900;
-$demon: #ce0100;
-$traveler: #cc04ff;
+$fabled: #ffe91f;
+$loric: #7cfc00;
+$townsfolk: #1f65ff;
+$outsider: #46d5ff;
+$minion: #ff6900;
+$demon: #ce0100;
+$traveler: #cc04ff;
+
+// Shared grimoire chrome (botc.app-inspired, restrained)
+$chrome-border-width: 2px;
+$chrome-border: rgba(0, 0, 0, 0.85);
+$chrome-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.25);
+$panel-bg: rgba(8, 6, 4, 0.72);
+$panel-radius: 7px;
+$nameplate-bg: rgba(12, 10, 8, 0.65);
+$nameplate-border: rgba(0, 0, 0, 0.75);
+
+@mixin token-chrome {
+  border: $chrome-border-width solid $chrome-border;
+  box-shadow: $chrome-shadow;
+}
+
+@mixin panel-chrome {
+  background: $panel-bg;
+  border: $chrome-border-width solid $chrome-border;
+  border-radius: $panel-radius;
+  box-shadow: $chrome-shadow;
+}
+
+@mixin nameplate-chrome {
+  background: $nameplate-bg;
+  border: $chrome-border-width solid $nameplate-border;
+  border-radius: $panel-radius;
+  box-shadow: $chrome-shadow;
+}
+

@@ -3,7 +3,7 @@
     v-if="modals.reminder && availableReminders.length && players[playerIndex]"
     @close="toggleModal('reminder')"
   >
-    <h3>Choose a reminder token:</h3>
+    <h3>{{ $t("reminder.choose") }}</h3>
     <ul class="reminders">
       <li
         v-for="reminder in availableReminders"
@@ -82,9 +82,9 @@ export default {
         }
       });
 
-      reminders.push({ role: "good", name: "Good" });
-      reminders.push({ role: "evil", name: "Evil" });
-      reminders.push({ role: "custom", name: "Custom note" });
+      reminders.push({ role: "good", name: this.$t("reminder.good") });
+      reminders.push({ role: "evil", name: this.$t("reminder.evil") });
+      reminders.push({ role: "custom", name: this.$t("reminder.customNote") });
       return reminders;
     },
     ...mapState(["modals", "grimoire"]),
@@ -95,7 +95,7 @@ export default {
       const player = this.$store.state.players.players[this.playerIndex];
       let value;
       if (reminder.role === "custom") {
-        const name = prompt("Add a custom reminder note");
+        const name = prompt(this.$t("prompt.customReminder"));
         if (!name) return;
         value = [...player.reminders, { role: "custom", name }];
       } else {

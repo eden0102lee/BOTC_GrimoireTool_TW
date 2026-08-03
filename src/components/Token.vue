@@ -4,11 +4,7 @@
       class="icon"
       v-if="role.id"
       :style="{
-        backgroundImage: `url(${
-          role.image && grimoire.isImageOptIn
-            ? role.image
-            : require('../assets/icons/' + (role.imageAlt || role.id) + '.png')
-        })`
+        backgroundImage: `url(${iconUrl})`
       }"
     ></span>
     <span
@@ -64,6 +60,34 @@ export default {
         (this.role.remindersGlobal || []).length
       );
     },
+    iconUrl() {
+      if (this.role.image && this.grimoire.isImageOptIn) {
+        return this.role.image;
+      }
+      const teamFallback = {
+        townsfolk: "good",
+        outsider: "outsider",
+        minion: "minion",
+        demon: "evil",
+        traveler: "traveler",
+        fabled: "fabled",
+        loric: "loric"
+      };
+      const candidates = [
+        this.role.imageAlt,
+        this.role.id,
+        teamFallback[this.role.team],
+        "custom"
+      ].filter(Boolean);
+      const icons = require.context("../assets/icons", false, /\.png$/);
+      for (const id of candidates) {
+        const key = `./${id}.png`;
+        if (icons.keys().includes(key)) {
+          return icons(key);
+        }
+      }
+      return icons("./custom.png");
+    },
     ...mapState(["grimoire"])
   },
   data() {
@@ -81,14 +105,16 @@ export default {
 </script>
 
 <style scoped lang="scss">
+@import "../vars.scss";
+@import "../gstone-assets.scss";
+
 .token {
   border-radius: 50%;
   width: 100%;
-  background: url("../assets/token.png") center center;
+  background: url($gstone-token) center center;
   background-size: 100%;
   text-align: center;
-  border: 3px solid black;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  @include token-chrome;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -204,10 +230,7 @@ export default {
     width: 250px;
     z-index: 25;
     font-size: 80%;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 10px;
-    border: 3px solid black;
-    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+    @include panel-chrome;
     text-align: left;
     justify-items: center;
     align-content: center;
@@ -221,7 +244,7 @@ export default {
       border: 10px solid transparent;
       width: 0;
       height: 0;
-      border-right-color: black;
+      border-right-color: $chrome-border;
       position: absolute;
       margin-right: 2px;
       right: 100%;

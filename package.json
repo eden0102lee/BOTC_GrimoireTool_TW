@@ -1,13 +1,22 @@
 {
-  "name": "townsquare",
+  "name": "clocktower-grimoire_TW",
   "version": "2.16.2",
-  "description": "Blood on the Clocktower Town Square",
+  "description": "Blood on the Clocktower Grimoire (Traditional Chinese) — local LAN fork of bra1n/townsquare",
   "author": "Steffen Baumgart",
   "scripts": {
+    "start": "node scripts/play-server.js",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build ./src/main.js",
     "lint": "vue-cli-service lint",
-    "lint-ci": "vue-cli-service lint --no-fix --max-warnings=0"
+    "lint-ci": "vue-cli-service lint --no-fix --max-warnings=0",
+    "build:characters": "node scripts/build-characters-zh-tw-from-community.js",
+    "sync:characters": "node scripts/sync-characters-from-csv.js",
+    "sync:official": "node scripts/sync-official-roles.js",
+    "sync:script-tool": "node scripts/sync-from-script-tool.js",
+    "sync:icons": "node scripts/sync-alignment-icons.js",
+    "serve:ws": "node scripts/dev-ws.js",
+    "start:ws": "node server/index.js",
+    "play": "node scripts/play-server.js"
   },
   "main": "App.vue",
   "dependencies": {
@@ -35,12 +44,14 @@
   "keywords": [
     "botc",
     "townsquare",
+    "grimoire",
+    "zh-TW",
     "vue",
     "scss"
   ],
   "license": "GPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com//bra1n/townsquare.git"
+    "url": "https://github.com/bra1n/townsquare.git"
   }
 }

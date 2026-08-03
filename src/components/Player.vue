@@ -23,18 +23,22 @@
         v-if="nightOrder.get(player).first && grimoire.isNightOrder"
       >
         <em>{{ nightOrder.get(player).first }}.</em>
-        <span v-if="player.role.firstNightReminder">{{
-          player.role.firstNightReminder
-        }}</span>
+        <span
+          v-if="player.role.firstNightReminder"
+          :data-label="$t('nightOrder.firstNightLabel')"
+          >{{ player.role.firstNightReminder }}</span
+        >
       </div>
       <div
         class="night-order other"
         v-if="nightOrder.get(player).other && grimoire.isNightOrder"
       >
         <em>{{ nightOrder.get(player).other }}.</em>
-        <span v-if="player.role.otherNightReminder">{{
-          player.role.otherNightReminder
-        }}</span>
+        <span
+          v-if="player.role.otherNightReminder"
+          :data-label="$t('nightOrder.otherNightsLabel')"
+          >{{ player.role.otherNightReminder }}</span
+        >
       </div>
 
       <Token
@@ -47,38 +51,38 @@
         <font-awesome-icon
           icon="hand-paper"
           class="vote"
-          title="Hand UP"
+          :title="$t('player.handUp')"
           @click="vote()"
         />
         <font-awesome-icon
           icon="times"
           class="vote"
-          title="Hand DOWN"
+          :title="$t('player.handDown')"
           @click="vote()"
         />
         <font-awesome-icon
           icon="times-circle"
           class="cancel"
-          title="Cancel"
+          :title="$t('player.cancel')"
           @click="cancel()"
         />
         <font-awesome-icon
           icon="exchange-alt"
           class="swap"
           @click="swapPlayer(player)"
-          title="Swap seats with this player"
+          :title="$t('player.swapSeats')"
         />
         <font-awesome-icon
           icon="redo-alt"
           class="move"
           @click="movePlayer(player)"
-          title="Move player to this seat"
+          :title="$t('player.moveToSeat')"
         />
         <font-awesome-icon
           icon="hand-point-right"
           class="nominate"
           @click="nominatePlayer(player)"
-          title="Nominate this player"
+          :title="$t('player.nominate')"
         />
       </div>
 
@@ -96,7 +100,7 @@
         class="has-vote"
         v-if="player.isDead && !player.isVoteless"
         @click="updatePlayer('isVoteless', true)"
-        title="Ghost vote"
+        :title="$t('player.ghostVote')"
       />
 
       <!-- On block icon -->
@@ -109,50 +113,37 @@
         :class="{ active: isMenuOpen }"
       >
         <span>{{ player.name }}</span>
-        <font-awesome-icon icon="venus-mars" v-if="player.pronouns" />
-        <div class="pronouns" v-if="player.pronouns">
-          <span>{{ player.pronouns }}</span>
-        </div>
       </div>
 
       <transition name="fold">
         <ul class="menu" v-if="isMenuOpen">
-          <li
-            @click="changePronouns"
-            v-if="
-              !session.isSpectator ||
-                (session.isSpectator && player.id === session.playerId)
-            "
-          >
-            <font-awesome-icon icon="venus-mars" />Change Pronouns
-          </li>
           <template v-if="!session.isSpectator">
             <li @click="changeName">
-              <font-awesome-icon icon="user-edit" />Rename
+              <font-awesome-icon icon="user-edit" />{{ $t("player.rename") }}
             </li>
             <li @click="movePlayer()" :class="{ disabled: session.lockedVote }">
               <font-awesome-icon icon="redo-alt" />
-              Move player
+              {{ $t("player.move") }}
             </li>
             <li @click="swapPlayer()" :class="{ disabled: session.lockedVote }">
               <font-awesome-icon icon="exchange-alt" />
-              Swap seats
+              {{ $t("player.swap") }}
             </li>
             <li @click="removePlayer" :class="{ disabled: session.lockedVote }">
               <font-awesome-icon icon="times-circle" />
-              Remove
+              {{ $t("player.remove") }}
             </li>
             <li
               @click="updatePlayer('id', '', true)"
               v-if="player.id && session.sessionId"
             >
               <font-awesome-icon icon="chair" />
-              Empty seat
+              {{ $t("player.emptySeat") }}
             </li>
             <template v-if="!session.nomination">
               <li @click="nominatePlayer()">
                 <font-awesome-icon icon="hand-point-right" />
-                Nomination
+                {{ $t("player.nomination") }}
               </li>
             </template>
           </template>
@@ -163,12 +154,12 @@
           >
             <font-awesome-icon icon="chair" />
             <template v-if="!player.id">
-              Claim seat
+              {{ $t("player.claimSeat") }}
             </template>
             <template v-else-if="player.id === session.playerId">
-              Vacate seat
+              {{ $t("player.vacateSeat") }}
             </template>
-            <template v-else> Seat occupied</template>
+            <template v-else> {{ $t("player.seatOccupied") }}</template>
           </li>
         </ul>
       </transition>
@@ -221,6 +212,7 @@ export default {
   computed: {
     ...mapState("players", ["players"]),
     ...mapState(["grimoire", "session"]),
+    ...mapGetters(["hideRolesOnBoard"]),
     ...mapGetters({ nightOrder: "players/nightOrder" }),
     index: function() {
       return this.players.indexOf(this.player);
@@ -253,17 +245,8 @@ export default {
     };
   },
   methods: {
-    changePronouns() {
-      if (this.session.isSpectator && this.player.id !== this.session.playerId)
-        return;
-      const pronouns = prompt("Player pronouns", this.player.pronouns);
-      //Only update pronouns if not null (prompt was not cancelled)
-      if (pronouns !== null) {
-        this.updatePlayer("pronouns", pronouns, true);
-      }
-    },
     toggleStatus() {
-      if (this.grimoire.isPublic) {
+      if (this.hideRolesOnBoard && !this.session.isSpectator) {
         if (!this.player.isDead) {
           this.updatePlayer("isDead", true);
           if (this.player.isMarked) {
@@ -287,7 +270,7 @@ export default {
     },
     changeName() {
       if (this.session.isSpectator) return;
-      const name = prompt("Player name", this.player.name) || this.player.name;
+      const name = prompt(this.$t("prompt.playerName"), this.player.name) || this.player.name;
       this.updatePlayer("name", name, true);
     },
     removeReminder(reminder) {
@@ -296,12 +279,7 @@ export default {
       this.updatePlayer("reminders", reminders, true);
     },
     updatePlayer(property, value, closeMenu = false) {
-      if (
-        this.session.isSpectator &&
-        property !== "reminders" &&
-        property !== "pronouns"
-      )
-        return;
+      if (this.session.isSpectator && property !== "reminders") return;
       this.$store.commit("players/update", {
         player: this.player,
         property,
@@ -351,6 +329,7 @@ export default {
 
 <style lang="scss">
 @import "../vars.scss";
+@import "../gstone-assets.scss";
 
 .fold-enter-active,
 .fold-leave-active {
@@ -388,7 +367,7 @@ export default {
 
     &:before {
       content: " ";
-      background: url("../assets/shroud.png") center -10px no-repeat;
+      background: url($gstone-shroud) center -10px no-repeat;
       background-size: auto 110%;
       position: absolute;
       margin-left: -50%;
@@ -431,10 +410,9 @@ export default {
   .life {
     border-radius: 50%;
     width: 100%;
-    background: url("../assets/life.png") center center;
+    background: url($gstone-life) center center;
     background-size: 100%;
-    border: 3px solid black;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    @include token-chrome;
     cursor: pointer;
     transition: transform 200ms ease-in-out;
     transform: perspective(400px) rotateY(180deg);
@@ -456,7 +434,7 @@ export default {
     }
 
     .life {
-      background-image: url("../assets/death.png");
+      background-image: url($gstone-death);
 
       &:after {
         content: " ";
@@ -477,14 +455,14 @@ export default {
   }
 }
 
-#townsquare.public .player {
+#townsquare.hide-roles .player {
+  .life {
+    transform: perspective(400px) rotateY(0deg);
+  }
+
   .shroud {
     transform: perspective(400px) rotateX(90deg);
     pointer-events: none;
-  }
-
-  .life {
-    transform: perspective(400px) rotateY(0deg);
   }
 
   &.traveler:not(.dead) .token {
@@ -509,7 +487,7 @@ export default {
   backface-visibility: hidden;
 }
 
-#townsquare.public .circle .token {
+#townsquare.hide-roles .circle .token {
   transform: perspective(400px) rotateY(-180deg);
 }
 
@@ -599,7 +577,7 @@ li.move:not(.from) .player .overlay svg.move {
   transition: opacity 250ms;
   z-index: 2;
 
-  #townsquare.public & {
+  #townsquare.hide-roles & {
     opacity: 0;
     pointer-events: none;
   }
@@ -713,11 +691,8 @@ li.move:not(.from) .player .overlay svg.move {
   cursor: pointer;
   white-space: nowrap;
   width: 120%;
-  background: rgba(0, 0, 0, 0.5);
-  border: 3px solid black;
-  border-radius: 10px;
+  @include nameplate-chrome;
   top: 5px;
-  box-shadow: 0 0 5px black;
   padding: 0 4px;
 
   svg {
@@ -738,39 +713,6 @@ li.move:not(.from) .player .overlay svg.move {
     color: red;
   }
 
-  &:hover .pronouns {
-    opacity: 1;
-    color: white;
-  }
-
-  .pronouns {
-    display: flex;
-    position: absolute;
-    right: 110%;
-    max-width: 250px;
-    z-index: 25;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 10px;
-    border: 3px solid black;
-    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
-    align-items: center;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 200ms ease-in-out;
-    padding: 0 4px;
-    bottom: -3px;
-
-    &:before {
-      content: " ";
-      border: 10px solid transparent;
-      width: 0;
-      height: 0;
-      border-left-color: black;
-      position: absolute;
-      margin-left: 2px;
-      left: 100%;
-    }
-  }
 }
 
 .player.dead > .name {
@@ -784,13 +726,10 @@ li.move:not(.from) .player .overlay svg.move {
   bottom: -5px;
   text-align: left;
   white-space: nowrap;
-  background: rgba(0, 0, 0, 0.5);
+  @include panel-chrome;
   padding: 2px 5px;
-  border-radius: 10px;
-  border: 3px solid #000;
   margin-left: 15px;
   cursor: pointer;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 
   &:before {
     content: " ";
@@ -798,7 +737,7 @@ li.move:not(.from) .player .overlay svg.move {
     height: 0;
     position: absolute;
     border: 10px solid transparent;
-    border-right-color: black;
+    border-right-color: $chrome-border;
     right: 100%;
     bottom: 5px;
     margin-right: 2px;
@@ -822,7 +761,7 @@ li.move:not(.from) .player .overlay svg.move {
 }
 
 /***** Ability text *****/
-#townsquare.public .circle .ability {
+#townsquare.hide-roles .circle .ability {
   display: none;
 }
 .circle .player .shroud:hover ~ .token .ability,
@@ -853,8 +792,7 @@ li.move:not(.from) .player .overlay svg.move {
   justify-content: center;
   margin: 5px 0 0 -25%;
   border-radius: 50%;
-  border: 3px solid black;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  @include token-chrome;
   transition: all 200ms;
   cursor: pointer;
 
@@ -949,7 +887,7 @@ li.move:not(.from) .player .overlay svg.move {
   opacity: 1;
 }
 
-#townsquare.public .reminder {
+#townsquare.hide-roles .reminder {
   opacity: 0;
   pointer-events: none;
 }

@@ -1,0 +1,45 @@
+{
+  "headers": [
+    "id",
+    "name",
+    "ability",
+    "flavor",
+    "firstNightReminder",
+    "otherNightReminder",
+    "remindersGlobal",
+    "reminders"
+  ],
+  "row_count": 181,
+  "sample_rows": [
+    {
+      "id": "acrobat",
+      "name": "雜技演員",
+      "ability": "每天晚上*，選擇一位玩家，如果他今晚將醉酒或中毒，則你死亡。",
+      "flavor": "歡迎各位前來，觀看世上最盛大的表演！",
+      "firstNightReminder": "",
+      "otherNightReminder": "雜技演員選擇一位玩家，如果他今晚醉酒或中毒，則雜技演員死亡。",
+      "remindersGlobal": "",
+      "reminders": "死亡"
+    },
+    {
+      "id": "alchemist",
+      "name": "煉金術士",
+      "ability": "你擁有一個僕從的能力，使用此能力時，說書人可能會提示你重新選擇目標。",
+      "flavor": "Visit the interior of the Earth. By rectification thou shalt find the hidden stone. Above the gold, lieth the red. Kether in Malkuth.",
+      "firstNightReminder": "展示一個僕從角色代幣，將煉金術士的角色代幣換成那個角色的角色代幣，以「是煉金術士」標記他。",
+      "otherNightReminder": "",
+      "remindersGlobal": "是煉金術士",
+      "reminders": ""
+    },
+    {
+      "id": "alhadikhia",
+      "name": "哈迪寂亞",
+      "ability": "每天晚上*，你可以選擇三位玩家(所有玩家都知道是誰)，他們各自私下選擇「活著」或 「死亡」，但是如果他們最後都活著，則他們都死亡。",
+      "flavor": "*沉默是金*",
+      "firstNightReminder": "",
+      "otherNightReminder": "哈迪寂亞選擇三位玩家，要求玩家們沉默並且根據選擇的順序，宣布「哈迪寂亞選擇了 [第一位玩家]」，喚醒該玩家，讓他點頭表示活著，搖頭表示死亡，根據結果殺死或復活他，請該玩家閉上眼睛，然後宣布下一位玩家。完成之後如果三位玩家都活著，則三位都死亡。允許玩家們繼續交談。",
+      "remindersGlobal": "",
+      "reminders": "1,2,3,選擇「死亡」,選擇「活著」"
+    }
+  ]
+}

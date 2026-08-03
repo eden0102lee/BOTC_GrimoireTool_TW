@@ -3,7 +3,7 @@
     id="townsquare"
     class="square"
     :class="{
-      public: grimoire.isPublic,
+      'hide-roles': hideRolesOnBoard,
       spectator: session.isSpectator,
       vote: session.nomination
     }"
@@ -30,8 +30,8 @@
       :class="{ closed: !isBluffsOpen }"
     >
       <h3>
-        <span v-if="session.isSpectator">Other characters</span>
-        <span v-else>Demon bluffs</span>
+        <span v-if="session.isSpectator">{{ $t("square.otherCharacters") }}</span>
+        <span v-else>{{ $t("square.demonBluffs") }}</span>
         <font-awesome-icon icon="times-circle" @click.stop="toggleBluffs" />
         <font-awesome-icon icon="plus-circle" @click.stop="toggleBluffs" />
       </h3>
@@ -48,7 +48,7 @@
 
     <div class="fabled" :class="{ closed: !isFabledOpen }" v-if="fabled.length">
       <h3>
-        <span>Fabled</span>
+        <span>{{ $t("square.fabled") }}</span>
         <font-awesome-icon icon="times-circle" @click.stop="toggleFabled" />
         <font-awesome-icon icon="plus-circle" @click.stop="toggleFabled" />
       </h3>
@@ -63,18 +63,22 @@
             v-if="nightOrder.get(role).first && grimoire.isNightOrder"
           >
             <em>{{ nightOrder.get(role).first }}.</em>
-            <span v-if="role.firstNightReminder">{{
-              role.firstNightReminder
-            }}</span>
+            <span
+              v-if="role.firstNightReminder"
+              :data-label="$t('nightOrder.firstNightLabel')"
+              >{{ role.firstNightReminder }}</span
+            >
           </div>
           <div
             class="night-order other"
             v-if="nightOrder.get(role).other && grimoire.isNightOrder"
           >
             <em>{{ nightOrder.get(role).other }}.</em>
-            <span v-if="role.otherNightReminder">{{
-              role.otherNightReminder
-            }}</span>
+            <span
+              v-if="role.otherNightReminder"
+              :data-label="$t('nightOrder.otherNightsLabel')"
+              >{{ role.otherNightReminder }}</span
+            >
           </div>
           <Token :role="role"></Token>
         </li>
@@ -101,9 +105,93 @@ export default {
     ReminderModal
   },
   computed: {
-    ...mapGetters({ nightOrder: "players/nightOrder" }),
+    ...mapGetters({
+      nightOrder: "players/nightOrder",
+      hideRolesOnBoard: "hideRolesOnBoard"
+    }),
     ...mapState(["grimoire", "roles", "session"]),
     ...mapState("players", ["players", "bluffs", "fabled"])
+  },
+  watch: {
+    players: {
+      deep: true,
+      handler(players) {
+        // #region agent log
+        try {
+          const summary = (players || []).map((p, i) => ({
+            i,
+            name: p.name,
+            roleId: p.role && p.role.id,
+            roleName: p.role && p.role.name,
+            team: p.role && p.role.team,
+            empty: !(p.role && p.role.id)
+          }));
+          fetch(
+            "http://127.0.0.1:7635/ingest/f524ca47-83f9-4f7b-bb8f-ebb427befe92",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-Debug-Session-Id": "efb8b2"
+              },
+              body: JSON.stringify({
+                sessionId: "efb8b2",
+                runId: "pre-fix",
+                hypothesisId: "A-B",
+                location: "TownSquare.vue:watch.players",
+                message: "Players/roles board state",
+                data: {
+                  hideRolesOnBoard: this.hideRolesOnBoard,
+                  rolesHidden: this.grimoire && this.grimoire.rolesHidden,
+                  isSpectator: this.session && this.session.isSpectator,
+                  playerCount: summary.length,
+                  assignedCount: summary.filter(s => !s.empty).length,
+                  players: summary
+                },
+                timestamp: Date.now()
+              })
+            }
+          ).catch(() => {});
+        } catch (e) {
+          /* ignore */
+        }
+        // #endregion
+      }
+    }
+  },
+  mounted() {
+    // #region agent log
+    try {
+      fetch("http://127.0.0.1:7635/ingest/f524ca47-83f9-4f7b-bb8f-ebb427befe92", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Debug-Session-Id": "efb8b2"
+        },
+        body: JSON.stringify({
+          sessionId: "efb8b2",
+          runId: "pre-fix",
+          hypothesisId: "A",
+          location: "TownSquare.vue:mounted",
+          message: "TownSquare mount hide/roles flags",
+          data: {
+            hideRolesOnBoard: this.hideRolesOnBoard,
+            rolesHidden: this.grimoire && this.grimoire.rolesHidden,
+            isSpectator: this.session && this.session.isSpectator,
+            hasHideClass: !!(
+              this.$el && this.$el.classList.contains("hide-roles")
+            ),
+            playerCount: (this.players || []).length,
+            assigned: (this.players || []).filter(p => p.role && p.role.id)
+              .length
+          },
+          timestamp: Date.now()
+        })
+      }).catch(() => {});
+    } catch (e) {
+      /* ignore */
+    }
+    // #endregion
   },
   data() {
     return {
@@ -155,7 +243,9 @@ export default {
       if (this.session.isSpectator || this.session.lockedVote) return;
       if (
         confirm(
-          `Do you really want to remove ${this.players[playerIndex].name}?`
+          this.$t("confirm.removePlayer", {
+            name: this.players[playerIndex].name
+          })
         )
       ) {
         const { nomination } = this.session;
@@ -343,16 +433,6 @@ export default {
             left: 100%;
           }
         }
-        .pronouns {
-          left: 110%;
-          right: auto;
-          &:before {
-            border-left-color: transparent;
-            border-right-color: black;
-            left: auto;
-            right: 100%;
-          }
-        }
       } @else {
         // second half of players
         z-index: $i - 1;
@@ -399,22 +479,21 @@ export default {
 #townsquare > .bluffs,
 #townsquare > .fabled {
   position: absolute;
-  &.bluffs {
-    bottom: 10px;
-  }
-  &.fabled {
-    top: 10px;
-  }
-  left: 10px;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 10px;
-  border: 3px solid black;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
-  transform-origin: bottom left;
+  bottom: 10px;
+  @include panel-chrome;
   transform: scale(1);
   opacity: 1;
   transition: all 200ms ease-in-out;
   z-index: 50;
+
+  &.bluffs {
+    left: 10px;
+    transform-origin: bottom left;
+  }
+  &.fabled {
+    right: 10px;
+    transform-origin: bottom right;
+  }
 
   > svg {
     position: absolute;
@@ -486,7 +565,7 @@ export default {
   }
 }
 
-#townsquare.public > .bluffs {
+#townsquare.hide-roles > .bluffs {
   opacity: 0;
   transform: scale(0.1);
 }
@@ -517,7 +596,7 @@ export default {
     padding-top: 100%;
   }
 
-  #townsquare.public & {
+  #townsquare.hide-roles & {
     opacity: 0;
     pointer-events: none;
   }
@@ -533,10 +612,7 @@ export default {
     width: 350px;
     z-index: 25;
     font-size: 70%;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 10px;
-    border: 3px solid black;
-    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+    @include panel-chrome;
     text-align: left;
     align-items: center;
     opacity: 0;
@@ -568,11 +644,12 @@ export default {
     background: linear-gradient(
       to right,
       $townsfolk 0%,
-      rgba(0, 0, 0, 0.5) 20%
+      $panel-bg 20%
     );
     &:before {
-      content: "First Night";
+      content: attr(data-label);
     }
+
     &:after {
       border-left-color: $townsfolk;
       margin-left: 3px;
@@ -582,9 +659,9 @@ export default {
 
   &.other span {
     left: 120%;
-    background: linear-gradient(to right, $demon 0%, rgba(0, 0, 0, 0.5) 20%);
+    background: linear-gradient(to right, $demon 0%, $panel-bg 20%);
     &:before {
-      content: "Other Nights";
+      content: attr(data-label);
     }
     &:after {
       right: 100%;
@@ -599,8 +676,8 @@ export default {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    border: 3px solid black;
-    filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.5));
+    border: $chrome-border-width solid $chrome-border;
+    box-shadow: $chrome-shadow;
     font-weight: bold;
     opacity: 1;
     pointer-events: all;
@@ -625,18 +702,18 @@ export default {
     opacity: 1;
   }
 
-  // adjustment for fabled
-  .fabled &.first {
+  // adjustment for fabled (bottom-right): other-night tip opens left
+  .fabled &.other {
     span {
-      right: auto;
-      left: 40px;
+      left: auto;
+      right: 40px;
       &:after {
-        left: auto;
-        right: 100%;
-        margin-left: 0;
-        margin-right: 3px;
-        border-left-color: transparent;
-        border-right-color: $townsfolk;
+        right: auto;
+        left: 100%;
+        margin-right: 0;
+        margin-left: 3px;
+        border-right-color: transparent;
+        border-left-color: $demon;
       }
     }
   }

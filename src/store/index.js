@@ -4,9 +4,14 @@ import persistence from "./persistence";
 import socket from "./socket";
 import players from "./modules/players";
 import session from "./modules/session";
+import battleLog from "./modules/battleLog";
+import gamePhase from "./modules/gamePhase";
+import battleLogPlugin from "./battleLogPlugin";
+import gamePhaseSync from "./gamePhaseSync";
 import editionJSON from "../editions.json";
 import rolesJSON from "../roles.json";
 import fabledJSON from "../fabled.json";
+import loricJSON from "../loric.json";
 import jinxesJSON from "../hatred.json";
 
 Vue.use(Vuex);
@@ -53,7 +58,10 @@ const editionJSONbyId = new Map(
   editionJSON.map(edition => [edition.id, edition])
 );
 const rolesJSONbyId = new Map(rolesJSON.map(role => [role.id, role]));
-const fabled = new Map(fabledJSON.map(role => [role.id, role]));
+// Fabled + Loric share the same Map / grimoire slot (ST tools, not player seats)
+const fabled = new Map(
+  [...fabledJSON, ...loricJSON].map(role => [role.id, role])
+);
 
 // jinxes
 let jinxes = {};
@@ -94,17 +102,19 @@ const customRole = {
 export default new Vuex.Store({
   modules: {
     players,
-    session
+    session,
+    battleLog,
+    gamePhase
   },
   state: {
     grimoire: {
-      isNight: false,
+      isNight: true,
       isNightOrder: true,
-      isPublic: true,
       isMenuOpen: false,
       isStatic: false,
       isMuted: false,
       isImageOptIn: false,
+      rolesHidden: false,
       zoom: 0,
       background: ""
     },
@@ -117,7 +127,8 @@ export default new Vuex.Store({
       reminder: false,
       role: false,
       roles: false,
-      voteHistory: false
+      voteHistory: false,
+      battleLog: false
     },
     edition: editionJSONbyId.get("tb"),
     roles: getRolesByEdition(),
@@ -126,6 +137,8 @@ export default new Vuex.Store({
     jinxes
   },
   getters: {
+    hideRolesOnBoard: ({ grimoire, session }) =>
+      !session.isSpectator && grimoire.rolesHidden,
     /**
      * Return all custom roles, with default values and non-essential data stripped.
      * Role object keys will be replaced with a numerical index to conserve bandwidth.
@@ -169,8 +182,8 @@ export default new Vuex.Store({
     toggleNightOrder: toggle("isNightOrder"),
     toggleStatic: toggle("isStatic"),
     toggleNight: toggle("isNight"),
-    toggleGrimoire: toggle("isPublic"),
     toggleImageOptIn: toggle("isImageOptIn"),
+    toggleRolesHidden: toggle("rolesHidden"),
     toggleModal({ modals }, name) {
       if (name) {
         modals[name] = !modals[name];
@@ -223,7 +236,8 @@ export default new Vuex.Store({
               outsider: "outsider",
               minion: "minion",
               demon: "evil",
-              fabled: "fabled"
+              fabled: "fabled",
+              loric: "loric"
             }[role.team] || "custom";
           role.firstNight = Math.abs(role.firstNight);
           role.otherNight = Math.abs(role.otherNight);
@@ -233,16 +247,19 @@ export default new Vuex.Store({
         .filter(role => role.name && role.ability && role.team)
         // sort by team
         .sort((a, b) => b.team.localeCompare(a.team));
-      // convert to Map without Fabled
+      // convert to Map without Fabled / Loric
       state.roles = new Map(
         processedRoles
-          .filter(role => role.team !== "fabled")
+          .filter(role => role.team !== "fabled" && role.team !== "loric")
           .map(role => [role.id, role])
       );
-      // update Fabled to include custom Fabled from this script
+      // update Fabled+Loric to include custom entries from this script
       state.fabled = new Map([
-        ...processedRoles.filter(r => r.team === "fabled").map(r => [r.id, r]),
-        ...fabledJSON.map(role => [role.id, role])
+        ...processedRoles
+          .filter(r => r.team === "fabled" || r.team === "loric")
+          .map(r => [r.id, r]),
+        ...fabledJSON.map(role => [role.id, role]),
+        ...loricJSON.map(role => [role.id, role])
       ]);
       // update extraTravelers map to only show travelers not in this script
       state.otherTravelers = new Map(
@@ -262,5 +279,7 @@ export default new Vuex.Store({
       state.modals.edition = false;
     }
   },
-  plugins: [persistence, socket]
+  plugins: [persistence, gamePhaseSync, socket, battleLogPlugin]
 });
+
+

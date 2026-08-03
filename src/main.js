@@ -1,6 +1,7 @@
 import Vue from "vue";
 import App from "./App";
 import store from "./store";
+import i18n from "./i18n";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { fab } from "@fortawesome/free-brands-svg-icons";
@@ -13,6 +14,8 @@ const faIcons = [
   "BroadcastTower",
   "Chair",
   "CheckSquare",
+  "ChevronLeft",
+  "ChevronRight",
   "CloudMoon",
   "Cog",
   "Copy",
@@ -60,6 +63,7 @@ library.add(
   ...fabIcons.map(i => fab["fa" + i])
 );
 Vue.component("font-awesome-icon", FontAwesomeIcon);
+Vue.use(i18n);
 Vue.config.productionTip = false;
 
 new Vue({

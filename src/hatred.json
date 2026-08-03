@@ -1,375 +1,660 @@
 [
   {
-    "id": "Chambermaid",
+    "id": "alchemist",
     "hatred": [
       {
-        "id": "Mathematician",
-        "reason": "The Chambermaid learns if the Mathematician wakes tonight or not, even though the Chambermaid wakes first."
+        "id": "boffin",
+        "reason": "如果鍊金術士擁有科學怪人的能力，鍊金術士不會得知惡魔因此獲得了哪個角色的能力。"
+      },
+      {
+        "id": "marionette",
+        "reason": "如果鍊金術士本應獲得提線木偶的能力，那麼他不會擁有該能力並改為提線木偶一定在場。"
+      },
+      {
+        "id": "mastermind",
+        "reason": "如果鍊金術士本應獲得主謀的能力，那麼他不會擁有該能力並改為主謀一定不在場。"
+      },
+      {
+        "id": "organgrinder",
+        "reason": "如果鍊金術士獲得街頭風琴手的能力，街頭風琴手一定在場。如果鍊金術士和街頭風琴手都是清醒的，改為他們都醉酒。"
+      },
+      {
+        "id": "spy",
+        "reason": "如果鍊金術士本應獲得間諜的能力，那麼他不會擁有該能力並改為間諜一定在場。每次處決後，存活的鍊金術士可以公開猜測一名存活玩家是間諜：如果猜對了，惡魔今晚必須選擇間諜。"
+      },
+      {
+        "id": "summoner",
+        "reason": "獲得召喚師能力的鍊金術士不會獲得偽裝。他要選擇一個惡魔角色，但不選擇玩家，由說書人決定哪一名玩家變成邪惡的惡魔。如果他在選擇之前死亡，邪惡陣營獲勝。[無惡魔在場]"
+      },
+      {
+        "id": "widow",
+        "reason": "如果鍊金術士本應獲得寡婦的能力，那麼他不會擁有該能力並改為寡婦一定在場。每次處決後，存活的鍊金術士可以公開猜測一名存活玩家是寡婦：如果猜對了，惡魔今晚必須選擇寡婦。"
+      },
+      {
+        "id": "wraith",
+        "reason": "如果鍊金術士本應獲得亡魂的能力，那麼他不會擁有該能力並改為亡魂一定在場。每次處決後，存活的鍊金術士可以公開猜測一名存活玩家是亡魂：如果猜對了，惡魔當晚必須選擇亡魂。"
       }
     ]
   },
   {
-    "id": "Butler",
+    "id": "alhadikhia",
     "hatred": [
       {
-        "id": "Cannibal",
-        "reason": "If the Cannibal gains the Butler ability, the Cannibal learns this."
+        "id": "mastermind",
+        "reason": "如果哈迪寂亞死於處決，且主謀存活，當晚哈迪寂亞要選擇三名善良玩家：如果他們都選擇存活，邪惡陣營獲勝。否則，善良陣營獲勝。"
+      },
+      {
+        "id": "princess",
+        "reason": "如果公主在首個白天提名並處決了一名玩家，沒有人會因為哈迪寂亞而死亡。"
       }
     ]
   },
   {
-    "id": "Lunatic",
+    "id": "boffin",
     "hatred": [
       {
-        "id": "Mathematician",
-        "reason": "The Mathematician learns if the Lunatic attacks a different player(s) than the real Demon attacked."
+        "id": "cultleader",
+        "reason": "如果惡魔擁有異教領袖的能力，他無法因為該能力轉變為善良陣營。"
+      },
+      {
+        "id": "drunk",
+        "reason": "惡魔不能獲得酒鬼的能力。"
+      },
+      {
+        "id": "goon",
+        "reason": "如果惡魔擁有莽夫的能力，他無法因為該能力轉變為善良陣營。"
+      },
+      {
+        "id": "heretic",
+        "reason": "惡魔無法擁有異端分子的能力。"
+      },
+      {
+        "id": "ogre",
+        "reason": "惡魔無法擁有食人魔的能力。"
+      },
+      {
+        "id": "politician",
+        "reason": "惡魔無法擁有政客的能力。"
+      },
+      {
+        "id": "villageidiot",
+        "reason": "如果村夫在場數量不足3人，科學怪人可以讓惡魔擁有村夫的能力。"
       }
     ]
   },
   {
-    "id": "Pit-Hag",
+    "id": "bountyhunter",
     "hatred": [
       {
-        "id": "Heretic",
-        "reason": "A Pit-Hag can not create a Heretic. "
+        "id": "kazali",
+        "reason": "如果卡扎力把賞金獵人變成了爪牙，賞金獵人不會帶來邪惡的鎮民。"
       },
       {
-        "id": "Damsel",
-        "reason": "If a Pit-Hag creates a Damsel, the Storyteller chooses which player it is."
-      },
-      {
-        "id": "Politician",
-        "reason": "A Pit-hag can not create an evil Politician."
+        "id": "philosopher",
+        "reason": "如果哲學家獲得了賞金獵人的能力，可能會有一名鎮民玩家轉變為邪惡。"
       }
     ]
   },
   {
-    "id": "Cerenovus",
+    "id": "butler",
     "hatred": [
       {
-        "id": "Goblin",
-        "reason": "The Cerenovus may choose to make a player mad that they are the Goblin."
+        "id": "organgrinder",
+        "reason": "如果街頭風琴手使得玩家需要閉眼投票，管家可以自由舉手投票，但只在他的主人投票時他的票才會被統計。"
       }
     ]
   },
   {
-    "id": "Leviathan",
+    "id": "cannibal",
     "hatred": [
       {
-        "id": "Soldier",
-        "reason": "If Leviathan nominates and executes the Soldier, the Soldier does not die."
+        "id": "butler",
+        "reason": "如果食人族獲得了管家的能力，他會得知這一信息。"
       },
       {
-        "id": "Monk",
-        "reason": "If Leviathan nominates and executes the player the Monk chose, that player does not die."
+        "id": "juggler",
+        "reason": "如果雜耍藝人在自己的首個白天猜測後在當天死於處決，當晚食人族會替雜耍藝人得知對應的信息。"
       },
       {
-        "id": "Innkeeper",
-        "reason": "If Leviathan nominates and executes a player the Innkeeper chose, that player does not die."
+        "id": "princess",
+        "reason": "如果食人族提名並處決了公主且公主因此死亡，當晚惡魔不會造成死亡。"
       },
       {
-        "id": "Ravenkeeper",
-        "reason": "If Leviathan is in play & the Ravenkeeper dies by execution, they wake that night to use their ability."
-      },
-      {
-        "id": "Sage",
-        "reason": "If Leviathan is in play & the Sage dies by execution, they wake that night to use their ability."
-      },
-      {
-        "id": "Farmer",
-        "reason": "If Leviathan is in play & a Farmer dies by execution, a good player becomes a Farmer that night."
-      },
-      {
-        "id": "Mayor",
-        "reason": "If Leviathan is in play & no execution occurs on day 5, good wins."
+        "id": "zealot",
+        "reason": "如果食人族獲得了狂熱者的能力，他會得知這一信息。"
       }
     ]
   },
   {
-    "id": "Al-Hadikhia",
+    "id": "cerenovus",
     "hatred": [
       {
-        "id": "Scarlet Woman",
-        "reason": "If there are two living Al-Hadikhias, the Scarlet Woman Al-Hadikhia becomes the Scarlet Woman again."
-      },
-      {
-        "id": "Mastermind",
-        "reason": "Only 1 jinxed character can be in play. Evil players start knowing which player and character it is."
+        "id": "goblin",
+        "reason": "洗腦師可以選擇將玩家洗腦成哥布林。"
       }
     ]
   },
   {
-    "id": "Lil' Monsta",
+    "id": "heretic",
     "hatred": [
       {
-        "id": "Poppy Grower",
-        "reason": "If the Poppy Grower is in play, Minions don't wake together. They are woken one by one, until one of them chooses to take the Lil' Monsta token."
+        "id": "baron",
+        "reason": "互為剋星的角色在同一時間裡只能有其中一個角色在場。"
       },
       {
-        "id": "Magician",
-        "reason": "Only 1 jinxed character can be in play. "
+        "id": "godfather",
+        "reason": "異端分子會被教父當作一個不在場的外來者，異端分子會知道是哪個外來者。"
       },
       {
-        "id": "Scarlet Woman",
-        "reason": "If there are 5 or more players alive and the player holding the Lil' Monsta token dies, the Scarlet Woman is given the Lil' Monsta token tonight."
+        "id": "lleech",
+        "reason": "互為剋星的角色在同一時間裡只能有其中一個角色在場。"
+      },
+      {
+        "id": "pithag",
+        "reason": "互為剋星的角色在同一時間裡只能有其中一個角色在場。"
+      },
+      {
+        "id": "spy",
+        "reason": "異端分子會被間諜當作一個不在場的外來者，異端分子會知道是哪個外來者。"
+      },
+      {
+        "id": "widow",
+        "reason": "異端分子會被寡婦當作一個不在場的外來者，異端分子會知道是哪個外來者。"
       }
     ]
   },
   {
-    "id": "Lycanthrope",
+    "id": "legion",
     "hatred": [
       {
-        "id": "Gambler",
-        "reason": "If the Lycanthrope is alive and the Gambler kills themself at night, no other players can die tonight."
+        "id": "engineer",
+        "reason": "如果工程師創造了軍團，所有邪惡玩家會變成軍團。如果軍團在場，工程師不會擁有能力並改為得知這一信息。"
+      },
+      {
+        "id": "hatter",
+        "reason": "如果帽匠創造了軍團，所有邪惡玩家會變成軍團。如果軍團在場，帽匠不會擁有能力。"
+      },
+      {
+        "id": "minstrel",
+        "reason": "如果軍團死於處決，所有軍團保留能力，但吟遊詩人可能會在當晚得知今天白天死於處決的玩家是軍團。"
+      },
+      {
+        "id": "politician",
+        "reason": "政客可能會被軍團當作邪惡玩家。"
+      },
+      {
+        "id": "preacher",
+        "reason": "如果傳教士選中了軍團，軍團仍然保留能力，但傳教士可能會得知自己選中了軍團。"
+      },
+      {
+        "id": "summoner",
+        "reason": "如果召喚師召喚了軍團，所有邪惡玩家會變成軍團。"
+      },
+      {
+        "id": "zealot",
+        "reason": "狂熱者可能會被軍團當作邪惡玩家。"
       }
     ]
   },
   {
-    "id": "Legion",
+    "id": "leviathan",
     "hatred": [
       {
-        "id": "Engineer",
-        "reason": "Legion and the Engineer can not both be in play at the start of the game. If the Engineer creates Legion, most players (including all evil players) become evil Legion."
+        "id": "banshee",
+        "reason": "每個夜晚*，利維坦要選擇一名存活的善良玩家（與之前的每個夜晚不同）：如果報喪女妖被選擇，他死亡並能力生效。"
       },
       {
-        "id": "Preacher",
-        "reason": "Only 1 jinxed character can be in play."
+        "id": "exorcist",
+        "reason": "如果利維坦提名並處決了驅魔人選擇的那名玩家，善良陣營獲勝。"
+      },
+      {
+        "id": "farmer",
+        "reason": "每個夜晚*，利維坦要選擇一名存活玩家（與之前的每個夜晚不同）：如果農夫被選擇，他的能力生效但不會死亡。"
+      },
+      {
+        "id": "grandmother",
+        "reason": "如果利維坦在場，孫子死於處決，邪惡陣營獲勝。"
+      },
+      {
+        "id": "hatter",
+        "reason": "利維坦不能在第五天之後加入遊戲。"
+      },
+      {
+        "id": "innkeeper",
+        "reason": "如果利維坦提名並處決了旅店老闆上個夜晚保護的其中一名玩家，善良陣營獲勝。"
+      },
+      {
+        "id": "king",
+        "reason": "如果利維坦在場，當至少一名玩家死亡時，國王每晚就會得知一個存活的角色。"
+      },
+      {
+        "id": "mayor",
+        "reason": "如果利維坦和鎮長在第五天存活且沒有處決發生，善良陣營獲勝。"
+      },
+      {
+        "id": "monk",
+        "reason": "如果利維坦提名並處決了僧侶上個夜晚保護的那名玩家，善良陣營獲勝。"
+      },
+      {
+        "id": "pithag",
+        "reason": "利維坦不能在第五天之後加入遊戲。"
+      },
+      {
+        "id": "ravenkeeper",
+        "reason": "每個夜晚*，利維坦要選擇一名存活的善良玩家（與之前的每個夜晚不同）：如果守鴉人被選擇，他的能力生效但不會死亡。"
+      },
+      {
+        "id": "sage",
+        "reason": "每個夜晚*，利維坦要選擇一名存活的善良玩家（與之前的每個夜晚不同）：如果賢者被選擇，他的能力生效但不會死亡。"
+      },
+      {
+        "id": "soldier",
+        "reason": "如果利維坦提名並處決了士兵，善良陣營獲勝。"
       }
     ]
   },
   {
-    "id": "Fang Gu",
+    "id": "lilmonsta",
     "hatred": [
       {
-        "id": "Scarlet Woman",
-        "reason": "If the Fang Gu chooses an Outsider and dies, the Scarlet Woman does not become the Fang Gu."
+        "id": "hatter",
+        "reason": "如果帽匠死亡，惡魔選擇了小怪寶，則還需要選擇變成一個爪牙角色。"
+      },
+      {
+        "id": "magician",
+        "reason": "如果魔術師存活，由說書人決定誰照看小怪寶。"
+      },
+      {
+        "id": "poppygrower",
+        "reason": "如果罌粟種植者在場，爪牙們會依次單獨被喚醒，直到其中一名玩家選擇照看小怪寶。"
+      },
+      {
+        "id": "psychopath",
+        "reason": "如果精神病患者正照看小怪寶，他會在被處決時死亡。"
+      },
+      {
+        "id": "scarletwoman",
+        "reason": "如果在五名及以上的玩家存活時照看小怪寶的玩家死亡，之後紅唇女郎必須要一直照看小怪寶。"
+      },
+      {
+        "id": "vizier",
+        "reason": "如果維齊爾正照看小怪寶，他會在被處決時死亡。"
       }
     ]
   },
   {
-    "id": "Spy",
+    "id": "lleech",
     "hatred": [
       {
-        "id": "Magician",
-        "reason": "When the Spy sees the Grimoire, the Demon and Magician's character tokens are removed."
+        "id": "mastermind",
+        "reason": "如果主謀存活且痢蛭的宿主死於處決，痢蛭存活但失去能力。"
       },
       {
-        "id": "Alchemist",
-        "reason": "The Alchemist can not have the Spy ability."
-      },
-      {
-        "id": "Poppy Grower",
-        "reason": "If the Poppy Grower is in play, the Spy does not see the Grimoire until the Poppy Grower dies."
-      },
-      {
-        "id": "Damsel",
-        "reason": "Only 1 jinxed character can be in play. "
-      },
-      {
-        "id": "Heretic",
-        "reason": "Only 1 jinxed character can be in play."
+        "id": "slayer",
+        "reason": "如果獵手選擇了痢蛭的宿主，則宿主會死亡。"
       }
     ]
   },
   {
-    "id": "Widow",
+    "id": "magician",
     "hatred": [
       {
-        "id": "Magician",
-        "reason": "When the Widow sees the Grimoire, the Demon and Magician's character tokens are removed."
+        "id": "legion",
+        "reason": "If the Magician is in play, during the Demon info step, Legion wake in separate groups. Each group learns which players are good, but does not learn the Magician."
       },
       {
-        "id": "Poppy Grower",
-        "reason": "If the Poppy Grower is in play, the Widow does not see the Grimoire until the Poppy Grower dies."
+        "id": "marionette",
+        "reason": "如果魔術師存活，惡魔不會得知誰是提線木偶。"
       },
       {
-        "id": "Alchemist",
-        "reason": "The Alchemist can not have the Widow ability."
+        "id": "spy",
+        "reason": "當間諜查看魔典時，魔術師和惡魔的角色標記會被說書人移除。"
       },
       {
-        "id": "Damsel",
-        "reason": "Only 1 jinxed character can be in play."
+        "id": "vizier",
+        "reason": "如果維齊爾在場，魔術師不會擁有能力，但他會免疫維齊爾的能力。"
       },
       {
-        "id": "Heretic",
-        "reason": "Only 1 jinxed character can be in play."
+        "id": "widow",
+        "reason": "當寡婦查看魔典時，魔術師和惡魔的標記會被說書人移除。"
+      },
+      {
+        "id": "wraith",
+        "reason": "每次處決後，存活的魔術師可以公開猜測一名存活玩家是亡魂：如果猜對了，惡魔當晚必須選擇亡魂。"
       }
     ]
   },
   {
-    "id": "Godfather",
+    "id": "marionette",
     "hatred": [
       {
-        "id": "Heretic",
-        "reason": "Only 1 jinxed character can be in play."
+        "id": "balloonist",
+        "reason": "如果提線木偶抽到了氣球駕駛員，在設置調整階段可能會+1外來者。"
+      },
+      {
+        "id": "huntsman",
+        "reason": "如果提線木偶抽到了巡山人，也會增加落難少女。"
+      },
+      {
+        "id": "kazali",
+        "reason": "如果提線木偶本應初始在場，他們會在惡魔之後進場並與惡魔鄰座。"
+      },
+      {
+        "id": "lilmonsta",
+        "reason": "如果提線木偶本應初始在場，他們會在惡魔之後進場並與惡魔鄰座。"
+      },
+      {
+        "id": "summoner",
+        "reason": "如果提線木偶本應初始在場，他們會在惡魔之後進場並與惡魔鄰座。"
       }
     ]
   },
   {
-    "id": "Baron",
+    "id": "mastermind",
     "hatred": [
       {
-        "id": "Heretic",
-        "reason": "The Baron might only add 1 Outsider, not 2."
+        "id": "vigormortis",
+        "reason": "如果亡骨魔死亡，被亡骨魔殺死的主謀依然保留能力。"
       }
     ]
   },
   {
-    "id": "Marionette",
+    "id": "mathematician",
     "hatred": [
       {
-        "id": "Lil' Monsta",
-        "reason": "The Marionette neighbors a Minion, not the Demon. The Marionette is not woken to choose who takes the Lil' Monsta token."
+        "id": "chambermaid",
+        "reason": "侍女會得知數學家是否醒來，即使她是在數學家之前醒來。"
       },
       {
-        "id": "Poppy Grower",
-        "reason": "When the Poppy Grower dies, the Demon learns the Marionette but the Marionette learns nothing."
+        "id": "drunk",
+        "reason": "The Mathematician learns if the Drunk’s ability yielded false info or failed to work properly."
       },
       {
-        "id": "Snitch",
-        "reason": "The Marionette does not learn 3 not in-play characters. The Demon learns an extra 3 instead."
+        "id": "lunatic",
+        "reason": "The Mathematician learns if the Lunatic attacks a different player than the real Demon attacked."
       },
       {
-        "id": "Balloonist",
-        "reason": "If the Marionette thinks that they are the Balloonist, +1 Outsider was added."
-      },
-      {
-        "id": "Damsel",
-        "reason": "The Marionette does not learn that a Damsel is in play."
-      },
-      {
-        "id": "Huntsman",
-        "reason": "If the Marionette thinks that they are the Huntsman, the Damsel was added."
+        "id": "marionette",
+        "reason": "The Mathematician learns if the Marionette’s ability yielded false info or failed to work properly."
       }
     ]
   },
   {
-    "id": "Riot",
+    "id": "pithag",
     "hatred": [
       {
-        "id": "Engineer",
-        "reason": "Riot and the Engineer can not both be in play at the start of the game. \nIf the Engineer creates Riot, the evil players become Riot."
+        "id": "cultleader",
+        "reason": "被麻臉巫婆創造的邪惡異教領袖無法因為自身能力轉變為善良陣營。"
       },
       {
-        "id": "Golem",
-        "reason": "If The Golem nominates Riot, the Riot player does not die."
+        "id": "damsel",
+        "reason": "如果麻臉巫婆創造了落難少女，改為由說書人來決定哪一名玩家變成落難少女。"
       },
       {
-        "id": "Snitch",
-        "reason": "If the Snitch is in play, each Riot player gets an extra 3 bluffs."
+        "id": "goon",
+        "reason": "被麻臉巫婆創造的邪惡莽夫無法因為自身能力轉變為善良陣營。"
       },
       {
-        "id": "Saint",
-        "reason": "If a good player nominates and kills the Saint, the Saint's team loses."
+        "id": "ogre",
+        "reason": "被麻臉巫婆創造的邪惡食人魔無法因為自身能力轉變為善良陣營。"
       },
       {
-        "id": "Butler",
-        "reason": "The Butler can not nominate their master."
+        "id": "politician",
+        "reason": "被麻臉巫婆創造的邪惡政客無法因為自身能力轉變為善良陣營。"
       },
       {
-        "id": "Pit-Hag",
-        "reason": "If the Pit-Hag creates Riot, all evil players become Riot. \nIf the Pit-Hag creates Riot after day 3, the game continues for one more day."
-      },
-      {
-        "id": "Mayor",
-        "reason": "If the 3rd day begins with just three players alive, the players may choose (as a group) not to nominate at all. If so (and a Mayor is alive) then the Mayor's team wins."
-      },
-      {
-        "id": "Monk",
-        "reason": "If a Riot player nominates and kills the Monk-protected-player, the Monk-protected-player does not die."
-      },
-      {
-        "id": "Farmer",
-        "reason": "If a Riot player nominates and kills a Farmer, the Farmer uses their ability tonight."
-      },
-      {
-        "id": "Innkeeper",
-        "reason": "If a Riot player nominates an Innkeeper-protected-player, the Innkeeper-protected-player does not die."
-      },
-      {
-        "id": "Sage",
-        "reason": "If a Riot player nominates and kills a Sage, the Sage uses their ability tonight."
-      },
-      {
-        "id": "Ravenkeeper",
-        "reason": "If a Riot player nominates and kills the Ravenkeeper, the Ravenkeeper uses their ability tonight."
-      },
-      {
-        "id": "Soldier",
-        "reason": "If a Riot player nominates the Soldier, the Soldier does not die."
-      },
-      {
-        "id": "Grandmother",
-        "reason": "If a Riot player nominates and kills the Grandchild, the Grandmother dies too."
-      },
-      {
-        "id": "King",
-        "reason": "If a Riot player nominates and kills the King and the Choirboy is alive, the Choirboy uses their ability tonight."
-      },
-      {
-        "id": "Exorcist",
-        "reason": "Only 1 jinxed character can be in play."
-      },
-      {
-        "id": "Minstrel",
-        "reason": "Only 1 jinxed character can be in play."
-      },
-      {
-        "id": "Flowergirl",
-        "reason": "Only 1 jinxed character can be in play."
-      },
-      {
-        "id": "Undertaker",
-        "reason": "Players that die by nomination register as being executed to the Undertaker."
-      },
-      {
-        "id": "Cannibal",
-        "reason": "Players that die by nomination register as being executed to the Cannibal."
-      },
-      {
-        "id": "Pacifist",
-        "reason": "Players that die by nomination register as being executed to the Pacifist."
-      },
-      {
-        "id": "Devil's Advocate",
-        "reason": "Players that die by nomination register as being executed to the Devil's Advocate."
-      },
-      {
-        "id": "Investigator",
-        "reason": "Riot registers as a Minion to the Investigator."
-      },
-      {
-        "id": "Clockmaker",
-        "reason": "Riot registers as a Minion to the Clockmaker."
-      },
-      {
-        "id": "Town Crier",
-        "reason": "Riot registers as a Minion to the Town Crier."
-      },
-      {
-        "id": "Damsel",
-        "reason": "Riot registers as a Minion to the Damsel."
-      },
-      {
-        "id": "Preacher",
-        "reason": "Riot registers as a Minion to the Preacher."
+        "id": "villageidiot",
+        "reason": "如果村夫在場數量不足3人，麻臉巫婆可以創造新的村夫。如果她這麼做，村夫的醉酒效果可能會更換目標。"
       }
     ]
   },
   {
-    "id": "Lleech",
+    "id": "plaguedoctor",
     "hatred": [
       {
-        "id": "Mastermind",
-        "reason": "If the Mastermind is alive and the Lleech's host dies by execution, the Lleech lives but loses their ability. "
+        "id": "baron",
+        "reason": "如果說書人獲得了男爵的能力，改為至多兩名玩家會變成外來者。"
       },
       {
-        "id": "Slayer",
-        "reason": "If the Slayer slays the Lleech's host, the host dies. "
+        "id": "boomdandy",
+        "reason": "如果說書人本應獲得炸彈人的能力，改為一名玩家會變成炸彈人。"
       },
       {
-        "id": "Heretic",
-        "reason": "If the Lleech has poisoned the Heretic then the Lleech dies, the Heretic remains poisoned."
+        "id": "eviltwin",
+        "reason": "如果說書人本應獲得鏡像雙子的能力，改為一名玩家會變成鏡像雙子。"
+      },
+      {
+        "id": "fearmonger",
+        "reason": "如果說書人本應獲得恐懼之靈的能力，改為一名爪牙玩家獲得此能力，且他會得知此事。"
+      },
+      {
+        "id": "goblin",
+        "reason": "如果說書人本應獲得哥布林的能力，改為一名爪牙玩家獲得此能力，且他會得知此事。"
+      },
+      {
+        "id": "marionette",
+        "reason": "如果說書人本應獲得提線木偶的能力，改為一名與惡魔鄰近的善良玩家變成提線木偶。"
+      },
+      {
+        "id": "scarletwoman",
+        "reason": "如果說書人本應獲得紅唇女郎的能力，改為一名爪牙玩家獲得此能力，且他會得知此事。"
+      },
+      {
+        "id": "spy",
+        "reason": "如果說書人本應獲得間諜的能力，改為一名爪牙玩家獲得此能力，且他會得知此事。"
+      },
+      {
+        "id": "wraith",
+        "reason": "如果說書人本應獲得亡魂的能力，改為一名爪牙玩家獲得此能力，且他會得知此事。"
+      }
+    ]
+  },
+  {
+    "id": "recluse",
+    "hatred": [
+      {
+        "id": "ogre",
+        "reason": "如果陌客被食人魔當作邪惡陣營，食人魔會得知自己轉變為邪惡。"
+      },
+      {
+        "id": "sage",
+        "reason": "陌客可能會被賢者當作殺死他的惡魔。"
+      }
+    ]
+  },
+  {
+    "id": "riot",
+    "hatred": [
+      {
+        "id": "atheist",
+        "reason": "在暴亂的提名鏈中，如果說書人被提名，玩家要進行投票。如果說書人\\"
+      },
+      {
+        "id": "banshee",
+        "reason": "每個夜晚*，暴亂要選擇一名存活玩家（與之前的每個夜晚不同）：如果報喪女妖被選擇，他死亡並能力生效。"
+      },
+      {
+        "id": "exorcist",
+        "reason": "如果暴亂提名並處決了驅魔人上個夜晚選擇的那名玩家，善良陣營獲勝。"
+      },
+      {
+        "id": "farmer",
+        "reason": "每個夜晚*，暴亂要選擇一名存活的善良玩家（與之前的每個夜晚不同）：如果農夫被選擇，他的能力生效但不會死亡。"
+      },
+      {
+        "id": "grandmother",
+        "reason": "如果暴亂在場，孫子死於處決，邪惡陣營獲勝。"
+      },
+      {
+        "id": "innkeeper",
+        "reason": "如果暴亂提名並處決了旅店老闆上個夜晚保護的其中一名玩家，善良陣營獲勝。"
+      },
+      {
+        "id": "king",
+        "reason": "如果暴亂在場，當至少一名玩家死亡時，國王每晚就會得知一個存活的角色。"
+      },
+      {
+        "id": "mayor",
+        "reason": "鎮長可以停止暴亂的提名鏈。如果他這樣做了，並且場上只有一名暴亂存活，善良陣營獲勝；否則，邪惡陣營獲勝。"
+      },
+      {
+        "id": "monk",
+        "reason": "如果暴亂提名並處決了僧侶上個夜晚保護的那名玩家，善良陣營獲勝。"
+      },
+      {
+        "id": "ravenkeeper",
+        "reason": "每個夜晚*，暴亂要選擇一名存活的善良玩家（與之前的每個夜晚不同）：如果守鴉人被選擇，他的能力生效但不會死亡。"
+      },
+      {
+        "id": "sage",
+        "reason": "每個夜晚*，暴亂要選擇一名存活的善良玩家（與之前的每個夜晚不同）：如果賢者被選擇，他的能力生效但不會死亡。"
+      },
+      {
+        "id": "soldier",
+        "reason": "如果暴亂提名並處決了士兵，善良陣營獲勝。"
+      }
+    ]
+  },
+  {
+    "id": "scarletwoman",
+    "hatred": [
+      {
+        "id": "alhadikhia",
+        "reason": "如果即將有兩名惡魔在場，則紅唇女郎變成的惡魔會變回紅唇女郎。"
+      },
+      {
+        "id": "fanggu",
+        "reason": "如果即將有兩名惡魔在場，紅唇女郎不會變成惡魔。"
+      }
+    ]
+  },
+  {
+    "id": "spy",
+    "hatred": [
+      {
+        "id": "damsel",
+        "reason": "如果間諜正在場或曾經在場，落難少女中毒。"
+      },
+      {
+        "id": "ogre",
+        "reason": "間諜必定被食人魔當作邪惡陣營。"
+      },
+      {
+        "id": "poppygrower",
+        "reason": "如果罌粟種植者擁有能力，間諜無法查看魔典。"
+      }
+    ]
+  },
+  {
+    "id": "summoner",
+    "hatred": [
+      {
+        "id": "clockmaker",
+        "reason": "召喚師會被鐘錶匠當作惡魔。"
+      },
+      {
+        "id": "courtier",
+        "reason": "如果召喚師因為侍臣的能力在第三個夜晚醉酒，由召喚師來選擇創造哪種惡魔，由說書人來決定哪名玩家發生轉變。"
+      },
+      {
+        "id": "engineer",
+        "reason": "如果存活的召喚師從遊戲中離場，說書人會獲得召喚師的能力。"
+      },
+      {
+        "id": "hatter",
+        "reason": "召喚師無法創造已經在場的惡魔。如果召喚師創造了一個不在場的惡魔，當晚的死亡由說書人決定。"
+      },
+      {
+        "id": "kazali",
+        "reason": "召喚師無法創造已經在場的惡魔。如果召喚師創造了一個不在場的惡魔，當晚的死亡由說書人決定。"
+      },
+      {
+        "id": "lordoftyphon",
+        "reason": "如果召喚師創造了堤豐之首，則堤豐之首必須與一名爪牙相鄰，且堤豐之首另一側的玩家會變成一個邪惡的爪牙。"
+      },
+      {
+        "id": "pithag",
+        "reason": "如果召喚師創造了第二個存活的惡魔，當晚的死亡由說書人決定。"
+      },
+      {
+        "id": "poppygrower",
+        "reason": "如果罌粟種植者在第三個夜晚存活，由召喚師來選擇創造哪種惡魔，由說書人來決定哪名玩家發生轉變。"
+      },
+      {
+        "id": "preacher",
+        "reason": "如果存活的召喚師失去能力，說書人會獲得召喚師能力。"
+      },
+      {
+        "id": "pukka",
+        "reason": "召喚師可以在第二個夜晚召喚普卡來替代第三個夜晚的召喚。"
+      },
+      {
+        "id": "zombuul",
+        "reason": "如果召喚師將一名已死亡的玩家變成了僵怖，該玩家會變成“已經死過一次”的僵怖。"
+      }
+    ]
+  },
+  {
+    "id": "vizier",
+    "hatred": [
+      {
+        "id": "alsaahir",
+        "reason": "說書人不會宣佈維齊爾在場。"
+      },
+      {
+        "id": "courtier",
+        "reason": "如果維齊爾失去能力，他會得知這一信息。如果侍臣在劇本列表中，且維齊爾在具有能力時被處決，他的陣營獲勝。"
+      },
+      {
+        "id": "fearmonger",
+        "reason": "在恐懼之靈因為自己的能力被喚醒時，維齊爾會一同被喚醒。他會得知恐懼之靈選擇了哪名玩家，並且無法使用自己的能力讓那名玩家立即被處決。"
+      },
+      {
+        "id": "investigator",
+        "reason": "說書人不會宣佈維齊爾在場。"
+      },
+      {
+        "id": "politician",
+        "reason": "維齊爾的能力可能會將政客當作邪惡陣營。"
+      },
+      {
+        "id": "preacher",
+        "reason": "如果維齊爾失去能力，他會得知此事，但不會在白天死亡。"
+      },
+      {
+        "id": "zealot",
+        "reason": "維齊爾的能力可能會將狂熱者當作邪惡陣營。"
+      }
+    ]
+  },
+  {
+    "id": "vortox",
+    "hatred": [
+      {
+        "id": "banshee",
+        "reason": "如果渦流殺死了報喪女妖，玩家仍然會得知正確信息。"
+      }
+    ]
+  },
+  {
+    "id": "widow",
+    "hatred": [
+      {
+        "id": "damsel",
+        "reason": "如果寡婦正在場或曾經在場，落難少女中毒。"
+      },
+      {
+        "id": "poppygrower",
+        "reason": "如果罌粟種植者擁有能力，寡婦無法查看魔典。"
+      }
+    ]
+  },
+  {
+    "id": "yaggababble",
+    "hatred": [
+      {
+        "id": "exorcist",
+        "reason": "如果驅魔人選中了牙噶巴卜，那麼牙噶巴卜在當晚無法造成死亡。"
       }
     ]
   }

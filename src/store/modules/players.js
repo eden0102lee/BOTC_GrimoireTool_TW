@@ -1,3 +1,6 @@
+import Vue from "vue";
+import { t } from "../../i18n";
+
 const NEWPLAYER = {
   name: "",
   id: "",
@@ -5,8 +8,20 @@ const NEWPLAYER = {
   reminders: [],
   isVoteless: false,
   isDead: false,
-  pronouns: ""
+  abilityLost: false
 };
+
+export function nextDefaultPlayerName(players) {
+  const prefix = t("player.defaultNamePrefix");
+  const taken = new Set(players.map(({ name }) => name));
+  for (let n = 1; n <= 15; n++) {
+    const candidate = `${prefix}${n}`;
+    if (!taken.has(candidate)) return candidate;
+  }
+  let n = 16;
+  while (taken.has(`${prefix}${n}`)) n++;
+  return `${prefix}${n}`;
+}
 
 const state = () => ({
   players: [],
@@ -80,11 +95,10 @@ const actions = {
         return player;
       });
     } else {
-      players = state.players.map(({ name, id, pronouns }) => ({
+      players = state.players.map(({ name, id }) => ({
         ...NEWPLAYER,
         name,
-        id,
-        pronouns
+        id
       }));
       commit("setFabled", { fabled: [] });
     }
@@ -102,24 +116,16 @@ const mutations = {
   set(state, players = []) {
     state.players = players;
   },
-  /**
-  The update mutation also has a property for isFromSockets
-  this property can be addded to payload object for any mutations
-  then can be used to prevent infinite loops when a property is
-  able to be set from multiple different session on websockets.
-  An example of this is in the sendPlayerPronouns and _updatePlayerPronouns
-  in socket.js.
-   */
   update(state, { player, property, value }) {
     const index = state.players.indexOf(player);
     if (index >= 0) {
-      state.players[index][property] = value;
+      Vue.set(state.players[index], property, value);
     }
   },
   add(state, name) {
     state.players.push({
       ...NEWPLAYER,
-      name
+      name: name || nextDefaultPlayerName(state.players)
     });
   },
   remove(state, index) {

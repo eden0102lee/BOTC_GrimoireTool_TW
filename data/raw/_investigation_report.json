@@ -1,0 +1,49 @@
+{
+  "official_roles_url": "https://script.bloodontheclocktower.com/data/roles.json",
+  "official_roles_status": "404 Not Found (HTML saved as data/raw/_official_roles_404.html)",
+  "official_roles_fallback": {
+    "url": "https://raw.githubusercontent.com/bra1n/townsquare/develop/src/roles.json",
+    "count": 130,
+    "first_role_id": "washerwoman"
+  },
+  "grimoire_character_source": {
+    "page": "https://clocktower.gstonegames.com/grimoire/",
+    "mechanism": "Vue SPA; roles bundled in webpack module ./roles.json (chunk b1d9) inside js/app.424f069e.js",
+    "public_api_probed": "No public roles JSON/API found (oss.gstonegames.com and clocktower.gstonegames.com/api/* returned 404)",
+    "embedded_roles_count": 209,
+    "companion_modules": [
+      "editions.json",
+      "fabled.json",
+      "game.json",
+      "hatred.json",
+      "tpi_roles_id_map.json"
+    ],
+    "cdn_icons": "https://oss.gstonegames.com/data_file/clocktower/role_icon/{slug}.png"
+  },
+  "community_sheet": {
+    "export_url_gid_1544433985": "https://docs.google.com/spreadsheets/d/1aAJdqSTafHnw01w-WZ94UPx1Me70Kz-EG1NFfBht2tA/export?format=csv&gid=1544433985",
+    "gviz_url": "gid=1544433985 gviz/tq?tqx=out:csv",
+    "row_count": 181,
+    "headers": [
+      "id",
+      "name",
+      "ability",
+      "flavor",
+      "firstNightReminder",
+      "otherNightReminder",
+      "remindersGlobal",
+      "reminders"
+    ]
+  },
+  "project_coverage": {
+    "src_roles_json_count": 130,
+    "roles_with_cjk_name": 10,
+    "characters_zh_TW_csv_data_rows": 10,
+    "community_covers_project_roles": 129,
+    "project_roles_missing_in_community": [
+      "mephit"
+    ],
+    "community_rows_not_in_project_roles": 52,
+    "possible_id_normalization_pairs": []
+  }
+}

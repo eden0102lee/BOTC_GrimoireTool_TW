@@ -8,16 +8,16 @@
       @click="toggleModal('reference')"
       icon="address-card"
       class="toggle"
-      title="Show Character Reference"
+      :title="$t('nightOrder.showReference')"
     />
     <h3>
-      Night Order
+      {{ $t("nightOrder.title") }}
       <font-awesome-icon icon="cloud-moon" />
-      {{ edition.name || "Custom Script" }}
+      {{ $editionName(edition) || $t("reference.customScript") }}
     </h3>
     <div class="night">
       <ul class="first">
-        <li class="headline">First Night</li>
+        <li class="headline">{{ $t("nightOrder.firstNight") }}</li>
         <li
           v-for="role in rolesFirstNight"
           :key="role.name"
@@ -56,7 +56,7 @@
         </li>
       </ul>
       <ul class="other">
-        <li class="headline">Other Nights</li>
+        <li class="headline">{{ $t("nightOrder.otherNights") }}</li>
         <li
           v-for="role in rolesOtherNight"
           :key="role.name"
@@ -114,24 +114,19 @@ export default {
         rolesFirstNight.push(
           {
             id: "evil",
-            name: "Minion info",
+            name: this.$t("nightOrder.minionInfo"),
             firstNight: 5,
             team: "minion",
             players: this.players.filter(p => p.role.team === "minion"),
-            firstNightReminder:
-              "• If more than one Minion, they all make eye contact with each other. " +
-              "• Show the “This is the Demon” card. Point to the Demon."
+            firstNightReminder: this.$t("nightOrder.minionReminder")
           },
           {
             id: "evil",
-            name: "Demon info & bluffs",
+            name: this.$t("nightOrder.demonInfo"),
             firstNight: 8,
             team: "demon",
             players: this.players.filter(p => p.role.team === "demon"),
-            firstNightReminder:
-              "• Show the “These are your minions” card. Point to each Minion. " +
-              "• Show the “These characters are not in play” card. Show 3 character tokens of good " +
-              "characters not in play."
+            firstNightReminder: this.$t("nightOrder.demonReminder")
           }
         );
       }
@@ -219,6 +214,15 @@ h4 {
     background: linear-gradient(90deg, $fabled, transparent 35%);
     .night .other & {
       background: linear-gradient(-90deg, $fabled, transparent 35%);
+    }
+  }
+}
+
+.loric {
+  .name {
+    background: linear-gradient(90deg, $loric, transparent 35%);
+    .night .other & {
+      background: linear-gradient(-90deg, $loric, transparent 35%);
     }
   }
 }
@@ -363,8 +367,8 @@ ul {
   }
 }
 
-/** hide players when town square is set to "public" **/
-#townsquare.public ~ .night-reference .modal .player {
+/** hide players when roles are hidden for projection **/
+#townsquare.hide-roles ~ .night-reference .modal .player {
   display: none;
 }
 </style>

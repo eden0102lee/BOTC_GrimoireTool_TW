@@ -8,11 +8,11 @@
       @click="clearVoteHistory"
       icon="trash-alt"
       class="clear"
-      title="Clear vote history"
+      :title="$t('voteHistory.clearTitle')"
       v-if="session.isSpectator"
     />
 
-    <h3>Vote history</h3>
+    <h3>{{ $t("voteHistory.title") }}</h3>
 
     <template v-if="!session.isSpectator">
       <div class="options">
@@ -23,26 +23,26 @@
               session.isVoteHistoryAllowed ? 'check-square' : 'square'
             ]"
           />
-          Accessible to players
+          {{ $t("voteHistory.accessibleToPlayers") }}
         </div>
         <div class="option" @click="clearVoteHistory">
           <font-awesome-icon icon="trash-alt" />
-          Clear for everyone
+          {{ $t("voteHistory.clearForEveryone") }}
         </div>
       </div>
     </template>
     <table>
       <thead>
         <tr>
-          <td>Time</td>
-          <td>Nominator</td>
-          <td>Nominee</td>
-          <td>Type</td>
-          <td>Votes</td>
-          <td>Majority</td>
+          <td>{{ $t("voteHistory.time") }}</td>
+          <td>{{ $t("voteHistory.nominator") }}</td>
+          <td>{{ $t("voteHistory.nominee") }}</td>
+          <td>{{ $t("voteHistory.type") }}</td>
+          <td>{{ $t("voteHistory.votes") }}</td>
+          <td>{{ $t("voteHistory.majority") }}</td>
           <td>
             <font-awesome-icon icon="user-friends" />
-            Voters
+            {{ $t("voteHistory.voters") }}
           </td>
         </tr>
       </thead>
@@ -63,7 +63,7 @@
           </td>
           <td>{{ vote.nominator }}</td>
           <td>{{ vote.nominee }}</td>
-          <td>{{ vote.type }}</td>
+          <td>{{ voteTypeLabel(vote.type) }}</td>
           <td>
             {{ vote.votes.length }}
             <font-awesome-icon icon="hand-paper" />
@@ -98,6 +98,11 @@ export default {
     ...mapState(["session", "modals"])
   },
   methods: {
+    voteTypeLabel(type) {
+      return type === "Exile"
+        ? this.$t("voteHistory.exile")
+        : this.$t("voteHistory.execution");
+    },
     clearVoteHistory() {
       this.$store.commit("session/clearVoteHistory");
     },

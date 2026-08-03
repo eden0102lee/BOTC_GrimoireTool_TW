@@ -1,7 +1,19 @@
+import { t } from "../i18n";
+
+function resolveWebSocketBase() {
+  const configured = (process.env.VUE_APP_WS_URL || "").trim();
+  if (configured) {
+    return configured.endsWith("/") ? configured : `${configured}/`;
+  }
+  const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+  const wsPort = process.env.VUE_APP_WS_PORT || "8081";
+  const host = window.location.hostname;
+  return `${wsProtocol}//${host}:${wsPort}/`;
+}
+
 class LiveSession {
   constructor(store) {
-    this._wss = "wss://live.clocktower.online:8080/";
-    // this._wss = "ws://localhost:8081/"; // uncomment if using local server with NODE_ENV=development
+    this._wss = resolveWebSocketBase();
     this._socket = null;
     this._isSpectator = true;
     this._gamestate = [];
@@ -202,9 +214,6 @@ class LiveSession {
       case "bye":
         this._handleBye(params);
         break;
-      case "pronouns":
-        this._updatePlayerPronouns(params);
-        break;
     }
   }
 
@@ -260,7 +269,6 @@ class LiveSession {
       id: player.id,
       isDead: player.isDead,
       isVoteless: player.isVoteless,
-      pronouns: player.pronouns,
       ...(player.role && player.role.team === "traveler"
         ? { roleId: player.role.id }
         : {})
@@ -325,7 +333,7 @@ class LiveSession {
       const player = players[x];
       const { roleId } = state;
       // update relevant properties
-      ["name", "id", "isDead", "isVoteless", "pronouns"].forEach(property => {
+      ["name", "id", "isDead", "isVoteless"].forEach(property => {
         const value = state[property];
         if (player[property] !== value) {
           this._store.commit("players/update", { player, property, value });
@@ -404,9 +412,7 @@ class LiveSession {
           }
         });
         alert(
-          `This session contains custom characters that can't be found. ` +
-            `Please load them before joining! ` +
-            `Missing roles: ${missing.join(", ")}`
+          t("socket.missingRoles", { roles: missing.join(", ") })
         );
         this.disconnect();
         this._store.commit("toggleModal", "edition");
@@ -471,9 +477,10 @@ class LiveSession {
    * @param index
    * @param property
    * @param value
+   * @param bluffs optional role ids sent with a demon's role
    * @private
    */
-  _updatePlayer({ index, property, value }) {
+  _updatePlayer({ index, property, value, bluffs }) {
     if (!this._isSpectator) return;
     const player = this._store.state.players.players[index];
     if (!player) return;
@@ -498,45 +505,25 @@ class LiveSession {
           value: role
         });
       }
+      // apply demon bluffs when included with a distributed role
+      if (Array.isArray(bluffs)) {
+        this._store.commit("players/setBluff");
+        bluffs.forEach((roleId, bluffIndex) => {
+          const role = roleId
+            ? this._store.state.roles.get(roleId) ||
+              this._store.getters.rolesJSONbyId.get(roleId) ||
+              {}
+            : {};
+          this._store.commit("players/setBluff", {
+            index: bluffIndex,
+            role
+          });
+        });
+      }
     } else {
       // just update the player otherwise
       this._store.commit("players/update", { player, property, value });
     }
-  }
-
-  /**
-   * Publish a player pronouns update
-   * @param player
-   * @param value
-   * @param isFromSockets
-   */
-  sendPlayerPronouns({ player, value, isFromSockets }) {
-    //send pronoun only for the seated player or storyteller
-    //Do not re-send pronoun data for an update that was recieved from the sockets layer
-    if (
-      isFromSockets ||
-      (this._isSpectator && this._store.state.session.playerId !== player.id)
-    )
-      return;
-    const index = this._store.state.players.players.indexOf(player);
-    this._send("pronouns", [index, value]);
-  }
-
-  /**
-   * Update a pronouns based on incoming data.
-   * @param index
-   * @param value
-   * @private
-   */
-  _updatePlayerPronouns([index, value]) {
-    const player = this._store.state.players.players[index];
-
-    this._store.commit("players/update", {
-      player,
-      property: "pronouns",
-      value,
-      isFromSockets: true
-    });
   }
 
   /**
@@ -651,21 +638,31 @@ class LiveSession {
   /**
    * Distribute player roles to all seated players in a direct message.
    * This will be split server side so that each player only receives their own (sub)message.
+   * Demons also receive the storyteller's demon bluffs.
    */
   distributeRoles() {
-    if (this._isSpectator) return;
+    if (this._isSpectator) return false;
     const message = {};
+    const bluffs = this._store.state.players.bluffs;
+    const bluffIds = [0, 1, 2].map(i => (bluffs[i] && bluffs[i].id) || "");
     this._store.state.players.players.forEach((player, index) => {
-      if (player.id && player.role) {
-        message[player.id] = [
-          "player",
-          { index, property: "role", value: player.role.id }
-        ];
+      if (player.id && player.role && player.role.id) {
+        const payload = {
+          index,
+          property: "role",
+          value: player.role.id,
+          // demons get bluffs; others get an empty list to clear leftovers
+          bluffs: player.role.team === "demon" ? bluffIds : []
+        };
+        message[player.id] = ["player", payload];
       }
     });
     if (Object.keys(message).length) {
       this._send("direct", message);
+      return true;
     }
+    alert(t("socket.noRolesToDistribute"));
+    return false;
   }
 
   /**
@@ -908,11 +905,7 @@ export default store => {
         session.sendGamestate("", true);
         break;
       case "players/update":
-        if (payload.property === "pronouns") {
-          session.sendPlayerPronouns(payload);
-        } else {
-          session.sendPlayer(payload);
-        }
+        session.sendPlayer(payload);
         break;
     }
   });
@@ -922,6 +915,6 @@ export default store => {
   if (sessionId) {
     store.commit("session/setSpectator", true);
     store.commit("session/setSessionId", sessionId);
-    store.commit("toggleGrimoire", false);
   }
 };
+

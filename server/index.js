@@ -1,4 +1,5 @@
 const fs = require("fs");
+const http = require("http");
 const https = require("https");
 const WebSocket = require("ws");
 const client = require("prom-client");
@@ -12,22 +13,115 @@ register.setDefaultLabels({
 
 const PING_INTERVAL = 30000; // 30 seconds
 
-const options = {};
+const HOST = process.env.HOST || "0.0.0.0";
+const WS_PORT = parseInt(process.env.WS_PORT || "8081", 10);
+const LISTEN_PORT = parseInt(process.env.PORT || String(WS_PORT), 10);
+const IS_DEV = process.env.NODE_ENV === "development";
+const CLOUD =
+  process.env.CLOUD === "1" ||
+  process.env.RENDER === "true" ||
+  !!process.env.RENDER_SERVICE_ID;
+const LOCAL_PLAY =
+  process.env.LOCAL_PLAY === "1" || (IS_DEV && !CLOUD);
 
-if (process.env.NODE_ENV !== "development") {
-  options.cert = fs.readFileSync("cert.pem");
-  options.key = fs.readFileSync("key.pem");
+function parseAllowedOrigins() {
+  const raw = process.env.ALLOWED_ORIGINS;
+  if (!raw) return null;
+  return raw
+    .split(",")
+    .map(s => s.trim())
+    .filter(Boolean);
 }
 
-const server = https.createServer(options);
-const wss = new WebSocket.Server({
-  ...(process.env.NODE_ENV === "development" ? { port: 8081 } : { server }),
-  verifyClient: info =>
-    info.origin &&
-    !!info.origin.match(
-      /^https?:\/\/([^.]+\.github\.io|localhost|clocktower\.online|eddbra1nprivatetownsquare\.xyz)/i
-    )
-});
+const EXTRA_ORIGINS = parseAllowedOrigins();
+
+function isAllowedOrigin(origin) {
+  if (!origin) return LOCAL_PLAY || CLOUD;
+  if (LOCAL_PLAY) return true;
+  if (
+    EXTRA_ORIGINS &&
+    EXTRA_ORIGINS.some(o => origin === o || origin.startsWith(o))
+  ) {
+    return true;
+  }
+  return !!origin.match(
+    /^https?:\/\/([^.]+\.github\.io|localhost|127\.0\.0\.1|clocktower\.online|eddbra1nprivatetownsquare\.xyz|\d{1,3}(?:\.\d{1,3}){3}(?::\d+)?)/i
+  );
+}
+
+function handleHttpRequest(req, res) {
+  if (req.url === "/health" || req.url === "/healthz") {
+    res.writeHead(200, { "Content-Type": "text/plain" });
+    res.end("ok");
+    return;
+  }
+  if (req.url === "/metrics") {
+    res.setHeader("Content-Type", register.contentType);
+    register.metrics().then(out => res.end(out));
+    return;
+  }
+  // Legacy prod served Prometheus on every path; keep that for HTTPS mode only via /metrics
+  res.writeHead(404);
+  res.end();
+}
+
+let server = null;
+let wss;
+
+if (CLOUD) {
+  // PaaS (Render etc.): TLS terminated at edge; plain HTTP + WS on $PORT
+  server = http.createServer(handleHttpRequest);
+  wss = new WebSocket.Server({
+    server,
+    verifyClient: info => isAllowedOrigin(info.origin)
+  });
+  server.listen(LISTEN_PORT, HOST, () => {
+    console.log(
+      `WebSocket (cloud) listening on http://${HOST}:${LISTEN_PORT}/ (LOCAL_PLAY=${
+        LOCAL_PLAY ? "1" : "0"
+      })`
+    );
+  });
+} else if (IS_DEV) {
+  // Local / LAN: raw WS port (play-server + serve:ws)
+  wss = new WebSocket.Server({
+    port: WS_PORT,
+    host: HOST,
+    verifyClient: info => isAllowedOrigin(info.origin)
+  });
+  console.log(
+    `WebSocket listening on ws://${HOST}:${WS_PORT}/ (LOCAL_PLAY=${
+      LOCAL_PLAY ? "1" : "0"
+    })`
+  );
+} else {
+  // Legacy self-hosted HTTPS (cert.pem / key.pem in cwd)
+  const options = {
+    cert: fs.readFileSync("cert.pem"),
+    key: fs.readFileSync("key.pem")
+  };
+  server = https.createServer(options, (req, res) => {
+    if (req.url === "/health" || req.url === "/healthz") {
+      res.writeHead(200, { "Content-Type": "text/plain" });
+      res.end("ok");
+      return;
+    }
+    res.setHeader("Content-Type", register.contentType);
+    register.metrics().then(out => res.end(out));
+  });
+  wss = new WebSocket.Server({
+    server,
+    verifyClient: info => isAllowedOrigin(info.origin)
+  });
+  const legacyPort = parseInt(process.env.HTTPS_PORT || "8080", 10);
+  server.listen(legacyPort, HOST, () => {
+    console.log(
+      `WebSocket (HTTPS) listening on ${HOST}:${legacyPort} (LOCAL_PLAY=${
+        LOCAL_PLAY ? "1" : "0"
+      })`
+    );
+  });
+}
 
 function noop() {}
 
@@ -248,13 +342,3 @@ const interval = setInterval(function ping() {
 wss.on("close", function close() {
   clearInterval(interval);
 });
-
-// prod mode with stats API
-if (process.env.NODE_ENV !== "development") {
-  console.log("server starting");
-  server.listen(8080);
-  server.on("request", (req, res) => {
-    res.setHeader("Content-Type", register.contentType);
-    register.metrics().then(out => res.end(out));
-  });
-}

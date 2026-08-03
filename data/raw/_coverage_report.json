@@ -1,0 +1,43 @@
+{
+  "roles_json_count": 130,
+  "roles_with_cjk_name": 10,
+  "characters_zh_TW_rows": 10,
+  "community_sheet_rows": 181,
+  "community_headers": [
+    "id",
+    "name",
+    "ability",
+    "flavor",
+    "firstNightReminder",
+    "otherNightReminder",
+    "remindersGlobal",
+    "reminders"
+  ],
+  "roles_in_local_csv": 10,
+  "roles_missing_local_csv": [
+    "acrobat",
+    "alchemist",
+    "alhadikhia",
+    "amnesiac",
+    "apprentice",
+    "artist",
+    "assassin",
+    "atheist",
+    "balloonist",
+    "barber",
+    "barista",
+    "beggar",
+    "bishop",
+    "bonecollector",
+    "boomdandy",
+    "bountyhunter",
+    "bureaucrat",
+    "butcher",
+    "butler",
+    "cannibal"
+  ],
+  "roles_missing_local_csv_count": 120,
+  "roles_in_community": 129,
+  "roles_missing_community_count": 1,
+  "community_not_in_roles_count": 52
+}

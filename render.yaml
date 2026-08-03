@@ -1,0 +1,27 @@
+# Render Blueprint — Live Session WebSocket server
+# Docs: https://render.com/docs/blueprint-spec
+#
+# After first deploy, set GitHub Actions secret:
+#   VUE_APP_WS_URL=wss://<this-service>.onrender.com/
+#
+# And set ALLOWED_ORIGINS to your GitHub Pages origin, e.g.:
+#   https://<user>.github.io
+
+services:
+  - type: web
+    name: clocktower-grimoire-ws
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm ci --omit=dev
+    startCommand: npm run start:ws
+    healthCheckPath: /health
+    envVars:
+      - key: CLOUD
+        value: "1"
+      - key: NODE_ENV
+        value: production
+      # Comma-separated page origins allowed to open WebSockets.
+      # Override in the Render Dashboard after you know your Pages URL.
+      - key: ALLOWED_ORIGINS
+        sync: false

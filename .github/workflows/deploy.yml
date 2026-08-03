@@ -16,6 +16,9 @@ jobs:
           node-version: '18'
 
       - name: Install and Build 🔧
+        env:
+          # Public Render (or other) WS URL, e.g. wss://my-app.onrender.com/
+          VUE_APP_WS_URL: ${{ secrets.VUE_APP_WS_URL }}
         run: |
           npm ci
           npm run build

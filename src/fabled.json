@@ -1,136 +1,188 @@
 [
   {
-    "id": "doomsayer",
-    "firstNightReminder": "",
-    "otherNightReminder": "",
-    "reminders": [],
-    "setup": false,
-    "name": "Doomsayer",
-    "team": "fabled",
-    "ability": "If 4 or more players live, each living player may publicly choose (once per game) that a player of their own alignment dies."
-  },
-  {
     "id": "angel",
-    "firstNightReminder": "",
-    "otherNightReminder": "",
-    "reminders": ["Protect", "Something Bad"],
-    "setup": false,
-    "name": "Angel",
+    "name": "天使",
     "team": "fabled",
-    "ability": "Something bad might happen to whoever is most responsible for the death of a new player."
+    "ability": "那名對他的死負主要責任的玩家將會遭遇一些不好的事情。",
+    "setup": false,
+    "reminders": [
+      "保護",
+      "天罰"
+    ],
+    "firstNight": 2,
+    "otherNight": 0,
+    "firstNightReminder": "宣佈將會受到天使保護的一名或多名玩家。將“庇護”提示標記放在每一個受到保護的玩家標記旁。",
+    "otherNightReminder": ""
   },
   {
     "id": "buddhist",
-    "firstNightReminder": "",
-    "otherNightReminder": "",
+    "name": "佛教徒",
+    "team": "fabled",
+    "ability": "每個白天的前兩分鐘老玩家不能發言。",
+    "setup": false,
     "reminders": [],
-    "setup": false,
-    "name": "Buddhist",
-    "team": "fabled",
-    "ability": "For the first 2 minutes of each day, veteran players may not talk."
+    "firstNight": 3,
+    "otherNight": 0,
+    "firstNightReminder": "宣佈哪名玩家是佛教徒。",
+    "otherNightReminder": ""
   },
   {
-    "id": "hellslibrarian",
-    "firstNightReminder": "",
-    "otherNightReminder": "",
-    "reminders": ["Something Bad"],
-    "setup": false,
-    "name": "Hell's Librarian",
+    "id": "deusexfiasco",
+    "name": "失敗的上帝",
     "team": "fabled",
-    "ability": "Something bad might happen to whoever talks when the Storyteller has asked for silence."
-  },
-  {
-    "id": "revolutionary",
-    "firstNightReminder": "",
-    "otherNightReminder": "",
-    "reminders": ["Used"],
-    "setup": false,
-    "name": "Revolutionary",
-    "team": "fabled",
-    "ability": "2 neighboring players are known to be the same alignment. Once per game, one of them registers falsely."
-  },
-  {
-    "id": "fiddler",
-    "firstNightReminder": "",
-    "otherNightReminder": "",
-    "reminders": [],
-    "setup": false,
-    "name": "Fiddler",
-    "team": "fabled",
-    "ability": "Once per game, the Demon secretly chooses an opposing player: all players choose which of these 2 players win."
-  },
-  {
-    "id": "toymaker",
-    "firstNightReminder": "",
-    "otherNight": 1,
-    "otherNightReminder": "If it is a night when a Demon attack could end the game, and the Demon is marked “Final night: No Attack,” then the Demon does not act tonight. (Do not wake them.)",
-    "reminders": ["Final Night: No Attack"],
-    "setup": false,
-    "name": "Toymaker",
-    "team": "fabled",
-    "ability": "The Demon may choose not to attack & must do this at least once per game. Evil players get normal starting info."
-  },
-  {
-    "id": "fibbin",
-    "firstNightReminder": "",
-    "otherNightReminder": "",
-    "reminders": ["Used"],
-    "setup": false,
-    "name": "Fibbin",
-    "team": "fabled",
-    "ability": "Once per game, 1 good player might get false information."
-  },
-  {
-    "id": "duchess",
-    "firstNightReminder": "",
-    "otherNight": 1,
-    "otherNightReminder": "Wake each player marked “Visitor” or “False Info” one at a time. Show them the Duchess token, then fingers (1, 2, 3) equaling the number of evil players marked “Visitor” or, if you are waking the player marked “False Info,” show them any number of fingers except the number of evil players marked “Visitor.”",
-    "reminders": ["Visitor", "False Info"],
-    "setup": false,
-    "name": "Duchess",
-    "team": "fabled",
-    "ability": "Each day, 3 players may choose to visit you. At night*, each visitor learns how many visitors are evil, but 1 gets false info."
-  },
-  {
-    "id": "sentinel",
-    "firstNightReminder": "",
-    "otherNightReminder": "",
-    "reminders": [],
+    "ability": "每局遊戲至少一次，說書人將會出現失誤，但會糾正並公開承認自己曾處理有誤。",
     "setup": true,
-    "name": "Sentinel",
-    "team": "fabled",
-    "ability": "There might be 1 extra or 1 fewer Outsider in play."
-  },
-  {
-    "id": "spiritofivory",
+    "reminders": [
+      "哇喔"
+    ],
+    "firstNight": 0,
+    "otherNight": 0,
     "firstNightReminder": "",
-    "otherNightReminder": "",
-    "reminders": ["No extra evil"],
-    "setup": false,
-    "name": "Spirit of Ivory",
-    "team": "fabled",
-    "ability": "There can't be more than 1 extra evil player."
+    "otherNightReminder": ""
   },
   {
     "id": "djinn",
-    "firstNight": 0,
-    "firstNightReminder": "",
-    "otherNightReminder": "",
-    "reminders": [],
-    "setup": false,
-    "name": "Djinn",
+    "name": "燈神",
     "team": "fabled",
-    "ability": "Use the Djinn's special rule. All players know what it is."
+    "ability": "使用燈神的相剋規則。所有玩家都會知道其內容。",
+    "setup": false,
+    "reminders": [],
+    "firstNight": 0,
+    "otherNight": 0,
+    "firstNightReminder": "",
+    "otherNightReminder": ""
   },
   {
-    "id": "stormcatcher",
-    "firstNight": 1,
-    "firstNightReminder": "Mark a good player as \"Safe\". Wake each evil player and show them the marked player.",
-    "otherNightReminder": "",
-    "reminders": ["Safe"],
-    "setup": false,
-    "name": "Storm Catcher",
+    "id": "doomsayer",
+    "name": "末日預言者",
     "team": "fabled",
-    "ability": "Name a good character. If in play, they can only die by execution, but evil players learn which player it is."
+    "ability": "如果大於等於四名玩家存活，每名當前存活的玩家可以公開要求你殺死一名與他陣營相同的玩家（每名玩家限一次）。",
+    "setup": false,
+    "reminders": [],
+    "firstNight": 0,
+    "otherNight": 0,
+    "firstNightReminder": "",
+    "otherNightReminder": ""
+  },
+  {
+    "id": "duchess",
+    "name": "公爵夫人",
+    "team": "fabled",
+    "ability": "每個白天，三名玩家可以一起拜訪你。當晚*，他們會得知他們之中有幾個是邪惡的，但其中一人的信息是錯的。",
+    "setup": false,
+    "reminders": [
+      "不正確",
+      "訪客"
+    ],
+    "firstNight": 0,
+    "otherNight": 1,
+    "firstNightReminder": "",
+    "otherNightReminder": "分別單獨喚醒每一名標記了“訪客”和“錯誤信息”的玩家。向被喚醒的玩家展示“公爵夫人”標記。如果被喚醒的玩家被標記了“訪客”，向他們用手指比劃一個數字（0，1，2或3），這個數字會等於被標記了“訪客”和“錯誤信息”的玩家中邪惡玩家的數量。如果被喚醒的玩家被標記了“錯誤信息”，則向他們用手指比劃一個錯誤的數字。"
+  },
+  {
+    "id": "ferryman",
+    "name": "擺渡人",
+    "team": "fabled",
+    "ability": "在遊戲的最後一天，所有已死亡玩家會重新獲得投票標記。",
+    "setup": false,
+    "reminders": [],
+    "firstNight": 0,
+    "otherNight": 0,
+    "firstNightReminder": "",
+    "otherNightReminder": ""
+  },
+  {
+    "id": "fibbin",
+    "name": "騙人精",
+    "team": "fabled",
+    "ability": "每局遊戲限一次，一名善良玩家可能會得知“有問題”的信息。",
+    "setup": false,
+    "reminders": [
+      "已發生"
+    ],
+    "firstNight": 0,
+    "otherNight": 0,
+    "firstNightReminder": "",
+    "otherNightReminder": ""
+  },
+  {
+    "id": "fiddler",
+    "name": "小提琴手",
+    "team": "fabled",
+    "ability": "每局遊戲限一次，惡魔可以秘密選擇一名對立陣營的玩家，所有玩家要表決：這兩名玩家中誰的陣營獲勝。",
+    "setup": false,
+    "reminders": [],
+    "firstNight": 0,
+    "otherNight": 0,
+    "firstNightReminder": "",
+    "otherNightReminder": ""
+  },
+  {
+    "id": "hellslibrarian",
+    "name": "地獄藏書員",
+    "team": "fabled",
+    "ability": "當說書人宣佈安靜時，仍在說話的玩家可能會遭遇一些不好的事情。",
+    "setup": false,
+    "reminders": [
+      "懲罰"
+    ],
+    "firstNight": 0,
+    "otherNight": 0,
+    "firstNightReminder": "",
+    "otherNightReminder": ""
+  },
+  {
+    "id": "revolutionary",
+    "name": "革命者",
+    "team": "fabled",
+    "ability": "公開聲明一對鄰座玩家本局遊戲一直保持同一陣營。每局遊戲限一次，他們中的一人可能被當作其他的角色/陣營。",
+    "setup": false,
+    "reminders": [
+      "不正確"
+    ],
+    "firstNight": 0,
+    "otherNight": 0,
+    "firstNightReminder": "",
+    "otherNightReminder": ""
+  },
+  {
+    "id": "sentinel",
+    "name": "哨兵",
+    "team": "fabled",
+    "ability": "在初始設置時，可能會額外增加或減少一個外來者。",
+    "setup": true,
+    "reminders": [],
+    "firstNight": 0,
+    "otherNight": 0,
+    "firstNightReminder": "",
+    "otherNightReminder": ""
+  },
+  {
+    "id": "spiritofivory",
+    "name": "聖潔之魂",
+    "team": "fabled",
+    "ability": "遊戲過程中邪惡玩家的總數最多能比初始設置多一名。",
+    "setup": false,
+    "reminders": [
+      "不再出現邪惡"
+    ],
+    "firstNight": 0,
+    "otherNight": 0,
+    "firstNightReminder": "",
+    "otherNightReminder": ""
+  },
+  {
+    "id": "toymaker",
+    "name": "玩具匠",
+    "team": "fabled",
+    "ability": "惡魔可以在夜晚選擇放棄攻擊（每局遊戲至少一次）。邪惡玩家照常獲取初始信息。",
+    "setup": false,
+    "reminders": [
+      "已選擇不攻擊"
+    ],
+    "firstNight": 4,
+    "otherNight": 1,
+    "firstNightReminder": "即使玩家數量少於七名，也依舊進行夜晚順序表上的 “爪牙信息” 和 “惡魔信息” 步驟。",
+    "otherNightReminder": "如果惡魔醒來後所進行的攻擊會導致遊戲結束，但惡魔還有“無法攻擊”的提示標記，惡魔當晚不會被喚醒。"
   }
 ]
