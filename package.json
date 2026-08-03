@@ -4,7 +4,7 @@
   "description": "Blood on the Clocktower Grimoire (Traditional Chinese) — local LAN fork of bra1n/townsquare",
   "author": "Steffen Baumgart",
   "scripts": {
-    "start": "node scripts/play-server.js",
+    "start": "node scripts/start-entry.js",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build ./src/main.js",
     "lint": "vue-cli-service lint",
