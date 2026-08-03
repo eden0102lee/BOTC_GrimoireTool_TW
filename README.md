@@ -16,7 +16,8 @@
 
 功能對照集石魔典見 [`docs/parity-checklist.md`](docs/parity-checklist.md)。  
 LAN 遊玩步驟見 [`docs/local-play.md`](docs/local-play.md)。  
-跨網路公開網址（Render + GitHub Pages）見 [`docs/online-hosting.md`](docs/online-hosting.md)。
+跨網路公開網址（Render + GitHub Pages）見 [`docs/online-hosting.md`](docs/online-hosting.md)。  
+**GitHub Pages 第一次啟用**（找不到部署時必看）→ [`docs/github-pages-setup.md`](docs/github-pages-setup.md)。
 
 ## 快速開始
 

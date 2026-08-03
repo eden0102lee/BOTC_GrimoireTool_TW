@@ -56,19 +56,13 @@ Free Web Service 閒置約 15 分鐘會休眠，喚醒可能要數十秒。開�
 
 ## 接上 GitHub Pages（必做，才有魔典畫面）
 
-1. GitHub repo → **Settings → Pages** → Source 選 **Deploy from a branch** → Branch **`gh-pages`** / **`/ (root)`** → Save。  
-   （若尚未有 `gh-pages` 分支，先完成下面第 2 步 workflow。）
+**逐步圖文說明見 [github-pages-setup.md](./github-pages-setup.md)**（找不到 Pages 設定時必看）。
 
-2. **Settings → Secrets and variables → Actions** 新增：
+1. GitHub repo → **Settings → Pages** → Source 選 **GitHub Actions**。
+2. **Actions → Deploy to GitHub Pages → Run workflow**（分支 `main`）。
+3. 完成後開啟：**https://eden0102lee.github.io/BOTC_GrimoireTool_TW/**
 
-   - Name: `VUE_APP_WS_URL`
-   - Value: `wss://botc-grimoiretool-tw.onrender.com/`
-
-3. **Actions** → **Deploy to GitHub Pages** → **Run workflow**（或 push 到 `main`）。
-
-4. 等幾分鐘後開啟：**https://eden0102lee.github.io/BOTC_GrimoireTool_TW/**
-
-5. **連線 → 創建小鎮** → **複製玩家連結** 分享（連結會是 GitHub Pages 網址 + `#房間碼`）。
+可選 Secret：`VUE_APP_WS_URL` = `wss://botc-grimoiretool-tw.onrender.com/`（未設時 workflow 用此預設值）。
 
 ## 本機 LAN（不變）
 

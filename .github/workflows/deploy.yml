@@ -4,31 +4,52 @@ on:
     branches:
       - main
   workflow_dispatch:
+
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 jobs:
-  build-and-deploy:
-    concurrency: ci-${{ github.ref }}
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout 🛎️
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: "18"
           cache: npm
 
-      - name: Install and Build 🔧
+      - name: Install and build
         env:
           VUE_APP_WS_URL: ${{ secrets.VUE_APP_WS_URL }}
           VUE_APP_PUBLIC_PATH: /BOTC_GrimoireTool_TW/
         run: |
           npm ci
+          if [ -z "$VUE_APP_WS_URL" ]; then
+            export VUE_APP_WS_URL="wss://botc-grimoiretool-tw.onrender.com/"
+          fi
           npm run build
 
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          branch: gh-pages
-          folder: dist
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
