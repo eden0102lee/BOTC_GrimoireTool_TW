@@ -1,4 +1,12 @@
 /*** Media queries ***/
+
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+}
+
 // Large devices (desktops, less than 1200px)
 @media screen and (max-width: 1199.98px) {
   html,
@@ -33,6 +41,59 @@
   #townsquare {
     padding: 10px;
   }
+  .left-panels {
+    max-height: calc(
+      100dvh - max(16px, var(--safe-top)) - max(16px, var(--safe-bottom))
+    );
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    max-width: min(
+      340px,
+      calc(100vw - max(16px, var(--safe-left)) - max(8px, var(--safe-right)))
+    );
+  }
+  .modal {
+    max-width: calc(100vw - 24px) !important;
+    max-height: calc(100dvh - 24px) !important;
+  }
+  .roles .modal,
+  .characters .modal {
+    max-width: calc(100vw - 24px) !important;
+  }
+  #controls {
+    top: max(3px, var(--safe-top));
+    right: max(3px, var(--safe-right));
+    padding-right: max(50px, calc(40px + var(--safe-right)));
+  }
+}
+
+// Portrait / tall narrow
+@media screen and (max-aspect-ratio: 1/1) {
+  #townsquare {
+    padding: 10px 6px;
+  }
+
+  .left-panels {
+    max-width: min(
+      300px,
+      calc(100vw - max(12px, var(--safe-left)) - max(12px, var(--safe-right)))
+    );
+    max-height: min(
+      58dvh,
+      calc(
+        100dvh - max(72px, var(--safe-top)) - max(48px, var(--safe-bottom))
+      )
+    );
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  #controls {
+    padding-right: max(44px, calc(36px + var(--safe-right)));
+  }
 }
 
 // Small devices (landscape phones, less than 768px)
@@ -46,9 +107,62 @@
   }
   .player > .menu {
     bottom: 0;
+    max-width: min(220px, calc(100vw - 32px));
+    white-space: normal;
     &:before {
       bottom: 0;
     }
+  }
+  .left-panels {
+    gap: 4px;
+    left: max(8px, var(--safe-left));
+    top: max(8px, var(--safe-top));
+    max-height: min(
+      52dvh,
+      calc(
+        100dvh - max(64px, var(--safe-top)) - max(40px, var(--safe-bottom))
+      )
+    );
+  }
+  .left-panels .phase-recorder {
+    max-height: min(38dvh, calc(100dvh - 180px));
+  }
+  #townsquare {
+    padding: 6px 4px;
+  }
+  #townsquare .circle .player > .name {
+    font-size: 85%;
+  }
+  #townsquare .circle .player > .name span {
+    max-width: 14vh;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    vertical-align: bottom;
+  }
+  #townsquare > .bluffs,
+  #townsquare > .fabled {
+    bottom: max(6px, var(--safe-bottom));
+  }
+  #townsquare > .bluffs {
+    left: max(6px, var(--safe-left));
+  }
+  #townsquare > .fabled {
+    right: max(6px, var(--safe-right));
+  }
+  #townsquare > .bluffs ul li,
+  #townsquare > .fabled ul li {
+    width: 11vh;
+    height: 11vh;
+  }
+  #version {
+    right: max(10px, var(--safe-right));
+    bottom: max(10px, var(--safe-bottom));
+  }
+  .modal > .top-right-buttons > .top-right-button {
+    width: 36px;
+    height: 36px;
+    padding: 4px;
   }
 }
 
@@ -80,5 +194,19 @@
     top: 0;
     width: 35%;
     padding-bottom: 35%;
+  }
+}
+
+// gstone-style height tweaks for short viewports
+@media screen and (max-height: 850px) {
+  #townsquare .player > .name {
+    font-size: 88%;
+  }
+}
+
+@media screen and (max-height: 600px) {
+  .night-order em {
+    width: 30px;
+    height: 30px;
   }
 }

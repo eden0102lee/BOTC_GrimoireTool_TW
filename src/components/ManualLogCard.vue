@@ -6,6 +6,12 @@
       <button type="button" class="add-btn player" @click="addToken('player')">
         {{ $t("recorder.addPlayer") }}
       </button>
+      <button type="button" class="add-btn player" @click="addToken('alivePlayer')">
+        {{ $t("recorder.addAlivePlayer") }}
+      </button>
+      <button type="button" class="add-btn player" @click="addToken('otherPlayer')">
+        {{ $t("recorder.addOtherPlayer") }}
+      </button>
       <button type="button" class="add-btn role" @click="addToken('role')">
         {{ $t("recorder.addRole") }}
       </button>
@@ -37,13 +43,17 @@
           <font-awesome-icon icon="chevron-left" />
         </button>
         <select
-          v-if="token.type === 'player'"
+          v-if="isPlayerInputType(token.type)"
           v-model="token.value"
           class="token-control"
         >
           <option value="">{{ $t("recorder.pickPlayer") }}</option>
-          <option v-for="(p, i) in players" :key="i" :value="label(p, i)">
-            {{ label(p, i) }}
+          <option
+            v-for="opt in playersForToken(token)"
+            :key="opt.index"
+            :value="opt.label"
+          >
+            {{ opt.label }}
           </option>
         </select>
         <select
@@ -132,6 +142,11 @@
 <script>
 import { formatPlayerRoleLabel } from "../store/roleInputConfig";
 import { previewEffectsFromTokens } from "../store/battleLogEffects";
+import {
+  MANUAL_STATUSES,
+  isPlayerInputType,
+  filterPlayersForInput,
+} from "../store/roleInteractionTypes";
 
 let tokenSeq = 0;
 
@@ -143,12 +158,13 @@ export default {
     initialTokens: { type: Array, default: null },
     editEntryId: { type: String, default: null },
     linkedMode: { type: Boolean, default: false },
+    excludePlayerIndex: { type: Number, default: -1 },
   },
   data() {
     return {
       tokens: [],
       verbs: ["選擇", "得知", "標記", "提名", "使用能力", "白天行動", "其他"],
-      statuses: ["死亡", "中毒", "醉酒", "復活", "失去能力"],
+      statuses: MANUAL_STATUSES,
     };
   },
   computed: {
@@ -212,6 +228,15 @@ export default {
     label(p, i) {
       return formatPlayerRoleLabel(p, i);
     },
+    isPlayerInputType,
+    playersForToken(token) {
+      return filterPlayersForInput(
+        this.players,
+        token.type,
+        this.excludePlayerIndex,
+        this.label,
+      );
+    },
     onRoleChange(token) {
       const role = this.scriptRoles.find(
         (r) => (r.name || r.id) === token.value,
@@ -238,6 +263,8 @@ export default {
     addToken(type) {
       const defaults = {
         player: "",
+        alivePlayer: "",
+        otherPlayer: "",
         role: "",
         action: "選擇",
         status: "死亡",
@@ -280,7 +307,7 @@ export default {
     write() {
       if (!this.canWrite) return;
       const players = this.tokens
-        .filter((t) => t.type === "player" && t.value)
+        .filter((t) => isPlayerInputType(t.type) && t.value)
         .map((t) => t.value);
       const actions = this.tokens
         .filter((t) => t.type === "action" && t.value)
@@ -392,7 +419,9 @@ export default {
   background: rgba(0, 0, 0, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.2);
 
-  &.player {
+  &.player,
+  &.alivePlayer,
+  &.otherPlayer {
     border-color: rgba(70, 213, 255, 0.45);
   }
   &.role {

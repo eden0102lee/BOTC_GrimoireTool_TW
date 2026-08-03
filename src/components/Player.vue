@@ -283,17 +283,18 @@ export default {
       return indexAdjusted < session.lockedVote - 1;
     },
     zoom: function() {
-      const unit = window.innerWidth > window.innerHeight ? "vh" : "vw";
-      if (this.players.length < 7) {
+      const unit = this.grimoire.unit;
+      const count = this.players.length;
+      if (count < 7) {
         return { width: 18 + this.grimoire.zoom + unit };
-      } else if (this.players.length <= 10) {
+      } else if (count <= 10) {
         return { width: 16 + this.grimoire.zoom + unit };
-      } else if (this.players.length <= 15) {
+      } else if (count <= 15) {
         return { width: 14 + this.grimoire.zoom + unit };
       } else {
         return { width: 12 + this.grimoire.zoom + unit };
       }
-    }
+    },
   },
   data() {
     return {
@@ -783,10 +784,17 @@ li.move:not(.from) .player .overlay svg.move {
   bottom: -5px;
   text-align: left;
   white-space: nowrap;
+  max-width: min(220px, calc(100vw - 32px));
   @include panel-chrome;
   padding: 2px 5px;
   margin-left: 15px;
   cursor: pointer;
+
+  li {
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+  }
 
   &:before {
     content: " ";

@@ -22,6 +22,7 @@
           v-for="role in rolesFirstNight"
           :key="role.name"
           :class="[role.team]"
+          tabindex="0"
         >
           <span class="name">
             {{ role.name }}
@@ -61,6 +62,7 @@
           v-for="role in rolesOtherNight"
           :key="role.name"
           :class="[role.team]"
+          tabindex="0"
         >
           <span
             class="icon"
@@ -298,8 +300,8 @@ ul {
       position: fixed;
       padding: 5px 10px;
       left: 50%;
-      bottom: 10%;
-      width: 500px;
+      bottom: max(10%, env(safe-area-inset-bottom, 0px));
+      width: min(500px, calc(100vw - 32px));
       z-index: 25;
       background: rgba(0, 0, 0, 0.75);
       border-radius: 10px;
@@ -309,9 +311,10 @@ ul {
       pointer-events: none;
       opacity: 0;
       transition: opacity 200ms ease-in-out;
-      margin-left: -250px;
+      transform: translateX(-50%);
     }
-    &:hover .reminder {
+    &:hover .reminder,
+    &:focus-within .reminder {
       opacity: 1;
     }
   }
@@ -370,5 +373,12 @@ ul {
 /** hide players when roles are hidden for projection **/
 #townsquare.hide-roles ~ .night-reference .modal .player {
   display: none;
+}
+
+@media (hover: none) {
+  .night-reference ul li:not(.headline):active .reminder,
+  .night-reference ul li:not(.headline):focus-within .reminder {
+    opacity: 1;
+  }
 }
 </style>

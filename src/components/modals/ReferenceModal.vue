@@ -261,7 +261,8 @@ ul {
     display: flex;
     align-items: center;
     flex-grow: 1;
-    width: 420px;
+    width: min(420px, 100%);
+    max-width: 100%;
     .icon {
       width: 8vh;
       background-size: cover;
@@ -297,7 +298,7 @@ ul {
 /** break into 1 column below 1200px **/
 @media screen and (max-width: 1199.98px) {
   .modal {
-    max-width: 60%;
+    max-width: calc(100vw - 24px);
   }
   ul {
     li {

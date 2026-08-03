@@ -14,6 +14,12 @@ import {
   invertEffect,
   FACT_TYPES,
 } from "../battleLogEffects";
+import {
+  getRule,
+  effectsFromRule,
+  buildSentence,
+  inputsFromRule,
+} from "../roleInteractionEngine";
 
 const newId = () =>
   Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
@@ -620,7 +626,7 @@ const actions = {
     });
   },
   recordRoleAction(
-    { commit, state, rootGetters, dispatch },
+    { commit, state, rootGetters, dispatch, rootState },
     {
       roleCardKey,
       actor,
@@ -629,10 +635,32 @@ const actions = {
       detail,
       formSnapshot,
       category = "ability",
+      message,
+      effects,
+      roleId,
     },
   ) {
     const phase = rootGetters["gamePhase/currentPhase"];
-    const patch = {
+    const players = rootState.players.players;
+    let resolvedEffects = effects;
+    if (!resolvedEffects && formSnapshot && formSnapshot.ruleId) {
+      const overlay = rootState.interactionRules
+        ? rootState.interactionRules.overlay
+        : {};
+      const rule = getRule(formSnapshot.ruleId, overlay);
+      if (rule) {
+        resolvedEffects = effectsFromRule(
+          rule,
+          formSnapshot.formData || {},
+          players,
+          formSnapshot.effectToggles || {},
+          rootState.roles,
+        );
+      }
+    }
+    const correlationId = newId();
+    const existing = state.entries.find((e) => e.roleCardKey === roleCardKey);
+    const fields = {
       source: "roleCard",
       category,
       roleCardKey,
@@ -641,14 +669,43 @@ const actions = {
       target: target || "無",
       detail: detail || null,
       formSnapshot: formSnapshot || null,
-      phase,
-      message: null,
+      phase: existing && existing.phase ? existing.phase : phase,
+      message: message || null,
+      effects: resolvedEffects || null,
+      roleId: roleId || (formSnapshot && formSnapshot.ruleId) || null,
+      correlationId:
+        (existing && existing.correlationId) || correlationId,
     };
-    const existing = state.entries.find((e) => e.roleCardKey === roleCardKey);
+
     if (existing) {
-      commit("updateEntry", { id: existing.id, patch });
+      if (state.linkedMode) {
+        const oldEffects = effectsFromEntry(existing, players);
+        dispatch("undoEntryEffects", { effects: oldEffects });
+      }
+      commit("updateEntry", { id: existing.id, patch: fields });
+      if (state.linkedMode) {
+        if (resolvedEffects && resolvedEffects.length) {
+          dispatch("applyEntryEffects", { entry: fields, effects: resolvedEffects });
+        }
+        dispatch("afterEntryWritten", {
+          entryId: existing.id,
+          entry: { ...fields, id: existing.id },
+          effects: resolvedEffects || [],
+        });
+      }
     } else {
-      commit("addEntry", patch);
+      commit("addEntry", { ...fields, phase });
+      const entryId = state.entries[state.entries.length - 1]?.id;
+      if (state.linkedMode) {
+        if (resolvedEffects && resolvedEffects.length) {
+          dispatch("applyEntryEffects", { entry: fields, effects: resolvedEffects });
+        }
+        dispatch("afterEntryWritten", {
+          entryId,
+          entry: { ...fields, id: entryId },
+          effects: resolvedEffects || [],
+        });
+      }
     }
   },
   recordManualCard(

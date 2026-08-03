@@ -168,7 +168,7 @@ ul.tokens {
   padding-left: 5%;
   li {
     border-radius: 50%;
-    width: 5vw;
+    width: clamp(36px, 8vw, 5vw);
     margin: 5px;
     opacity: 0.5;
     transition: all 250ms;
@@ -297,15 +297,23 @@ ul.tokens {
       position: absolute;
       right: -20px;
       bottom: 30px;
-      width: 420px;
+      width: min(420px, calc(100vw - 32px));
       background: rgba(0, 0, 0, 0.75);
       padding: 5px;
       border-radius: 10px;
       border: 2px solid black;
     }
-    &:hover span {
+    &:hover span,
+    &:focus-within span {
       display: block;
     }
+  }
+}
+
+@media (hover: none) {
+  .roles .modal .warning:active span,
+  .roles .modal .warning:focus-within span {
+    display: block;
   }
 }
 </style>

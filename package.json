@@ -1,6 +1,6 @@
 {
   "name": "clocktower-grimoire_TW",
-  "version": "2.17.0",
+  "version": "2.18.0",
   "description": "Blood on the Clocktower Grimoire (Traditional Chinese) — local LAN fork of bra1n/townsquare",
   "author": "Steffen Baumgart",
   "scripts": {
@@ -10,6 +10,7 @@
     "lint": "vue-cli-service lint",
     "lint-ci": "vue-cli-service lint --no-fix --max-warnings=0",
     "build:characters": "node scripts/build-characters-zh-tw-from-community.js",
+    "fetch:community-translations": "node scripts/fetch-community-translations.js",
     "sync:characters": "node scripts/sync-characters-from-csv.js",
     "sync:official": "node scripts/sync-official-roles.js",
     "sync:script-tool": "node scripts/sync-from-script-tool.js",

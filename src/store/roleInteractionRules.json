@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "imp",
+      "name": "小惡魔",
+      "enabled": true,
+      "when": { "nights": ["other"] },
+      "inputs": [
+        { "key": "target", "type": "player", "label": "目標對象", "required": true }
+      ],
+      "sentence": {
+        "action": "使用能力",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [
+        {
+          "id": "kill",
+          "type": "setDead",
+          "targetFrom": "target",
+          "value": true,
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標死亡"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "死亡",
+          "reminderRole": "imp",
+          "bindTo": "kill",
+          "label": "目標掛死亡標記"
+        }
+      ],
+      "notes": "勾選「目標死亡」時：設為死亡（帷幕）並掛上小惡魔「死亡」標記；自殺時 target=自己"
+    },
+    {
+      "id": "poisoner",
+      "name": "投毒者",
+      "enabled": true,
+      "when": { "nights": ["other"] },
+      "inputs": [
+        { "key": "target", "type": "player", "label": "目標對象", "required": true }
+      ],
+      "sentence": {
+        "action": "使用能力",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 中毒"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "中毒",
+          "reminderRole": "poisoner",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標中毒"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "washerwoman",
+      "name": "洗衣婦",
+      "enabled": true,
+      "when": { "nights": ["first"] },
+      "inputs": [
+        { "key": "p1", "type": "player", "label": "玩家 1", "required": true },
+        { "key": "p2", "type": "player", "label": "玩家 2", "required": true },
+        { "key": "r1", "type": "role", "label": "對應角色", "required": true }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → {p1} & {p2} 其中一位是 {r1}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "p1",
+          "reminderName": "鎮民",
+          "reminderRole": "washerwoman",
+          "label": "玩家1 鎮民"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "p2",
+          "reminderName": "非鎮民",
+          "reminderRole": "washerwoman",
+          "label": "玩家2 非鎮民"
+        }
+      ],
+      "notes": "首夜資訊：在魔典上為兩名玩家分別掛上鎮民／非鎮民標記"
+    },
+    {
+      "id": "monk",
+      "name": "僧侶",
+      "enabled": true,
+      "when": { "nights": ["other"] },
+      "inputs": [
+        { "key": "target", "type": "player", "label": "目標對象", "required": true }
+      ],
+      "sentence": {
+        "action": "使用能力",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 受保護"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "保護",
+          "reminderRole": "monk",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標受保護"
+        }
+      ],
+      "notes": ""
+    }
+  ]
+}

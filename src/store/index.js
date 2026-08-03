@@ -6,8 +6,10 @@ import players from "./modules/players";
 import session from "./modules/session";
 import battleLog from "./modules/battleLog";
 import gamePhase from "./modules/gamePhase";
+import interactionRules from "./modules/interactionRules";
 import battleLogPlugin from "./battleLogPlugin";
 import gamePhaseSync from "./gamePhaseSync";
+import { resolveViewportUnit } from "./viewportLayout";
 import editionJSON from "../editions.json";
 import rolesJSON from "../roles.json";
 import fabledJSON from "../fabled.json";
@@ -104,7 +106,8 @@ export default new Vuex.Store({
     players,
     session,
     battleLog,
-    gamePhase
+    gamePhase,
+    interactionRules,
   },
   state: {
     grimoire: {
@@ -116,6 +119,7 @@ export default new Vuex.Store({
       isImageOptIn: false,
       rolesHidden: false,
       zoom: 0,
+      unit: resolveViewportUnit(),
       background: ""
     },
     modals: {
@@ -128,7 +132,8 @@ export default new Vuex.Store({
       role: false,
       roles: false,
       voteHistory: false,
-      battleLog: false
+      battleLog: false,
+      interactionRules: false,
     },
     edition: editionJSONbyId.get("tb"),
     roles: getRolesByEdition(),
@@ -176,6 +181,7 @@ export default new Vuex.Store({
   },
   mutations: {
     setZoom: set("zoom"),
+    setUnit: set("unit"),
     setBackground: set("background"),
     toggleMuted: toggle("isMuted"),
     toggleMenu: toggle("isMenuOpen"),

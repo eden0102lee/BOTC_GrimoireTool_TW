@@ -5,7 +5,7 @@
     :class="{
       'hide-roles': hideRolesOnBoard,
       spectator: session.isSpectator,
-      vote: session.nomination
+      vote: session.nomination,
     }"
   >
     <ul class="circle" :class="['size-' + players.length]">
@@ -26,7 +26,6 @@
     <div
       class="bluffs"
       v-if="players.length"
-      ref="bluffs"
       :class="{ closed: !isBluffsOpen }"
     >
       <h3>

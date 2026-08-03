@@ -36,6 +36,15 @@ if not exist "node_modules\" (
     exit /b 1
   )
   echo.
+) else if not exist "node_modules\@vue\cli-plugin-eslint\" (
+  echo [INFO] Dependencies incomplete, running npm install...
+  call npm install
+  if errorlevel 1 (
+    echo [ERROR] npm install failed.
+    pause
+    exit /b 1
+  )
+  echo.
 )
 
 echo [INFO] Starting HTTP :8080 and WebSocket :8081 ...

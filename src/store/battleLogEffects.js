@@ -16,6 +16,7 @@ export const FACT_TYPES = {
 
 const POISON_NAMES = ["中毒"];
 const DRUNK_NAMES = ["醉酒"];
+const MAD_NAMES = ["瘋狂"];
 
 const newId = () =>
   Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
@@ -32,6 +33,12 @@ export function resolvePlayerIndex(players, labelOrName) {
     if (lab === target || players[i].name === target) return i;
   }
   return -1;
+}
+
+export function isMadReminder(reminder) {
+  if (!reminder) return false;
+  const name = reminder.name || "";
+  return MAD_NAMES.some((n) => name.includes(n));
 }
 
 export function isPoisonReminder(reminder) {
@@ -54,6 +61,7 @@ export function reminderFactTypeForAdd(reminder) {
   if (isPoisonReminder(reminder)) return FACT_TYPES.EVENT_POISON;
   if (isIdentityDrunkReminder(reminder)) return FACT_TYPES.IDENTITY_DRUNK;
   if (isDrunkReminder(reminder)) return FACT_TYPES.EVENT_DRUNK;
+  if (isMadReminder(reminder)) return "mad";
   return null;
 }
 
@@ -77,7 +85,13 @@ export function effectsFromManualTokens(tokens, players) {
   if (!Array.isArray(tokens) || !tokens.length) return [];
   const effects = [];
   const playerLabels = tokens
-    .filter((t) => t.type === "player" && t.value)
+    .filter(
+      (t) =>
+        (t.type === "player" ||
+          t.type === "alivePlayer" ||
+          t.type === "otherPlayer") &&
+        t.value,
+    )
     .map((t) => String(t.value).trim());
   const statuses = tokens
     .filter((t) => t.type === "status" && t.value)
@@ -139,6 +153,13 @@ export function effectsFromManualTokens(tokens, players) {
           });
           break;
         }
+        case "瘋狂":
+          effects.push({
+            type: "addReminder",
+            playerIndex,
+            reminder: makeBattleLogReminder("瘋狂"),
+          });
+          break;
         default:
           break;
       }
@@ -265,7 +286,11 @@ export function matchPending(pending, effects, playerIndex) {
 
 function entryTargetsPlayer(tokens, pending, players) {
   const playerTokens = (tokens || []).filter(
-    (t) => t.type === "player" && t.value,
+    (t) =>
+      (t.type === "player" ||
+        t.type === "alivePlayer" ||
+        t.type === "otherPlayer") &&
+      t.value,
   );
   if (!playerTokens.length) return pending.playerIndex == null;
   return playerTokens.some(
@@ -298,7 +323,12 @@ export function tokensResolvePending(tokens, pending, players) {
       return statuses.includes("醉酒");
     case FACT_TYPES.IDENTITY_DRUNK:
       return statuses.includes("醉酒") || roleIds.includes("drunk");
+    case "mad":
+      return statuses.includes("瘋狂");
     default:
+      if (pending.reminderName === "瘋狂") {
+        return statuses.includes("瘋狂");
+      }
       return false;
   }
 }

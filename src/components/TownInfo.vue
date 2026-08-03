@@ -179,4 +179,40 @@ export default {
     top: -25%;
   }
 }
+
+@media screen and (max-width: 991.98px) {
+  .info {
+    width: min(180px, 36vw);
+    height: auto;
+    padding: 28px 0 0;
+    font-size: 90%;
+  }
+  .info li.edition {
+    width: 150px;
+    height: 130px;
+    top: -18%;
+  }
+}
+
+@media screen and (max-width: 767.98px) {
+  .info {
+    width: min(140px, 44vw);
+    padding: 16px 0 0;
+    font-size: 78%;
+    pointer-events: none;
+  }
+  .info li {
+    span {
+      margin: 0 4px;
+    }
+    svg {
+      margin-right: 4px;
+    }
+  }
+  .info li.edition {
+    width: 110px;
+    height: 90px;
+    top: -12%;
+  }
+}
 </style>

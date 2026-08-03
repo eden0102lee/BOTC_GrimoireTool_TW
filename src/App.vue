@@ -36,6 +36,7 @@
     <VoteHistoryModal />
     <GameStateModal />
     <BattleLogModal />
+    <InteractionRulesModal />
     <Gradients />
     <LeftPanels />
     <span id="version">v{{ version }}</span>
@@ -59,13 +60,16 @@ import FabledModal from "@/components/modals/FabledModal";
 import VoteHistoryModal from "@/components/modals/VoteHistoryModal";
 import GameStateModal from "@/components/modals/GameStateModal";
 import BattleLogModal from "@/components/modals/BattleLogModal";
+import InteractionRulesModal from "@/components/modals/InteractionRulesModal";
 import LeftPanels from "@/components/LeftPanels";
+import { bindViewportUnitSync } from "./store/viewportLayout";
 
 export default {
   components: {
     LeftPanels,
     GameStateModal,
     BattleLogModal,
+    InteractionRulesModal,
     VoteHistoryModal,
     FabledModal,
     NightOrderModal,
@@ -86,7 +90,17 @@ export default {
   data() {
     return {
       version,
+      _unbindViewport: null,
     };
+  },
+  mounted() {
+    this._unbindViewport = bindViewportUnitSync(this.$store);
+  },
+  beforeDestroy() {
+    if (this._unbindViewport) {
+      this._unbindViewport();
+      this._unbindViewport = null;
+    }
   },
   methods: {
     keyup(event) {
@@ -190,6 +204,7 @@ body {
   background-size: cover;
   color: white;
   height: 100%;
+  height: 100dvh;
   font-family: "Roboto Condensed", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -232,6 +247,7 @@ ul {
 
 #app {
   height: 100%;
+  height: 100dvh;
   background-position: center center;
   background-size: cover;
   display: flex;
@@ -251,10 +267,11 @@ ul {
 #version {
   position: absolute;
   text-align: right;
-  right: 10px;
-  bottom: 10px;
+  right: max(10px, env(safe-area-inset-right, 0px));
+  bottom: max(10px, env(safe-area-inset-bottom, 0px));
   font-size: 60%;
   opacity: 0.5;
+  pointer-events: none;
 }
 
 .blur-enter-active,

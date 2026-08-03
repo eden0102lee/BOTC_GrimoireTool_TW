@@ -23,8 +23,8 @@ export default {
 <style scoped lang="scss">
 .left-panels {
   position: fixed;
-  left: 8px;
-  top: 8px;
+  left: max(8px, env(safe-area-inset-left, 0px));
+  top: max(8px, env(safe-area-inset-top, 0px));
   z-index: 60;
   display: flex;
   flex-direction: column;
@@ -32,9 +32,14 @@ export default {
   pointer-events: none;
   font-size: 0.85rem;
   line-height: 1.3;
+  max-width: min(
+    340px,
+    calc(100vw - max(16px, env(safe-area-inset-left, 0px)) - max(8px, env(safe-area-inset-right, 0px)))
+  );
 
   > * {
     pointer-events: auto;
+    max-width: 100%;
   }
 }
 </style>

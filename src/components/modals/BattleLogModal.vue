@@ -239,13 +239,29 @@ h3 {
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 10px;
-  align-items: center;
+  align-items: stretch;
+}
+
+.filters .button,
+.actions .button {
+  min-height: 44px;
+  padding: 8px 12px;
 }
 
 .manual-note input {
-  flex: 1;
-  min-width: 180px;
-  padding: 4px 8px;
+  flex: 1 1 100%;
+  min-width: 0;
+  width: 100%;
+  padding: 8px;
+  min-height: 44px;
+}
+
+@media screen and (min-width: 480px) {
+  .manual-note input {
+    flex: 1;
+    min-width: 120px;
+    width: auto;
+  }
 }
 
 .button {

@@ -241,6 +241,9 @@
             {{ $t("menu.battleLog") }}
             <em>[B]</em>
           </li>
+          <li @click="toggleModal('interactionRules')">
+            {{ $t("menu.interactionRules") }}
+          </li>
           <li @click="toggleModal('gameState')">
             {{ $t("menu.gameStateJson") }}
             <em><font-awesome-icon icon="file-code"/></em>
@@ -440,10 +443,10 @@ export default {
 // Controls
 #controls {
   position: absolute;
-  right: 3px;
-  top: 3px;
+  right: max(3px, env(safe-area-inset-right, 0px));
+  top: max(3px, env(safe-area-inset-top, 0px));
   text-align: right;
-  padding-right: 50px;
+  padding-right: max(50px, calc(40px + env(safe-area-inset-right, 0px)));
   z-index: 75;
 
   svg {
@@ -460,6 +463,10 @@ export default {
     z-index: 5;
     margin-top: 7px;
     margin-left: 10px;
+    min-height: 44px;
+    min-width: 44px;
+    line-height: 44px;
+    text-align: center;
   }
 
   span.nomlog-summary {
@@ -485,8 +492,11 @@ export default {
 }
 
 .menu {
-  width: 220px;
-  transform-origin: 200px 22px;
+  width: min(
+    220px,
+    calc(100vw - 24px - env(safe-area-inset-right, 0px))
+  );
+  transform-origin: calc(100% - 20px) 22px;
   transition: transform 500ms cubic-bezier(0.68, -0.55, 0.27, 1.55);
   transform: rotate(-90deg);
   position: absolute;
@@ -501,7 +511,7 @@ export default {
     cursor: pointer;
     background: rgba(0, 0, 0, 0.5);
     border: 3px solid black;
-    width: 40px;
+    width: 44px;
     height: 50px;
     margin-bottom: -8px;
     border-bottom: 0;
@@ -529,14 +539,14 @@ export default {
     border-radius: 10px 0 10px 10px;
 
     li {
-      padding: 2px 5px;
+      padding: 4px 8px;
       color: white;
       text-align: left;
       background: rgba(0, 0, 0, 0.7);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      min-height: 30px;
+      min-height: 44px;
 
       &.tabs {
         display: flex;
@@ -544,10 +554,10 @@ export default {
         svg {
           flex-grow: 1;
           flex-shrink: 0;
-          height: 35px;
+          height: 44px;
           border-bottom: 3px solid black;
           border-right: 3px solid black;
-          padding: 5px 0;
+          padding: 8px 0;
           cursor: pointer;
           transition: color 250ms;
           &:hover {

@@ -379,13 +379,26 @@ import { formatLogMessage } from "../store/modules/battleLog";
 import { pendingLabelKey, FACT_TYPES } from "../store/battleLogEffects";
 
 const MANUAL_END = "__end__";
+const RECORDER_COLLAPSED_KEY = "phaseRecorderCollapsed";
+const MOBILE_MQ = "(max-width: 767.98px)";
+
+function readInitialCollapsed() {
+  const stored = localStorage.getItem(RECORDER_COLLAPSED_KEY);
+  if (stored !== null) {
+    return stored === "1";
+  }
+  if (typeof window !== "undefined" && window.matchMedia) {
+    return window.matchMedia(MOBILE_MQ).matches;
+  }
+  return false;
+}
 
 export default {
   name: "PhaseRecorderPanel",
   components: { RoleActionCard, ManualLogCard, VoteLogCard, DeadVoteLogCard },
   data() {
     return {
-      collapsed: false,
+      collapsed: readInitialCollapsed(),
       activeTab: "phase",
       manualFormOpen: false,
       voteFormOpen: false,
@@ -396,6 +409,9 @@ export default {
     };
   },
   watch: {
+    collapsed(value) {
+      localStorage.setItem(RECORDER_COLLAPSED_KEY, value ? "1" : "0");
+    },
     "currentPhase.id"() {
       this.manualFormOpen = false;
       this.voteFormOpen = false;
@@ -1034,9 +1050,15 @@ export default {
 }
 
 .phase-recorder {
-  min-width: 280px;
+  width: min(
+    340px,
+    calc(100vw - max(16px, env(safe-area-inset-left, 0px)) - max(8px, env(safe-area-inset-right, 0px)))
+  );
+  min-width: 0;
   max-width: 340px;
-  max-height: calc(100vh - 160px);
+  max-height: calc(
+    100dvh - max(160px, calc(120px + env(safe-area-inset-top, 0px) + env(safe-area-inset-bottom, 0px)))
+  );
   display: flex;
   flex-direction: column;
   background: rgba(0, 0, 0, 0.65);
@@ -1082,6 +1104,7 @@ export default {
 
 .recorder-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   gap: 6px;
@@ -1098,8 +1121,9 @@ export default {
 }
 
 .tab {
-  flex: 1;
-  padding: 4px 6px;
+  flex: 1 1 auto;
+  min-height: 36px;
+  padding: 6px 8px;
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 6px;
   background: rgba(0, 0, 0, 0.35);
@@ -1123,7 +1147,8 @@ export default {
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
   border-radius: 4px;
-  padding: 2px 6px;
+  padding: 8px 10px;
+  min-height: 36px;
   font-size: 0.7rem;
   cursor: pointer;
   flex-shrink: 0;

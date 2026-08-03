@@ -65,8 +65,8 @@ export default {
   box-shadow: 2px 2px 20px 1px #000;
   display: flex;
   flex-direction: column;
-  max-height: 80%;
-  max-width: 80%;
+  max-height: min(80%, calc(100dvh - 24px));
+  max-width: min(80%, calc(100vw - 24px));
 
   .vote-history &,
   .night-reference &,
@@ -76,8 +76,8 @@ export default {
 
   .roles &,
   .characters & {
-    max-height: 100%;
-    max-width: 60%;
+    max-height: min(100%, calc(100dvh - 24px));
+    max-width: min(60%, calc(100vw - 24px));
   }
 
   ul {
@@ -100,6 +100,11 @@ export default {
     > .top-right-button {
       cursor: pointer;
       width: 28px;
+      height: 28px;
+      min-width: 44px;
+      min-height: 44px;
+      padding: 8px;
+      box-sizing: border-box;
       &:hover {
         color: red;
       }

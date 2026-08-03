@@ -19,10 +19,14 @@ const { spawn, execSync } = require("child_process");
 
 const ROOT = path.join(__dirname, "..");
 const DIST = path.join(ROOT, "dist");
-const HTTP_PORT = parseInt(process.env.PORT || "8080", 10);
-const WS_PORT = parseInt(process.env.WS_PORT || "8081", 10);
+const DEFAULT_HTTP_PORT = parseInt(process.env.PORT || "8080", 10);
+const DEFAULT_WS_PORT = parseInt(process.env.WS_PORT || "8081", 10);
 const HOST = process.env.HOST || "0.0.0.0";
 const OPEN_BROWSER = process.env.OPEN_BROWSER !== "0";
+
+/** Active ports (may differ from defaults if those are busy). */
+let HTTP_PORT = DEFAULT_HTTP_PORT;
+let WS_PORT = DEFAULT_WS_PORT;
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -102,8 +106,19 @@ function openBrowser(url) {
   }
 }
 
+const GH_PAGES_PREFIX = "/BOTC_GrimoireTool_TW";
+
+function normalizeLocalUrlPath(urlPath) {
+  if (urlPath.startsWith(GH_PAGES_PREFIX + "/")) {
+    return urlPath.slice(GH_PAGES_PREFIX.length) || "/";
+  }
+  return urlPath;
+}
+
 function serveFile(req, res) {
-  let urlPath = decodeURIComponent(req.url.split("?")[0]);
+  let urlPath = normalizeLocalUrlPath(
+    decodeURIComponent(req.url.split("?")[0]),
+  );
 
   if (urlPath === "/api/health") {
     res.writeHead(200, { "Content-Type": "application/json" });
@@ -184,23 +199,55 @@ function getNewestMtime(dir, filterFn) {
   return newest;
 }
 
+function distHasGithubPagesPublicPath() {
+  const indexHtml = path.join(DIST, "index.html");
+  if (!fs.existsSync(indexHtml)) return false;
+  try {
+    const html = fs.readFileSync(indexHtml, "utf8");
+    return html.includes(`${GH_PAGES_PREFIX}/js/`);
+  } catch (_) {
+    return false;
+  }
+}
+
 function ensureDist(force = false) {
   const indexHtml = path.join(DIST, "index.html");
   const needsBuild =
     force ||
     !fs.existsSync(indexHtml) ||
+    distHasGithubPagesPublicPath() ||
     getNewestMtime(path.join(ROOT, "src")) > fs.statSync(indexHtml).mtimeMs ||
     getNewestMtime(path.join(ROOT, "public")) > fs.statSync(indexHtml).mtimeMs;
 
   if (needsBuild) {
-    console.log(
-      force
-        ? "Force rebuilding frontend..."
-        : fs.existsSync(indexHtml)
-          ? "Source newer than dist/. Rebuilding frontend..."
-          : "dist/ not found. Building frontend..."
-    );
-    execSync("npm run build", { cwd: ROOT, stdio: "inherit" });
+    if (distHasGithubPagesPublicPath() && !force) {
+      console.log(
+        "dist/index.html uses GitHub Pages paths; rebuilding for local LAN..."
+      );
+    } else {
+      console.log(
+        force
+          ? "Force rebuilding frontend..."
+          : fs.existsSync(indexHtml)
+            ? "Source newer than dist/. Rebuilding frontend..."
+            : "dist/ not found. Building frontend..."
+      );
+    }
+    execSync("npm run build", {
+      cwd: ROOT,
+      stdio: "inherit",
+      env: {
+        ...process.env,
+        NODE_ENV: "production",
+        // Local LAN serves dist/ at site root — not GitHub Pages subpath.
+        VUE_APP_PUBLIC_PATH: "/",
+      },
+    });
+    if (distHasGithubPagesPublicPath()) {
+      console.warn(
+        "[WARN] dist/index.html still references GitHub Pages paths after build.",
+      );
+    }
   }
 }
 
@@ -339,21 +386,64 @@ function shutdown() {
   process.exit(0);
 }
 
+async function resolvePorts() {
+  const explicitHttp = process.env.PORT != null && process.env.PORT !== "";
+  const explicitWs = process.env.WS_PORT != null && process.env.WS_PORT !== "";
+
+  if (explicitHttp && explicitWs) {
+    const httpFree = await isPortFree(DEFAULT_HTTP_PORT, HOST);
+    const wsFree = await isPortFree(DEFAULT_WS_PORT, HOST);
+    if (!httpFree || !wsFree) return null;
+    return { httpPort: DEFAULT_HTTP_PORT, wsPort: DEFAULT_WS_PORT };
+  }
+
+  const wsCandidates = explicitWs
+    ? [DEFAULT_WS_PORT]
+    : [8081, 8083, 8085, 8087, 8089];
+
+  for (const wsPort of wsCandidates) {
+    const wsFree = await isPortFree(wsPort, HOST);
+    if (!wsFree) continue;
+
+    const httpStart = explicitHttp ? DEFAULT_HTTP_PORT : 8080;
+    const httpAttempts = explicitHttp ? 1 : 20;
+    for (let attempt = 0; attempt < httpAttempts; attempt++) {
+      const httpPort = explicitHttp ? httpStart : httpStart + attempt * 2;
+      const httpFree = await isPortFree(httpPort, HOST);
+      if (httpFree) {
+        if (wsPort !== 8081) {
+          console.warn(
+            `[WARN] WebSocket on :${wsPort} (not :8081). Live session may need a dev rebuild with VUE_APP_WS_PORT=${wsPort}.`,
+          );
+        }
+        return { httpPort, wsPort };
+      }
+    }
+  }
+
+  return null;
+}
+
 async function main() {
-  const httpFree = await isPortFree(HTTP_PORT, HOST);
-  const wsFree = await isPortFree(WS_PORT, HOST);
-  if (!httpFree || !wsFree) {
+  const resolved = await resolvePorts();
+  if (!resolved) {
     console.error("");
-    console.error("Cannot start: port already in use.");
-    if (!httpFree) console.error(`  HTTP  :${HTTP_PORT} is busy`);
-    if (!wsFree) console.error(`  WS    :${WS_PORT} is busy`);
+    console.error("Cannot start: no free HTTP/WS port pair found.");
+    console.error(
+      `Tried :8080/:8081 through :${8080 + 19 * 2}/:${8081 + 19 * 2}.`,
+    );
     console.error("");
-    console.error("If the server is already running, open:");
-    console.error(`  http://localhost:${HTTP_PORT}/`);
-    console.error("Or type restart / quit in that server window.");
-    console.error("Or stop the other process, then run this again.");
+    console.error("Stop other servers or set PORT / WS_PORT explicitly.");
     console.error("");
     process.exit(1);
+  }
+
+  HTTP_PORT = resolved.httpPort;
+  WS_PORT = resolved.wsPort;
+  if (HTTP_PORT !== 8080 || WS_PORT !== 8081) {
+    console.log(
+      `[INFO] Default ports busy; using HTTP :${HTTP_PORT} and WS :${WS_PORT}`,
+    );
   }
 
   ensureDist();

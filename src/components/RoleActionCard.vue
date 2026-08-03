@@ -39,16 +39,16 @@
         <label v-for="field in configs" :key="field.key" class="field">
           <span>{{ field.label }}</span>
           <select
-            v-if="field.type === 'player'"
+            v-if="isPlayerInputType(field.type)"
             v-model="formData[field.key]"
           >
             <option value="">—</option>
             <option
-              v-for="(p, i) in players"
-              :key="i"
-              :value="playerOption(p, i)"
+              v-for="opt in playersForField(field)"
+              :key="opt.index"
+              :value="opt.label"
             >
-              {{ playerOption(p, i) }}
+              {{ opt.label }}
             </option>
           </select>
           <select
@@ -76,6 +76,19 @@
           />
           <input v-else type="text" v-model="formData[field.key]" />
         </label>
+
+        <template v-if="interactionRule && visibleEffectToggles.length">
+          <div class="grimoire-effects-head">{{ $t("interactionRules.grimoireEffects") }}</div>
+          <label
+            v-for="item in visibleEffectToggles"
+            :key="item.key"
+            class="field effect-toggle full"
+          >
+            <span>{{ item.label }}</span>
+            <input type="checkbox" v-model="effectToggles[item.key]" />
+          </label>
+        </template>
+
         <label class="field full">
           <span>{{ $t("recorder.note") }}</span>
           <input
@@ -85,6 +98,12 @@
           />
         </label>
       </div>
+
+      <p class="sentence-preview" v-if="interactionRule && liveSentence">
+        <span class="preview-label">{{ $t("recorder.sentencePreview") }}</span>
+        {{ liveSentence }}
+      </p>
+
       <div class="form-actions">
         <button
           v-if="editing"
@@ -110,10 +129,23 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 import {
   getRoleInputConfig,
   formatPlayerRoleLabel,
 } from "../store/roleInputConfig";
+import {
+  getRule,
+  inputsFromRule,
+  buildSentence,
+  effectsFromRule,
+} from "../store/roleInteractionEngine";
+import {
+  isPlayerInputType,
+  filterPlayersForInput,
+  isEffectToggleVisible,
+  formatGrimoireEffectSpec,
+} from "../store/roleInteractionTypes";
 
 export default {
   name: "RoleActionCard",
@@ -132,6 +164,7 @@ export default {
       formData: {},
       detailNote: "",
       editing: false,
+      effectToggles: {},
     };
   },
   watch: {
@@ -144,6 +177,7 @@ export default {
           next[c.key] = "";
         });
         this.formData = next;
+        this.initEffectToggles();
       },
     },
     isRecorded(val) {
@@ -151,8 +185,38 @@ export default {
     },
   },
   computed: {
+    ...mapState("interactionRules", ["overlay"]),
+    interactionRule() {
+      const role = this.player && this.player.role;
+      if (!role || !role.id) return null;
+      const rule = getRule(role.id, this.overlay);
+      return rule && rule.enabled ? rule : null;
+    },
     configs() {
+      if (this.interactionRule) {
+        return inputsFromRule(this.interactionRule);
+      }
       return getRoleInputConfig(this.player.role);
+    },
+    optionalEffects() {
+      if (!this.interactionRule || !this.interactionRule.effects) return [];
+      return this.interactionRule.effects.filter((e) => isEffectToggleVisible(e));
+    },
+    visibleEffectToggles() {
+      if (!this.interactionRule || !this.interactionRule.effects) return [];
+      return this.interactionRule.effects
+        .map((effect, idx) => ({
+          effect,
+          idx,
+          key: this.effectToggleKey(effect, idx),
+          label:
+            effect.label ||
+            formatGrimoireEffectSpec(
+              effect,
+              this.interactionRule.inputs || [],
+            ),
+        }))
+        .filter((item) => isEffectToggleVisible(item.effect));
     },
     label() {
       return formatPlayerRoleLabel(this.player, this.playerIndex);
@@ -178,6 +242,13 @@ export default {
         return {};
       }
     },
+    liveSentence() {
+      if (!this.interactionRule) return "";
+      return buildSentence(this.interactionRule, {
+        actor: this.player.role.name || this.player.role.id,
+        formData: this.formData,
+      });
+    },
     recordedSummary() {
       if (!this.recordedEntry) return this.$t("recorder.recorded");
       const e = this.recordedEntry;
@@ -187,8 +258,37 @@ export default {
     },
   },
   methods: {
+    isPlayerInputType,
     playerOption(p, i) {
       return formatPlayerRoleLabel(p, i);
+    },
+    playersForField(field) {
+      return filterPlayersForInput(
+        this.players,
+        field.type,
+        this.playerIndex,
+        this.playerOption,
+      );
+    },
+    effectToggleKey(effect, idx) {
+      return effect.id || `effect-${idx}`;
+    },
+    initEffectToggles(fromSnapshot) {
+      const toggles = {};
+      if (!this.interactionRule) {
+        this.effectToggles = toggles;
+        return;
+      }
+      this.interactionRule.effects.forEach((effect, idx) => {
+        if (!isEffectToggleVisible(effect)) return;
+        const key = this.effectToggleKey(effect, idx);
+        if (fromSnapshot && fromSnapshot[key] !== undefined) {
+          toggles[key] = !!fromSnapshot[key];
+        } else {
+          toggles[key] = effect.defaultOn !== false;
+        }
+      });
+      this.effectToggles = toggles;
     },
     onAbilityLostChange(event) {
       const value = !!event.target.checked;
@@ -226,6 +326,7 @@ export default {
       }
       this.formData = next;
       this.detailNote = snap.detailNote || "";
+      this.initEffectToggles(snap.effectToggles || {});
       this.editing = true;
     },
     cancelEdit() {
@@ -236,6 +337,12 @@ export default {
       if (this.abilityLost) return;
       let targetStr = "";
       const details = [];
+      const actionLabel =
+        (this.interactionRule &&
+          this.interactionRule.sentence &&
+          this.interactionRule.sentence.action) ||
+        "使用能力";
+
       this.configs.forEach((c) => {
         const val = this.formData[c.key];
         if (!val && val !== 0) return;
@@ -247,25 +354,48 @@ export default {
           targetStr += ` & ${val}`;
         } else if (c.key === "evilTarget" && targetStr) {
           targetStr += ` & ${val}`;
-        } else {
+        } else if (!this.interactionRule) {
           details.push(`${c.label}: ${val}`);
         }
       });
+
       let finalDetail = details.join(" | ");
       if (this.detailNote.trim()) {
         finalDetail = finalDetail
           ? `${finalDetail} | ${this.detailNote.trim()}`
           : this.detailNote.trim();
       }
+
+      const message = this.interactionRule
+        ? buildSentence(this.interactionRule, {
+            actor: this.player.role.name || this.player.role.id,
+            formData: this.formData,
+          })
+        : null;
+
+      const effects = this.interactionRule
+        ? effectsFromRule(
+            this.interactionRule,
+            this.formData,
+            this.players,
+            this.effectToggles,
+          )
+        : null;
+
       this.$emit("record", {
         roleCardKey: this.roleCardKey,
         actor: this.player.role.name || this.player.role.id,
-        action: "使用能力",
+        action: actionLabel,
         target: targetStr || "無",
         detail: finalDetail || null,
+        message,
+        effects,
+        roleId: this.player.role.id,
         formSnapshot: {
+          ruleId: this.interactionRule ? this.player.role.id : null,
           formData: { ...this.formData },
           detailNote: this.detailNote,
+          effectToggles: { ...this.effectToggles },
         },
       });
       this.editing = false;
@@ -275,6 +405,7 @@ export default {
         next[c.key] = "";
       });
       this.formData = next;
+      this.initEffectToggles();
     },
   },
 };
@@ -357,6 +488,14 @@ export default {
   line-height: 1.3;
 }
 
+.grimoire-effects-head {
+  grid-column: 1 / -1;
+  font-size: 0.72rem;
+  font-weight: bold;
+  color: #ffd699;
+  margin-top: 2px;
+}
+
 .fields {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -372,6 +511,11 @@ export default {
   &.full {
     grid-column: 1 / -1;
   }
+  &.effect-toggle {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
   span {
     opacity: 0.7;
   }
@@ -384,6 +528,18 @@ export default {
     background: rgba(0, 0, 0, 0.5);
     color: white;
     font-size: 0.75rem;
+  }
+}
+
+.sentence-preview {
+  font-size: 0.72rem;
+  margin: 4px 0 8px;
+  line-height: 1.35;
+  word-break: break-word;
+
+  .preview-label {
+    opacity: 0.65;
+    margin-right: 4px;
   }
 }
 
@@ -423,12 +579,6 @@ export default {
     background: rgba(0, 0, 0, 0.45);
     &:hover {
       background: rgba(60, 60, 60, 0.7);
-    }
-  }
-  &.cancel {
-    background: rgba(90, 30, 30, 0.7);
-    &:hover {
-      background: rgba(120, 40, 40, 0.9);
     }
   }
 }
