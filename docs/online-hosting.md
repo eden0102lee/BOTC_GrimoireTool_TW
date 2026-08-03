@@ -17,7 +17,10 @@
 
 1. 將本 repo 推到 GitHub（若尚未推送）。
 2. 開啟 [Render Dashboard](https://dashboard.render.com) → **New** → **Blueprint**，選取本 repo（會讀根目錄 [`render.yaml`](../render.yaml)）。
-   - 或手動 **New Web Service**：Build `npm ci --omit=dev`，Start `npm run start:ws`，Health Check `/health`。
+   - 或手動 **New Web Service**（務必設定下列指令，勿用預設 `node App.vue`）：
+     - **Build Command**：`npm ci --omit=dev`
+     - **Start Command**：`CLOUD=1 npm run start:ws`
+     - **Health Check Path**：`/health`
 3. 環境變數：
    - `CLOUD=1`（Blueprint 已設）
    - `NODE_ENV=production`
@@ -52,6 +55,7 @@ npm start
 
 | 現象 | 可能原因 |
 | --- | --- |
+| `Cannot find module ... App.vue` | Start Command 設錯；改為 `CLOUD=1 npm run start:ws` |
 | Pages 上無法連線 | 未設 `VUE_APP_WS_URL` 或建置後未重新 Deploy Pages |
 | WS 立刻被拒 | `ALLOWED_ORIGINS` 未包含你的 Pages origin |
 | 第一次很慢 | Render Free 冷啟動，稍候再連 |

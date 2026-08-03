@@ -14,7 +14,7 @@ services:
     plan: free
     region: singapore
     buildCommand: npm ci --omit=dev
-    startCommand: npm run start:ws
+    startCommand: CLOUD=1 npm run start:ws
     healthCheckPath: /health
     envVars:
       - key: CLOUD
