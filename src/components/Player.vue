@@ -227,6 +227,12 @@
 <script>
 import Token from "./Token";
 import { mapGetters, mapState } from "vuex";
+import {
+  getMobileProfile,
+  getPortraitTokenScale,
+  getViewportSize,
+  seatBaseSize,
+} from "../store/boardLayout";
 
 export default {
   components: {
@@ -285,15 +291,17 @@ export default {
     zoom: function() {
       const unit = this.grimoire.unit;
       const count = this.players.length;
-      if (count < 7) {
-        return { width: 18 + this.grimoire.zoom + unit };
-      } else if (count <= 10) {
-        return { width: 16 + this.grimoire.zoom + unit };
-      } else if (count <= 15) {
-        return { width: 14 + this.grimoire.zoom + unit };
-      } else {
-        return { width: 12 + this.grimoire.zoom + unit };
-      }
+      const adjust = this.grimoire.boardTokenAdjust || 0;
+      const { width, height } = getViewportSize();
+      const profile = getMobileProfile(width, height);
+      const base = seatBaseSize(count);
+      const portraitScale =
+        profile === "iphone16pro" ? getPortraitTokenScale(width) : 1;
+      const size = Math.max(
+        8,
+        (base + this.grimoire.zoom + adjust) * portraitScale,
+      );
+      return { width: size + unit };
     },
   },
   data() {

@@ -63,6 +63,11 @@ import BattleLogModal from "@/components/modals/BattleLogModal";
 import InteractionRulesModal from "@/components/modals/InteractionRulesModal";
 import LeftPanels from "@/components/LeftPanels";
 import { bindViewportUnitSync } from "./store/viewportLayout";
+import {
+  applyLayoutProfileClass,
+  bindBoardLayoutSync,
+  getViewportSize,
+} from "./store/boardLayout";
 
 export default {
   components: {
@@ -91,15 +96,23 @@ export default {
     return {
       version,
       _unbindViewport: null,
+      _unbindBoard: null,
     };
   },
   mounted() {
     this._unbindViewport = bindViewportUnitSync(this.$store);
+    this._unbindBoard = bindBoardLayoutSync(this.$store);
+    const { width, height } = getViewportSize();
+    applyLayoutProfileClass(width, height);
   },
   beforeDestroy() {
     if (this._unbindViewport) {
       this._unbindViewport();
       this._unbindViewport = null;
+    }
+    if (this._unbindBoard) {
+      this._unbindBoard();
+      this._unbindBoard = null;
     }
   },
   methods: {

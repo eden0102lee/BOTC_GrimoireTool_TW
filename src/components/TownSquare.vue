@@ -6,7 +6,9 @@
       'hide-roles': hideRolesOnBoard,
       spectator: session.isSpectator,
       vote: session.nomination,
+      'board-fit': grimoire.boardArm < 50,
     }"
+    :style="boardStyle"
   >
     <ul class="circle" :class="['size-' + players.length]">
       <Player
@@ -95,6 +97,7 @@ import Player from "./Player";
 import Token from "./Token";
 import ReminderModal from "./modals/ReminderModal";
 import RoleModal from "./modals/RoleModal";
+import { syncBoardLayout } from "../store/boardLayout";
 
 export default {
   components: {
@@ -109,7 +112,12 @@ export default {
       hideRolesOnBoard: "hideRolesOnBoard"
     }),
     ...mapState(["grimoire", "roles", "session"]),
-    ...mapState("players", ["players", "bluffs", "fabled"])
+    ...mapState("players", ["players", "bluffs", "fabled"]),
+    boardStyle() {
+      const arm = this.grimoire.boardArm;
+      if (arm >= 50) return {};
+      return { "--circle-arm": `${arm}%` };
+    },
   },
   data() {
     return {
@@ -119,8 +127,16 @@ export default {
       move: -1,
       nominate: -1,
       isBluffsOpen: true,
-      isFabledOpen: true
+      isFabledOpen: true,
     };
+  },
+  watch: {
+    isBluffsOpen() {
+      syncBoardLayout(this.$store);
+    },
+    isFabledOpen() {
+      syncBoardLayout(this.$store);
+    },
   },
   methods: {
     toggleBluffs() {
@@ -288,7 +304,7 @@ export default {
   > li {
     position: absolute;
     left: 50%;
-    height: 50%;
+    height: min(50%, var(--circle-arm, 50%));
     transform-origin: 0 100%;
     pointer-events: none;
 

@@ -68,13 +68,64 @@
   }
 }
 
-// Portrait / tall narrow
+// All portrait / tall layouts — iPhone 16 Pro reference (boardLayout.js)
 @media screen and (max-aspect-ratio: 1/1) {
+  #controls {
+    padding-right: max(44px, calc(36px + var(--safe-right)));
+  }
+}
+
+html.layout-portrait,
+html.layout-iphone16pro {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+
+  body {
+    font-size: 1rem;
+  }
+
   #townsquare {
-    padding: 10px 6px;
+    padding: 2px 0;
+  }
+
+  #townsquare.board-fit {
+    padding: 2px 0;
+  }
+
+  #townsquare .circle .player > .name {
+    font-size: max(15px, 1.125rem);
+    line-height: 1.2;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    -webkit-font-smoothing: antialiased;
+
+    span {
+      max-width: 20vw;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+    }
+  }
+
+  #townsquare .circle .player .reminder .text {
+    font-size: 55%;
+    font-weight: 700;
+  }
+
+  #townsquare > .bluffs ul li,
+  #townsquare > .fabled ul li {
+    width: 14vh;
+    height: 14vh;
+  }
+
+  .night-order em {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
   }
 
   .left-panels {
+    font-size: 0.9375rem;
+    line-height: 1.35;
     max-width: min(
       300px,
       calc(100vw - max(12px, var(--safe-left)) - max(12px, var(--safe-right)))
@@ -90,17 +141,13 @@
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
   }
-
-  #controls {
-    padding-right: max(44px, calc(36px + var(--safe-right)));
-  }
 }
 
-// Small devices (landscape phones, less than 768px)
-@media screen and (max-width: 767.98px) {
+// Small devices — landscape phones only (portrait uses layout-portrait above)
+@media screen and (max-width: 767.98px) and (min-aspect-ratio: 1/1) {
   html,
   body {
-    font-size: 0.9em;
+    font-size: 0.95em;
   }
   .player > .name {
     top: 0;
@@ -129,9 +176,6 @@
   }
   #townsquare {
     padding: 6px 4px;
-  }
-  #townsquare .circle .player > .name {
-    font-size: 85%;
   }
   #townsquare .circle .player > .name span {
     max-width: 14vh;
@@ -166,11 +210,11 @@
   }
 }
 
-// Old phones
-@media screen and (max-width: 575.98px) {
+// Old phones — keep landscape smaller; portrait uses block above
+@media screen and (max-width: 575.98px) and (min-aspect-ratio: 1/1) {
   html,
   body {
-    font-size: 0.8em;
+    font-size: 0.9em;
   }
 }
 
@@ -197,10 +241,10 @@
   }
 }
 
-// gstone-style height tweaks for short viewports
-@media screen and (max-height: 850px) {
+// Short viewports — skip name shrink on portrait phones (board-fit handles layout)
+@media screen and (max-height: 850px) and (min-aspect-ratio: 1/1) {
   #townsquare .player > .name {
-    font-size: 88%;
+    font-size: 100%;
   }
 }
 
