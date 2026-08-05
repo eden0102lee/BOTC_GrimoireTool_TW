@@ -16,10 +16,19 @@ import {
 } from "../battleLogEffects";
 import {
   getRule,
+  getSetupRule,
   effectsFromRule,
   buildSentence,
   inputsFromRule,
 } from "../roleInteractionEngine";
+import {
+  formatAlivePlayersLine,
+  formatEntryForDisplay,
+  buildNaturalRoleMessage,
+  scaffoldEntriesFromVotes,
+  eligibleDeadVotersFromLabels,
+  formatPlayerLabel,
+} from "../battleLogFormat";
 
 const newId = () =>
   Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
@@ -35,23 +44,67 @@ const state = () => ({
     playerCount: "",
     storyteller: "",
   },
-  linkedMode: false,
+  linkedMode: true,
+  hideTimestamp: false,
   pendingFacts: [],
   previewEffects: [],
   applyingFromLog: false,
 });
 
-export function formatLogMessage(entry) {
-  if (entry.message) return entry.message;
+function actorIndexFromRoleCardKey(roleCardKey) {
+  if (!roleCardKey) return -1;
+  const parts = String(roleCardKey).split("|");
+  if (parts.length < 3) return -1;
+  const idx = parseInt(parts[parts.length - 2], 10);
+  return Number.isFinite(idx) ? idx : -1;
+}
+
+function resolveRuleForRoleCard(formSnapshot, overlay, roleCardKey) {
+  if (!formSnapshot || !formSnapshot.ruleId) return null;
+  if (
+    formSnapshot.setup ||
+    (roleCardKey && String(roleCardKey).startsWith("setup|"))
+  ) {
+    return getSetupRule(formSnapshot.ruleId, overlay);
+  }
+  return getRule(formSnapshot.ruleId, overlay);
+}
+
+/** Build dawn report from previous night's setDead effects. */
+export function buildNightDeathMessage(entries, nightPhaseId, players) {
+  const deadIndices = new Set();
+  (entries || []).forEach((entry) => {
+    if (!entry.phase || entry.phase.id !== nightPhaseId) return;
+    (entry.effects || []).forEach((eff) => {
+      if (
+        eff.type === "setDead" &&
+        eff.value !== false &&
+        eff.playerIndex >= 0
+      ) {
+        deadIndices.add(eff.playerIndex);
+      }
+    });
+  });
+  if (!deadIndices.size) return "昨天夜裡無人死亡";
+  const labels = [...deadIndices]
+    .sort((a, b) => a - b)
+    .map((i) => formatPlayerLabel(players[i], i));
+  return `昨天夜裡死亡：${labels.join(" ")}`;
+}
+
+export function formatLogMessage(entry, options = {}) {
+  if (entry.message) {
+    return formatEntryForDisplay(entry, options) || entry.message;
+  }
   const actor = entry.actor || "";
   const action = entry.action || "";
   const target = entry.target || "";
   if (!actor && !action) return "";
   if (action && target && target !== "無") {
-    return `${actor} -> ${action} -> ${target}`;
+    return `${actor} ${action} ${target}`;
   }
   if (action) {
-    return `${actor} -> ${action}`;
+    return `${actor} ${action}`;
   }
   return actor;
 }
@@ -96,6 +149,123 @@ export function resolveGameMeta(state, rootState) {
     scriptName,
     playerCount,
   };
+}
+
+function deadVoteAlreadyRecorded(state, phaseId, playerLabel) {
+  return state.entries.some(
+    (e) =>
+      e.category === "deadVote" &&
+      e.phase &&
+      e.phase.id === phaseId &&
+      Array.isArray(e.formSnapshot && e.formSnapshot.players) &&
+      e.formSnapshot.players.includes(playerLabel),
+  );
+}
+
+function insertAfterVoteBlock(state, voteId) {
+  const voteIdx = state.entries.findIndex((e) => e.id === voteId);
+  if (voteIdx < 0) return voteId;
+  let idx = voteIdx;
+  while (idx + 1 < state.entries.length) {
+    const next = state.entries[idx + 1];
+    const snap = next.formSnapshot || {};
+    const linkedToVote =
+      snap.afterVoteId === voteId || snap.linkedVoteId === voteId;
+    if (
+      linkedToVote &&
+      (next.category === "voteScaffold" || next.category === "deadVote")
+    ) {
+      idx += 1;
+    } else {
+      break;
+    }
+  }
+  return state.entries[idx].id;
+}
+
+function autoRecordDeadVotesFromVoters({
+  dispatch,
+  state,
+  rootState,
+  phase,
+  voters,
+  voteEntryId,
+}) {
+  if (!voteEntryId || !phase || !phase.id) return;
+  const players = rootState.players.players;
+  const eligible = eligibleDeadVotersFromLabels(players, voters);
+  const toRecord = eligible.filter(
+    (label) => !deadVoteAlreadyRecorded(state, phase.id, label),
+  );
+  if (!toRecord.length) return;
+  dispatch("recordDeadVoteCard", {
+    players: toRecord,
+    message: `${toRecord.join("、")}使用遺言票`,
+    formSnapshot: { players: toRecord, linkedVoteId: voteEntryId },
+    insertAfterEntryId: voteEntryId,
+  });
+}
+
+function rebuildPhaseScaffolds({ commit, state, rootState, phase }) {
+  if (!phase || !phase.id) return;
+  const phaseId = phase.id;
+  const players = rootState.players.players;
+
+  state.entries
+    .filter(
+      (e) =>
+        e.category === "voteScaffold" && e.phase && e.phase.id === phaseId,
+    )
+    .map((e) => e.id)
+    .forEach((id) => commit("removeEntry", id));
+
+  const votes = state.entries
+    .filter(
+      (e) =>
+        e.category === "vote" &&
+        e.source === "vote" &&
+        e.phase &&
+        e.phase.id === phaseId,
+    )
+    .sort(
+      (a, b) =>
+        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
+    );
+
+  const cumulative = [];
+  const voteRecords = votes.map((vote) => ({
+    nominee:
+      (vote.formSnapshot && vote.formSnapshot.nominee) ||
+      (vote.target !== "無" ? vote.target : ""),
+    voteCount:
+      vote.formSnapshot && vote.formSnapshot.voteCount != null
+        ? vote.formSnapshot.voteCount
+        : 0,
+  }));
+
+  const timeline = scaffoldEntriesFromVotes(voteRecords, players);
+
+  timeline.forEach(({ result, voteIndex }) => {
+    const vote = votes[voteIndex];
+    if (!vote) return;
+
+    commit("addEntry", {
+      source: "vote",
+      category: "voteScaffold",
+      message: result.message,
+      formSnapshot: {
+        nominee: result.nominee,
+        empty: result.empty,
+        phaseId,
+        afterVoteId: vote.id,
+      },
+      phase,
+      timestamp: new Date(
+        new Date(vote.timestamp).getTime() + 1,
+      ).toISOString(),
+      insertAfterEntryId: insertAfterVoteBlock(state, vote.id),
+    });
+  });
 }
 
 function applyEffectToBoard(ctx, effect) {
@@ -144,7 +314,48 @@ function applyEffectToBoard(ctx, effect) {
         { root: true },
       );
       break;
+    case "setRole":
+      if (effect.role) {
+        ctx.commit(
+          "players/update",
+          { player, property: "role", value: { ...effect.role } },
+          { root: true },
+        );
+        if (player.disguiseRole && player.disguiseRole.id) {
+          ctx.commit(
+            "players/update",
+            { player, property: "disguiseRole", value: {} },
+            { root: true },
+          );
+        }
+      }
+      break;
+    case "setDisguiseRole":
+      if (effect.role) {
+        ctx.commit(
+          "players/update",
+          { player, property: "disguiseRole", value: { ...effect.role } },
+          { root: true },
+        );
+      }
+      break;
     case "addReminder": {
+      const reminder = effect.reminder;
+      if (effect.unique && reminder) {
+        players.forEach((p, idx) => {
+          if (idx === effect.playerIndex) return;
+          if (!hasReminder(p.reminders, reminder)) return;
+          const value = (p.reminders || []).filter(
+            (r) =>
+              !(r.role === reminder.role && r.name === reminder.name),
+          );
+          ctx.commit(
+            "players/update",
+            { player: p, property: "reminders", value },
+            { root: true },
+          );
+        });
+      }
       if (hasReminder(player.reminders, effect.reminder)) return;
       const value = [...(player.reminders || []), effect.reminder];
       ctx.commit(
@@ -286,6 +497,14 @@ const mutations = {
     if (!normalized.message) {
       normalized.message = formatLogMessage(normalized);
     }
+    if (entry.insertAfterEntryId) {
+      const afterId = entry.insertAfterEntryId;
+      const idx = state.entries.findIndex((e) => e.id === afterId);
+      if (idx >= 0) {
+        state.entries.splice(idx + 1, 0, normalized);
+        return normalized.id;
+      }
+    }
     state.entries.push(normalized);
     return normalized.id;
   },
@@ -362,6 +581,12 @@ const mutations = {
   loadLinkedMode(state, value) {
     state.linkedMode = !!value;
   },
+  setHideTimestamp(state, value) {
+    state.hideTimestamp = !!value;
+  },
+  loadHideTimestamp(state, value) {
+    state.hideTimestamp = !!value;
+  },
   setApplyingFromLog(state, value) {
     state.applyingFromLog = !!value;
   },
@@ -434,6 +659,25 @@ const actions = {
   setLinkedMode({ commit }, value) {
     commit("setLinkedMode", value);
   },
+  setHideTimestamp({ commit }, value) {
+    commit("setHideTimestamp", value);
+  },
+  appendDawnNightDeathReport({ commit, state, rootState, rootGetters }, { nightPhaseId }) {
+    if (!nightPhaseId) return;
+    const players = rootState.players.players;
+    const message = buildNightDeathMessage(
+      state.entries,
+      nightPhaseId,
+      players,
+    );
+    const phase = rootGetters["gamePhase/currentPhase"];
+    commit("addEntry", {
+      category: "nightDeaths",
+      source: "system",
+      message,
+      phase,
+    });
+  },
   setPreviewEffects({ commit }, effects) {
     commit("setPreviewEffects", effects);
   },
@@ -485,6 +729,9 @@ const actions = {
     }
     if (data.linkedMode != null) {
       commit("loadLinkedMode", data.linkedMode);
+    }
+    if (data.hideTimestamp != null) {
+      commit("loadHideTimestamp", data.hideTimestamp);
     }
     if (data.pendingFacts) {
       commit("loadPendingFacts", data.pendingFacts);
@@ -647,30 +894,52 @@ const actions = {
       const overlay = rootState.interactionRules
         ? rootState.interactionRules.overlay
         : {};
-      const rule = getRule(formSnapshot.ruleId, overlay);
+      const rule = resolveRuleForRoleCard(formSnapshot, overlay, roleCardKey);
       if (rule) {
+        const actorIndex = actorIndexFromRoleCardKey(roleCardKey);
         resolvedEffects = effectsFromRule(
           rule,
           formSnapshot.formData || {},
           players,
           formSnapshot.effectToggles || {},
           rootState.roles,
+          actorIndex,
+          { setupVariant: formSnapshot.setupVariant || null },
         );
+      }
+    }
+    let resolvedMessage = message;
+    if (!resolvedMessage && formSnapshot && formSnapshot.ruleId) {
+      const overlay = rootState.interactionRules
+        ? rootState.interactionRules.overlay
+        : {};
+      const rule = resolveRuleForRoleCard(formSnapshot, overlay, roleCardKey);
+      if (rule) {
+        const actorIndex = actorIndexFromRoleCardKey(roleCardKey);
+        resolvedMessage = buildNaturalRoleMessage(rule, {
+          players,
+          actorIndex,
+          formData: formSnapshot.formData || {},
+          effects: resolvedEffects,
+        });
       }
     }
     const correlationId = newId();
     const existing = state.entries.find((e) => e.roleCardKey === roleCardKey);
+    const isSetupCard =
+      roleCardKey && String(roleCardKey).startsWith("setup|");
+    const applyBoardEffects = state.linkedMode || isSetupCard;
     const fields = {
       source: "roleCard",
       category,
       roleCardKey,
       actor,
-      action: action || "使用能力",
+      action: action || "選擇",
       target: target || "無",
       detail: detail || null,
       formSnapshot: formSnapshot || null,
       phase: existing && existing.phase ? existing.phase : phase,
-      message: message || null,
+      message: resolvedMessage || null,
       effects: resolvedEffects || null,
       roleId: roleId || (formSnapshot && formSnapshot.ruleId) || null,
       correlationId:
@@ -678,33 +947,37 @@ const actions = {
     };
 
     if (existing) {
-      if (state.linkedMode) {
+      if (applyBoardEffects) {
         const oldEffects = effectsFromEntry(existing, players);
         dispatch("undoEntryEffects", { effects: oldEffects });
       }
       commit("updateEntry", { id: existing.id, patch: fields });
-      if (state.linkedMode) {
+      if (applyBoardEffects) {
         if (resolvedEffects && resolvedEffects.length) {
           dispatch("applyEntryEffects", { entry: fields, effects: resolvedEffects });
         }
-        dispatch("afterEntryWritten", {
-          entryId: existing.id,
-          entry: { ...fields, id: existing.id },
-          effects: resolvedEffects || [],
-        });
+        if (state.linkedMode) {
+          dispatch("afterEntryWritten", {
+            entryId: existing.id,
+            entry: { ...fields, id: existing.id },
+            effects: resolvedEffects || [],
+          });
+        }
       }
     } else {
       commit("addEntry", { ...fields, phase });
       const entryId = state.entries[state.entries.length - 1]?.id;
-      if (state.linkedMode) {
+      if (applyBoardEffects) {
         if (resolvedEffects && resolvedEffects.length) {
           dispatch("applyEntryEffects", { entry: fields, effects: resolvedEffects });
         }
-        dispatch("afterEntryWritten", {
-          entryId,
-          entry: { ...fields, id: entryId },
-          effects: resolvedEffects || [],
-        });
+        if (state.linkedMode) {
+          dispatch("afterEntryWritten", {
+            entryId,
+            entry: { ...fields, id: entryId },
+            effects: resolvedEffects || [],
+          });
+        }
       }
     }
   },
@@ -855,7 +1128,7 @@ const actions = {
     }
   },
   recordVoteCard(
-    { commit, rootGetters },
+    { commit, state, rootGetters, rootState, dispatch },
     {
       nominator,
       nominee,
@@ -867,6 +1140,8 @@ const actions = {
     },
   ) {
     const phase = rootGetters["gamePhase/currentPhase"];
+    const voterList =
+      (formSnapshot && formSnapshot.voters) || voters || [];
     const fields = {
       source: "vote",
       category: "vote",
@@ -879,12 +1154,21 @@ const actions = {
         nominator,
         nominee,
         voteCount,
-        voters: voters || [],
+        voters: voterList,
       },
       phase,
     };
     if (editEntryId) {
       commit("updateEntry", { id: editEntryId, patch: fields });
+      autoRecordDeadVotesFromVoters({
+        dispatch,
+        state,
+        rootState,
+        phase,
+        voters: voterList,
+        voteEntryId: editEntryId,
+      });
+      rebuildPhaseScaffolds({ commit, state, rootState, phase });
       return;
     }
     const manualKey = `vote|${phase.id}|${Date.now().toString(36)}${Math.random()
@@ -894,10 +1178,95 @@ const actions = {
       ...fields,
       manualKey,
     });
+    const voteEntryId = state.entries[state.entries.length - 1]?.id;
+    autoRecordDeadVotesFromVoters({
+      dispatch,
+      state,
+      rootState,
+      phase,
+      voters: voterList,
+      voteEntryId,
+    });
+    rebuildPhaseScaffolds({ commit, state, rootState, phase });
+  },
+  recordExecution(
+    { commit, state, rootGetters, dispatch, rootState },
+    { playerLabel, playerIndex, died, message, aliveMessage },
+  ) {
+    const phase = rootGetters["gamePhase/currentPhase"];
+    const players = rootState.players.players;
+    const effects =
+      died && playerIndex != null && playerIndex >= 0
+        ? [{ type: "setDead", playerIndex, value: true }]
+        : [];
+    const correlationId = newId();
+    const fields = {
+      source: "execution",
+      category: "execution",
+      actor: playerLabel || "說書人",
+      action: died ? "被處決 死亡" : "被處決 沒有死亡",
+      target: "無",
+      message: message || null,
+      playerIndex,
+      playerName: playerLabel || null,
+      effects,
+      correlationId,
+      phase,
+    };
+    commit("addEntry", fields);
+    const entryId = state.entries[state.entries.length - 1]?.id;
+    if (state.linkedMode) {
+      if (effects.length) {
+        dispatch("applyEntryEffects", { entry: fields, effects });
+      }
+      dispatch("afterEntryWritten", {
+        entryId,
+        entry: { ...fields, id: entryId },
+        effects,
+      });
+    }
+    commit("addEntry", {
+      source: "system",
+      category: "alivePlayers",
+      message: aliveMessage || formatAlivePlayersLine(players),
+      phase,
+      correlationId,
+    });
+  },
+  recordNoExecution(
+    { commit, rootGetters, rootState },
+    { message, aliveMessage },
+  ) {
+    const phase = rootGetters["gamePhase/currentPhase"];
+    const players = rootState.players.players;
+    const correlationId = newId();
+    commit("addEntry", {
+      source: "execution",
+      category: "noExecution",
+      actor: "說書人",
+      action: "無人處決",
+      target: "無",
+      message: message || "無人處決",
+      correlationId,
+      phase,
+    });
+    commit("addEntry", {
+      source: "system",
+      category: "alivePlayers",
+      message: aliveMessage || formatAlivePlayersLine(players),
+      phase,
+      correlationId,
+    });
   },
   recordDeadVoteCard(
     { commit, state, rootGetters, dispatch, rootState },
-    { players: selectedPlayers, message, formSnapshot, editEntryId },
+    {
+      players: selectedPlayers,
+      message,
+      formSnapshot,
+      editEntryId,
+      insertAfterEntryId,
+    },
   ) {
     const phase = rootGetters["gamePhase/currentPhase"];
     const players = rootState.players.players;
@@ -940,7 +1309,11 @@ const actions = {
     const manualKey = `deadVote|${phase.id}|${Date.now().toString(36)}${Math.random()
       .toString(36)
       .substr(2, 5)}`;
-    commit("addEntry", { ...fields, manualKey });
+    commit("addEntry", {
+      ...fields,
+      manualKey,
+      insertAfterEntryId: insertAfterEntryId || null,
+    });
     const entryId = state.entries[state.entries.length - 1]?.id;
     if (state.linkedMode) {
       if (effects.length) {
@@ -955,12 +1328,16 @@ const actions = {
   },
   cancelRoleCard({ commit, state, dispatch, rootState }, roleCardKey) {
     const entry = state.entries.find((e) => e.roleCardKey === roleCardKey);
-    if (entry && state.linkedMode) {
+    if (!entry) return;
+    const isSetupCard =
+      roleCardKey && String(roleCardKey).startsWith("setup|");
+    const shouldUndo = state.linkedMode || isSetupCard;
+    if (shouldUndo) {
       const effects = effectsFromEntry(entry, rootState.players.players);
       dispatch("undoEntryEffects", { effects });
       dispatch("afterEntryRemoved", { entry });
     }
-    commit("removeByRoleCardKey", roleCardKey);
+    commit("removeEntry", entry.id);
   },
   cancelManualEntry({ commit, state, dispatch, rootState }, entryId) {
     const entry = state.entries.find((e) => e.id === entryId);
@@ -969,7 +1346,12 @@ const actions = {
       dispatch("undoEntryEffects", { effects });
       dispatch("afterEntryRemoved", { entry });
     }
+    const phase = entry && entry.phase;
+    const wasVote = entry && entry.category === "vote";
     commit("removeEntry", entryId);
+    if (wasVote && phase) {
+      rebuildPhaseScaffolds({ commit, state, rootState, phase });
+    }
   },
   exportJson({ state, rootState, rootGetters }) {
     const gamePhase = rootGetters["gamePhase/currentPhase"];
@@ -984,6 +1366,7 @@ const actions = {
         currentPhase: gamePhase,
         gamePhase: rootState.gamePhase,
         linkedMode: state.linkedMode,
+        hideTimestamp: state.hideTimestamp,
         players: rootState.players.players.map((p) => ({
           name: p.name,
           role: p.role.name || p.role.id || "",
@@ -1015,6 +1398,7 @@ const actions = {
     });
 
     const sections = buildPhaseSections(state.entries);
+    const hideTime = !!state.hideTimestamp;
     md += `\n## 階段戰報\n\n`;
     sections.forEach((section) => {
       md += `### ${section.label}\n\n`;
@@ -1023,9 +1407,19 @@ const actions = {
           hour: "2-digit",
           minute: "2-digit",
         });
-        md += `- **${time}** ${formatLogMessage(entry)}\n`;
+        const msg = formatLogMessage(entry) || "";
+        const msgLines = String(msg).split("\n").filter((l) => l.length);
+        const timePrefix = hideTime ? "" : `**${time}** `;
+        if (!msgLines.length) {
+          md += hideTime ? `- \n` : `- **${time}**\n`;
+        } else {
+          md += `- ${timePrefix}${msgLines[0]}\n`;
+          msgLines.slice(1).forEach((line) => {
+            md += `  ${line}\n`;
+          });
+        }
         if (entry.detail && entry.detail !== "無備註") {
-          md += `  - └ ${entry.detail}\n`;
+          md += `  └ ${entry.detail}\n`;
         }
         if (entry.snapshot) {
           md += `  - 快照：${
@@ -1037,7 +1431,9 @@ const actions = {
     });
     return md;
   },
-  exportReplayText({ state, rootState }) {
+  exportReplayText({ state, rootState }, payload = {}) {
+    const hideNickname = !!(payload && payload.hideNickname);
+    const logOpts = { hideNickname };
     const resolved = resolveGameMeta(state, rootState);
     const edition =
       resolved.scriptName ||
@@ -1063,7 +1459,7 @@ const actions = {
             if (e.category === "phase") {
               return `  ${e.message}`;
             }
-            let line = `  ${formatLogMessage(e)}`;
+            let line = `  ${formatLogMessage(e, logOpts)}`;
             if (e.detail && e.detail !== "無備註" && String(e.detail).trim()) {
               line += `\n    └ ${e.detail}`;
             }

@@ -2,6 +2,8 @@
  * Role-specific fill fields for the night recorder (Laplace-style).
  * Empty array = passive / no selectable night action card.
  */
+import { getRule, ruleAppliesTonight } from "./roleInteractionEngine";
+import { TEAM_CATEGORY_OPTIONS } from "./teamTerms";
 
 const isRole = (role, ids, names = []) => {
   const id = (role.baseRoleId || role.id || "").toLowerCase();
@@ -93,39 +95,30 @@ export function getRoleInputConfig(role) {
   if (
     isRole(
       role,
-      [
-        "chef",
-        "empath",
-        "mathematician",
-        "shiguan",
-        "fangshi",
-        "clockmaker",
-        "oracle",
-        "juggler",
-        "dagengren",
-        "chambermaid",
-      ],
-      [
-        "廚師",
-        "共情者",
-        "數學家",
-        "史官",
-        "方士",
-        "鐘錶匠",
-        "鐘表匠",
-        "神諭者",
-        "雜耍藝人",
-        "打更人",
-        "侍女",
-        "厨师",
-        "数学家",
-        "钟表匠",
-        "神谕者",
-        "杂耍艺人",
-      ],
+      ["chef", "empath", "mathematician", "shiguan", "fangshi", "clockmaker", "oracle", "juggler", "dagengren", "chambermaid"],
+      ["廚師", "共情者", "數學家", "史官", "方士", "鐘錶匠", "神諭者", "雜耍藝人", "打更人", "侍女"],
     )
   ) {
     return [{ key: "num", type: "number", label: "得知數字" }];
+  }
+
+  if (isRole(role, ["balloonist"], ["氣球駕駛員", "气球驾驶员"])) {
+    return [
+      { key: "target", type: "player", label: "標記玩家" },
+      {
+        key: "category",
+        type: "select",
+        label: "角色類別",
+        options: TEAM_CATEGORY_OPTIONS,
+      },
+    ];
+  }
+
+  if (isRole(role, ["courtier"], ["侍臣"])) {
+    return [
+      { key: "target", type: "player", label: "醉酒玩家" },
+      { key: "r1", type: "role", label: "選擇角色" },
+    ];
   }
 
   if (
@@ -491,27 +484,44 @@ export function getRoleInputConfig(role) {
     return [];
   }
 
+  if (isRole(role, ["monk"], ["僧侶"])) {
+    return [{ key: "target", type: "otherPlayer", label: "目標對象" }];
+  }
+
+  if (isRole(role, ["poisoner"], ["投毒者"])) {
+    return [{ key: "target", type: "alivePlayer", label: "目標對象" }];
+  }
+
+  if (isRole(role, ["imp"], ["小惡魔"])) {
+    return [{ key: "target", type: "alivePlayer", label: "目標對象" }];
+  }
+
   // Default: pick a player target (Imp, Monk, Poisoner, …)
   return [{ key: "target", type: "player", label: "目標對象" }];
 }
 
 /** Whether this role wakes / has a fillable card tonight. */
-export function roleHasNightAction(role, isFirstNight) {
+export function roleHasNightAction(role, isFirstNight, overlay = null) {
   if (!role || !role.id) return false;
   const order = isFirstNight ? role.firstNight : role.otherNight;
   if (!order) return false;
+
+  if (overlay != null) {
+    const rule = getRule(role.id, overlay);
+    if (rule) {
+      if (!rule.enabled) return false;
+      if (!ruleAppliesTonight(rule, isFirstNight)) return false;
+      return !!(rule.inputs && rule.inputs.length);
+    }
+  }
+
   return getRoleInputConfig(role).length > 0;
 }
 
+import { formatPlayerLabel } from "./battleLogFormat";
+
 export function formatPlayerRoleLabel(player, fallbackSeat) {
-  const name =
-    (player && player.name) ||
-    (fallbackSeat != null ? `座位 ${fallbackSeat + 1}` : "未知");
-  const roleName =
-    player && player.role && (player.role.name || player.role.id)
-      ? player.role.name || player.role.id
-      : "未指派";
-  return `${name}[${roleName}]`;
+  return formatPlayerLabel(player, fallbackSeat);
 }
 
 export function buildRoleCardKey(phaseId, playerIndex, roleId) {

@@ -1,5 +1,28 @@
 // Gstone grimoire web assets (clocktower.gstonegames.com)
 $gstone-token: "https://oss.gstonegames.com/data_file/clocktower/web/token1.png";
+$gstone-reminder: "https://oss.gstonegames.com/data_file/clocktower/web/reminder1.png";
 $gstone-life: "https://oss.gstonegames.com/data_file/clocktower/web/life1.png";
 $gstone-shroud: "https://oss.gstonegames.com/data_file/clocktower/web/shroud1.png";
 $gstone-death: "https://oss.gstonegames.com/data_file/clocktower/web/death1.png";
+$gstone-vote: "https://oss.gstonegames.com/data_file/clocktower/web/vote1.png";
+$gstone-leaf-left: "https://oss.gstonegames.com/data_file/clocktower/web/leaf-left.png";
+$gstone-leaf-orange: "https://oss.gstonegames.com/data_file/clocktower/web/leaf-orange.png";
+$gstone-leaf-right: "https://oss.gstonegames.com/data_file/clocktower/web/leaf-right.png";
+$gstone-leaf-top1: "https://oss.gstonegames.com/data_file/clocktower/web/leaf-top1.png";
+$gstone-leaf-top2: "https://oss.gstonegames.com/data_file/clocktower/web/leaf-top2.png";
+$gstone-leaf-top3: "https://oss.gstonegames.com/data_file/clocktower/web/leaf-top3.png";
+$gstone-leaf-top4: "https://oss.gstonegames.com/data_file/clocktower/web/leaf-top4.png";
+$gstone-leaf-top5: "https://oss.gstonegames.com/data_file/clocktower/web/leaf-top5.png";
+$gstone-icon-plus: "https://oss.gstonegames.com/data_file/clocktower/web/icons/plus1.png";
+$gstone-icon-x: "https://oss.gstonegames.com/data_file/clocktower/web/icons/x.png";
+
+@mixin gstone-token-shadow {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+@mixin gstone-corner-panel {
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 10px;
+  border: 3px solid #8a7864;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+}

@@ -1,19 +1,19 @@
 id,name,ability,flavor,firstNightReminder,otherNightReminder,remindersGlobal,reminders
 acrobat,雜技演員,每天晚上*，選擇一位玩家，如果他今晚將醉酒或中毒，則你死亡。,歡迎各位前來，觀看世上最盛大的表演！,,雜技演員選擇一位玩家，如果他今晚醉酒或中毒，則雜技演員死亡。,,死亡
-alchemist,煉金術士,你擁有一個僕從的能力，使用此能力時，說書人可能會提示你重新選擇目標。,"Visit the interior of the Earth. By rectification thou shalt find the hidden stone. Above the gold, lieth the red. Kether in Malkuth.",展示一個僕從角色代幣，將煉金術士的角色代幣換成那個角色的角色代幣，以「是煉金術士」標記他。,,是煉金術士,
+alchemist,煉金術士,你擁有一個爪牙的能力，使用此能力時，說書人可能會提示你重新選擇目標。,"Visit the interior of the Earth. By rectification thou shalt find the hidden stone. Above the gold, lieth the red. Kether in Malkuth.",展示一個爪牙角色代幣，將煉金術士的角色代幣換成那個角色的角色代幣，以「是煉金術士」標記他。,,是煉金術士,
 alhadikhia,哈迪寂亞,每天晚上*，你可以選擇三位玩家(所有玩家都知道是誰)，他們各自私下選擇「活著」或 「死亡」，但是如果他們最後都活著，則他們都死亡。,*沉默是金*,,哈迪寂亞選擇三位玩家，要求玩家們沉默並且根據選擇的順序，宣布「哈迪寂亞選擇了 [第一位玩家]」，喚醒該玩家，讓他點頭表示活著，搖頭表示死亡，根據結果殺死或復活他，請該玩家閉上眼睛，然後宣布下一位玩家。完成之後如果三位玩家都活著，則三位都死亡。允許玩家們繼續交談。,,"1,2,3,選擇「死亡」,選擇「活著」"
-alsaahir,戲法師,每天白天一次，如果你公開猜出哪些玩家是僕從、哪些玩家是惡魔，則善良陣營獲勝。,你在故我在，而我在故你在。,,,,
+alsaahir,戲法師,每天白天一次，如果你公開猜出哪些玩家是爪牙、哪些玩家是惡魔，則善良陣營獲勝。,你在故我在，而我在故你在。,,,,
 amnesiac,失憶者,你不知道你擁有的能力。每天白天一次，私下向說書人猜測你的能力，你得知你的猜測有多準確。,等等。什麼。誰？哦，明白。等等。什麼？,決定失憶者的真實能力，如果此能力使他在今晚醒來，喚醒失憶症玩家並且進行他的能力。,如果失憶者的能力使他在今晚醒來，喚醒他並且進行他的能力。,,?
 angel,天使,任何需要對新玩家的死亡負最大責任的玩家可能會受到懲罰。,"Let those who are without sin dare to raise their hand to my chosen, for I shall strike such fools down with the fury and righteousness of a thousand storms.",,,,"保護,天罰"
-apprentice,學徒,在你的第一晚，你得到一個鎮民的能力(如果你是善良陣營)，或一個僕從的能力(如果你是邪惡陣營)。,多年來我旅行各地，研究這工藝的作法。你問是什麼？簡單來說就是一些簡單的民間工藝，不需要擔心...還不需要。,展示「你是」 卡片 + 一個鎮民或僕從的角色代幣，將學徒的角色代幣換成那個角色的角色代幣，然後以「是學徒」標記他。,,,是學徒
+apprentice,學徒,在你的第一晚，你得到一個鎮民的能力(如果你是善良陣營)，或一個爪牙的能力(如果你是邪惡陣營)。,多年來我旅行各地，研究這工藝的作法。你問是什麼？簡單來說就是一些簡單的民間工藝，不需要擔心...還不需要。,展示「你是」 卡片 + 一個鎮民或爪牙的角色代幣，將學徒的角色代幣換成那個角色的角色代幣，然後以「是學徒」標記他。,,,是學徒
 artist,藝術家,每場遊戲一次，白天時，私下問說書人任何一個是非題。,"Mon Dieu! C'est lumineux! My work, she is... how you say... Magnifique! Dieu est révélé! Oui.",,,,無能力
 assassin,刺客,每場遊戲一次，晚上時*，選擇一位玩家，該玩家死亡，無論是否有原因導致他們不能死。,,,刺客可以指向一位玩家，該玩家死亡。,,"死亡,無能力"
 atheist,無神論者,說書人可以破壞遊戲規則，而如果他被處決，則善良陣營獲勝(儘管你死亡)。[沒有邪惡的角色],"Let us disperse with unnecessary conjecture and silly paranoia. There is a perfectly rational explanation for everything. Yes, a teacup may indeed be orbiting the planet, too small to see, but I shall drink my tea from the very real china in my very real hands.",,,,
-balloonist,氣球駕駛員,每天晚上，你得知與昨晚不同角色類別的一位玩家。[+0 或 +1 城外人],繼續加熱！再高！再高！啊...從上面看真是美麗，對吧？能看到河邊柳樹下捕魚的小孩嗎？你能看到馬戲團帳篷柱子上閃爍的太陽嗎？一個老人獨自在葡萄園...死了！？把火關小！下降！下降！,選擇一個角色類別，指向一個為該類別的玩家，以「已得知」標記該玩家。,選擇一個旁邊還沒放置「已得知」標記的角色類別，有選擇到的話，指向一個為該類別的玩家，以「已得知」標記該玩家。,,"已得知(僕從),已得知(城外人),已得知(惡魔),已得知(旅行者),已得知(鎮民)"
+balloonist,氣球駕駛員,每天晚上，你得知與昨晚不同角色類別的一位玩家。[+0 或 +1 外來者],繼續加熱！再高！再高！啊...從上面看真是美麗，對吧？能看到河邊柳樹下捕魚的小孩嗎？你能看到馬戲團帳篷柱子上閃爍的太陽嗎？一個老人獨自在葡萄園...死了！？把火關小！下降！下降！,選擇一個角色類別，指向一個為該類別的玩家，以「已得知」標記該玩家。,選擇一個旁邊還沒放置「已得知」標記的角色類別，有選擇到的話，指向一個為該類別的玩家，以「已得知」標記該玩家。,,"已得知(爪牙),已得知(外來者),已得知(惡魔),已得知(旅行者),已得知(鎮民)"
 banshee,報喪女妖,如果惡魔殺死了你，所有玩家得知此事。從現在開始，你每天可以提名兩次，每次投票也可以投下兩票。,"Gorm do shúile, dearg do ghruaig, ní bheidh sé i bhfad, is a mbeidh tú san uaigh.",,宣布報喪女妖已死亡(如果有的話)。,,具有能力
 barber,理髮師,如果你死亡，惡魔今晚可以選擇兩位玩家(非另一位惡魔)交換角色。,你知道理髮和手術曾經是同一份職業嗎？沒聽說過？那現在你知道了。,,如果理髮師在今天死亡，喚醒惡魔並展示「這個能力選擇你」提示卡 + 理髮師角色代幣，惡魔可以指向兩位玩家，如果惡魔有選擇，交換他們的角色代幣，分別喚醒他們並展示「你是」提示卡 + 他們的新角色代幣。,,今晚剪頭髮
 barista,咖啡師,每天晚上，直到隔天黃昏，隨機發生 1) 一位玩家變得清醒及健康，得到正確的資訊，或者 2) 該玩家的能力觸發兩次。受到影響的玩家得知是哪種效果。,要一杯不加奶油的咖啡嗎，先生？非常抱歉，我們奶油剛用完了—不如要不加牛奶的咖啡吧？,選擇一位玩家，喚醒該玩家並告知他們哪一種咖啡師的效果作用於他們身上(清醒&健康/能力x2)。以對應的標記標記該玩家。,選擇一位玩家，喚醒該玩家並告知他們哪一種咖啡師的效果作用於他們身上(清醒&健康/能力x2)。以對應的標記標記該玩家。,,"清醒&健康,能力x2"
-baron,男爵,遊戲中會出現額外的城外人。[+2 城外人],"This town has gone to the dogs, what? Cheap foreign labor... that's the ticket. Stuff them in the mine, I say. A bit of hard work never hurt anyone, and a clip'o'the ears to any brigand who says otherwise. It's all about the bottom line, what?",,,,
+baron,男爵,遊戲中會出現額外的外來者。[+2 外來者],"This town has gone to the dogs, what? Cheap foreign labor... that's the ticket. Stuff them in the mine, I say. A bit of hard work never hurt anyone, and a clip'o'the ears to any brigand who says otherwise. It's all about the bottom line, what?",,,,
 beggar,乞丐,你需要使用投票代幣投票，死去的玩家可以將自己的代幣給你，若如此，你得知該玩家的陣營。,"Alms for the poor, good Sir? Spare a coin, Madam? Thank you. God bless! You're a right kind soul and no mistake! I'll have some swanky nosh tonight, I will!",,,,
 bigwig,Big Wig,"Each nominee chooses a player: until voting, only they may speak & they are mad the nominee is good or they might die.",Vanity asks ‘Is it popular?’ Cowardice asks ‘Is it safe?’ Conscience asks ‘Is it right?’ Who among us will ask: ‘Is it true?’,,,,
 bishop,主教,只有說書人可以提名，每天必須至少提名一位與你不同陣營的玩家。,"In nomine Patris, et Filii, et Spiritus Sancti… Nos mos Dei. Deus vult de nobis.",,,,"提名善良,提名邪惡"
@@ -34,10 +34,10 @@ cerenovus,洗腦師,每天晚上，選擇一位玩家及一個善良角色，明
 chambermaid,侍女,每天晚上，選擇兩位活著的其他玩家，你得知其中有幾位因自己的能力而醒來(0/1/2)。,"I aint seen nothin' untoward, Milady. Begging your pardon, but if I did see somethin', it certainly weren't the master o' the house sneaking into the professor's laboratory 'round eleven o'clock and mixing up fancy potions, just like you said, Miss.",侍女指向兩位玩家，展示他們之中因自己的能力而醒來的玩家數量。,侍女指向兩位玩家，展示他們之中因自己的能力而醒來的玩家數量。,,
 chef,廚師,在你的第一晚，你得知總共有幾對邪惡的玩家坐在一起。,今晚的訂位真不尋常。梅威瑟夫人以前根本不會和哈德遜巷的那個流氓為伍，今晚他們卻訂了一張兩人桌。奇怪。,展示比鄰而坐的邪惡玩家們的對數。,,,
 choirboy,唱詩男孩,如果惡魔殺死了國王，你得知惡魔是哪一位玩家。[+ 國王],我看到了。那時候我在長凳那裡整理聖詩集，突然管風琴奏起了可怕的曲調。彈管風琴的那人穿著長斗篷，長長的手指在琴鍵上彈奏著。那人還帶戴著一頂帽子，看起來…就像…你的那頂。,,如果國王被惡魔殺死，喚醒唱詩男孩並指向惡魔玩家。,,
-clockmaker,鐘錶匠,在你的第一晚，你得知惡魔到最近的僕從的距離(相鄰時為1)。,不要打擾我。滴答聲必須繼續下去，因為圓圈是生命的象徵，而一切事物——所有答案——都被它那神聖的機械所包藏。我必須工作。,展示惡魔到最近的僕從的距離數(相鄰時為1)。,,,
+clockmaker,鐘錶匠,在你的第一晚，你得知惡魔到最近的爪牙的距離(相鄰時為1)。,不要打擾我。滴答聲必須繼續下去，因為圓圈是生命的象徵，而一切事物——所有答案——都被它那神聖的機械所包藏。我必須工作。,展示惡魔到最近的爪牙的距離數(相鄰時為1)。,,,
 courtier,侍臣,每場遊戲一次，晚上時，選擇一位角色，該角色的玩家醉酒持續三天三夜。,I am more afraid of an army of one hundred sheep led by a lion than an army of one hundred lions led by a sheep.,侍臣可以選擇角色表上的一個角色，如果朝臣使用了能力且該角色在遊戲中，以 「醉酒N」標記該角色的玩家。,減少被標記玩家的醉酒天數。或者侍臣可以選擇角色表上的一個角色，如果他使用了能力且該角色在遊戲中，以 「醉酒N」標記該角色的玩家。,,"無能力,醉酒 1,醉酒 2,醉酒 3"
 cultleader,異教領袖,每天晚上，你轉變為其中一位活著的鄰居所在的陣營。每天白天一次，你可以提議其他玩家加入你的教團，如果所有善良玩家都如此做，則你的陣營獲勝。,自以為聰明的人，結果卻成了愚人。,如果異教領袖改變了陣營，喚醒他並告知他目前所在的陣營。,如果異教領袖改變了陣營，喚醒他並告知他目前所在的陣營。,,
-damsel,落難少女,所有僕從都知道你在遊戲中。每場遊戲一次，僕從可以猜測你是落難少女，如果猜對，則你的陣營落敗。,別摸頭髮，親愛的。,喚醒所有僕從並展示「這個能力選擇你」提示卡 + 落難少女的角色代幣。,如果落難少女已被獵人選中，喚醒他並展示「你是」提示卡 + 一個不在遊戲中的鎮民角色代幣。,,已猜測
+damsel,落難少女,所有爪牙都知道你在遊戲中。每場遊戲一次，爪牙可以猜測你是落難少女，如果猜對，則你的陣營落敗。,別摸頭髮，親愛的。,喚醒所有爪牙並展示「這個能力選擇你」提示卡 + 落難少女的角色代幣。,如果落難少女已被獵人選中，喚醒他並展示「你是」提示卡 + 一個不在遊戲中的鎮民角色代幣。,,已猜測
 deusexfiasco,失敗的上帝,每場遊戲至少一次，說書人會犯一個錯誤，向玩家們承認並修正它。,,,,,哇喔
 deviant,怪咖,只要你今天很有趣，你就不會被放逐。,"Twas the lady's quip, forsooth.",,,,
 devilsadvocate,魔鬼代言人,每天晚上，選擇一位活著的玩家(不同於昨晚)，如果該玩家明天被處決，他不會死。,"My client, should the objection be overruled, pleads innocent by virtue of the prosecution's non-observance of statute 27.B - incorrect or misleading conjugation of a verb. The fact that nine of the jury died last night is simply prima facie, which is, as Wills vs Thule set precedent for, further reason to acquit.",魔鬼代言人指向一位活著的玩家，以「處決保護」標記該玩家。,魔鬼代言人指向一位活著的玩家，以「處決保護」標記該玩家。,,處決保護
@@ -47,13 +47,13 @@ djinn,燈神,使用燈神的特殊規則。所有玩家都得知這個規則。,
                                 أسئلتك هي جبل نار في يوم صافٍ.",,,,
 doomsayer,末日預言者,如果有四個或更多玩家活著，白天時，每位活著的玩家可以公開使一位與自己同陣營的玩家死亡(每位玩家限一次)。,"And on the Seventh Day, there shall be a great flood and a pestilence upon the People of the Village of the Ravens! The dead shall rise and the living shall repent! O Woe! O Unholy day! Only by great sacrifice shall they prevail! So sayeth the Sages of Nostros and so sayeth I.",,,,
 dreamer,築夢師,每天晚上，選擇其他一位玩家(非旅行者)，你得知該玩家是一個善良角色或一個邪惡角色，其中一個正確。,我記得鐘匠。天空是紅色的，分形三角形如下雨般落下。我嗅到了紫羅蘭的氣味，聽到了冒泡的聲音。一個眼睛發光、鬍鬚蓬亂的女人對著天空發出嘶嘶聲。然後，我醒了。,築夢師指向一位玩家，將一個善良的角色代幣和一個邪惡的角色代幣展示給他，其中一個是正確的。,築夢師指向一位玩家，將一個善良的角色代幣和一個邪惡的角色代幣展示給他，其中一個是正確的。,,
-drunk,酒鬼,你不知道自己是酒鬼，你認為自己是某一位鎮民，但你不是。,"I’m only a *hic* social drinker, my dear. Admittedly, I am a heavy *burp* socializer.",,,醉酒,
+drunk,酒鬼,你不知道自己是酒鬼，你認為自己是某一位鎮民，但你不是。,"I’m only a *hic* social drinker, my dear. Admittedly, I am a heavy *burp* socializer.",,,是酒鬼,
 duchess,公爵夫人,每天白天，至多三位玩家可以拜訪說書人。當晚*，他們得知有多少拜訪者是邪惡的，但其中一位得到不正確的訊息。,"We shall entertain between the hours of 6 and 7 precisely. Tea at 6:15. Scones at 6:45. Do not be late. Formal wear applies, as always.",,,,"不正確,訪客"
 empath,共情者,每天晚上，你得知你活著的鄰居中有幾位是邪惡的(0/1/2)。,My skin prickles. Something is not right here. I can feel it.,展示共情者的邪惡鄰居數量。,展示共情者的邪惡鄰居數量。,,
-engineer,工程師,每場遊戲一次，晚上時，選擇哪些僕從或惡魔出現在遊戲中。,"If it bends, great. If it breaks, well, it probably needed fixing anyway.",工程師可以指向角色表上的一個惡魔或數個僕從，如果他有選擇，根據選擇置換角色代幣，喚醒相關玩家並展示「你是」提示卡 + 他們的新角色代幣。,工程師可以指向角色表上的一個惡魔或數個僕從，如果他有選擇，根據選擇置換角色代幣，喚醒相關玩家並展示「你是」提示卡 + 他們的新角色代幣。,,無能力
+engineer,工程師,每場遊戲一次，晚上時，選擇哪些爪牙或惡魔出現在遊戲中。,"If it bends, great. If it breaks, well, it probably needed fixing anyway.",工程師可以指向角色表上的一個惡魔或數個爪牙，如果他有選擇，根據選擇置換角色代幣，喚醒相關玩家並展示「你是」提示卡 + 他們的新角色代幣。,工程師可以指向角色表上的一個惡魔或數個爪牙，如果他有選擇，根據選擇置換角色代幣，喚醒相關玩家並展示「你是」提示卡 + 他們的新角色代幣。,,無能力
 eviltwin,鏡像雙子,你與一位對手認識彼此。如果你們當中的善良玩家被處決，邪惡陣營獲勝。只要你們兩個人都活著，善良陣營不能獲勝。,我不是莎拉！我是克拉！她才是莎拉！莎拉是壞的那個！不是我！,喚醒鏡像雙子和他的雙胞胎，確認他們看到對方是誰，指向鏡像雙子，將他的角色代幣展示給雙胞胎玩家；指向雙胞胎玩家，將他的角色代幣展示給鏡像雙子。,,,雙胞胎
 exorcist,驅魔人,每天晚上*，選擇一位玩家(不同於昨晚)，如果你選中了惡魔，則他得知你是誰並且今晚不會因自身能力被喚醒。,"We cast you out, every unclean spirit, every satanic power, every onslaught of the infernal adversary, every legion, every diabolical group and sect, in the name and by the power of Our Lord Jesus Christ. We command you, begone and fly far from the Church of God, from the souls made by God in His image and redeemed by the precious blood of the divine Lamb.",,驅魔人選擇一位不同於昨晚的玩家，如果該玩家是惡魔，喚醒惡魔並展示「這個能力選擇你」提示卡 + 驅魔人的角色代幣並指向驅魔人，惡魔今晚不會因自身能力被喚醒。,,已選擇
-fanggu,方古,每天晚上*，選擇一位玩家，該玩家死亡。被選擇的城外人變成邪惡的方古，並改為你死亡(每場遊戲只能觸發一次)。[+1 城外人],汝之牆壁與武器，皆為幻夢之雲煙。,,方古指向一位玩家，該玩家死亡，或者如果該玩家是城外人且沒有「第一位城外人」標記，則改為方古死亡，被選擇的玩家變成邪惡的方古，喚醒新的方古並展示「你是」提示卡 + 方古角色代幣，再展示「你是」提示卡 + 倒讚表示邪惡。放置「第一位城外人」標記。,,"死亡,第一位城外人"
+fanggu,方古,每天晚上*，選擇一位玩家，該玩家死亡。被選擇的外來者變成邪惡的方古，並改為你死亡(每場遊戲只能觸發一次)。[+1 外來者],汝之牆壁與武器，皆為幻夢之雲煙。,,方古指向一位玩家，該玩家死亡，或者如果該玩家是外來者且沒有「第一位外來者」標記，則改為方古死亡，被選擇的玩家變成邪惡的方古，喚醒新的方古並展示「你是」提示卡 + 方古角色代幣，再展示「你是」提示卡 + 倒讚表示邪惡。放置「第一位外來者」標記。,,"死亡,第一位外來者"
 farmer,農夫,如果你在晚上死亡，一個活著的善良玩家變成農夫。,再有權勢的人桌上也必須有食物，沒有我們，城市就會挨餓。,,如果農夫在晚上死亡，選擇另一個善良玩家，該玩家變成農夫，喚醒該玩家並展示「你是」提示卡 + 農夫的角色代幣。,,
 fearmonger,恐懼之靈,每天晚上，選擇一位玩家。如果你提名並且處死了他，他的陣營落敗。所有玩家都知道你是否有選擇新玩家。,"Beware of gazing long into the Abyss, lest the Abyss also gaze into you.",恐懼之靈指向一位玩家，以「恐懼」標記該玩家並宣布恐懼之靈選擇了一位新玩家。,恐懼之靈指向一位玩家，如果該玩家與前一晚的選擇不同，以「恐懼」標記該玩家並宣布恐懼之靈選擇了一位新玩家。,,恐懼
 ferryman,擺渡人,在遊戲最後一天，所有死亡的玩家得到自己的投票代幣。,"When righteous dreams come, they have the weight of truth.",,,,
@@ -70,7 +70,7 @@ gardener,園丁,一個或更多的角色由說書人分配給玩家。,"Oh now, 
 general,將軍,每天晚上，你得知說書人認為較佔優勢的陣營，善良，邪惡，或著都不是。,我沒有時間留下名言。,以比讚表示善良正在獲勝；倒讚表示邪惡正在獲勝，或向旁邊比讚表示兩者皆不。,以比讚表示善良正在獲勝；倒讚表示邪惡正在獲勝，或向旁邊比讚表示兩者皆不。,,
 gnome,侏儒,每個玩家都得知一位與你同陣營的玩家，當該玩家被提名時，你可以將提名者殺死。,"Four the score or seven beers, no shows are goes for me and my. A prank to crack the cranks and planks o' the floor foundation length, so incontravertabubbilly mini. The large essays down streams of joyce, no greater than is scene, not inherdt, Ha-urrumph.o.",,,,摯友
 goblin,哥布林,如果你被提名時公開聲明自己是哥布林並且在同一天被處決，你的陣營獲勝。,你不會想激怒哥布林的，永遠不會！另一件事...我能再要一塊蛋糕嗎？,,,,已聲明
-godfather,教父,在你的第一晚，你得知哪些城外人在遊戲中。如果今天白天有城外人死亡，在當晚選擇一位玩家，該玩家死亡。[−1 或 +1 城外人],通常，這只是做生意。但你侮辱我女兒的話，就是在侮辱我，而你侮辱我，就是侮辱我的幫派。我勸你小心一點——你有甚麼三長兩短的話就可惜了。,展示「這些角色在遊戲中」提示卡 + 每個在遊戲中的城外人角色代幣。,如果今天有城外人死亡，教父指向一位玩家，該玩家死亡。,,"城外人死亡,死亡"
+godfather,教父,在你的第一晚，你得知哪些外來者在遊戲中。如果今天白天有外來者死亡，在當晚選擇一位玩家，該玩家死亡。[−1 或 +1 外來者],通常，這只是做生意。但你侮辱我女兒的話，就是在侮辱我，而你侮辱我，就是侮辱我的幫派。我勸你小心一點——你有甚麼三長兩短的話就可惜了。,展示「這些角色在遊戲中」提示卡 + 每個在遊戲中的外來者角色代幣。,如果今天有外來者死亡，教父指向一位玩家，該玩家死亡。,,"外來者死亡,死亡"
 godofug,God of Ug,"One Ug hat. When wear Ug hat, must speak one sound at a time but vote twice. If fail, pass Ug hat.","Blessed are my children, for they see the beauty in simple things.",,,,Hat
 golem,魔像,你每場遊戲只能提名一次。當你如此做時，如果被提名者不是惡魔，則該玩家死亡。,魔像支援？魔像粉碎！魔像支援。,,,,不能提名
 goon,莽夫,每天晚上，第一個使用能力選擇你的玩家會醉到明天黃昏，你變成該玩家的陣營。,"Yes boss. I explained fings real good to dat geezer. He don't want me explain it again. Nah boss, I don't need no doctor - it's only a knife wound. Be right come mornin'",,,,醉酒
@@ -79,19 +79,19 @@ grandmother,祖母,在你的第一晚，你得知一位善良玩家以及他的�
 gunslinger,槍手,每天的第一次提名中，第一票投下後，你可以選擇其中一位投票的玩家，該玩家死亡。,是時候有人出來親手解決問題了。而那個人…就是我。,,,,
 harlot,流鶯,每天晚上*，選擇一位活著的玩家，如果該玩家同意，你得知他的角色，但是你們兩個有可能會死亡。,"Enchanté, Sailor. You look like you need someone to really listen to your troubles. I'm a good listener. Very, very good.",,流鶯指向一位玩家，喚醒該玩家並展示「這個能力選擇你」提示卡 + 流鶯的角色代幣，讓他以點頭或搖頭來表達意願，如果該玩家點頭，喚醒流鶯並展示該玩家的角色代幣，然後，你可以讓兩位玩家都死亡。,,死亡
 harpy,鷹身女妖,每天晚上，選擇兩位玩家，明天第一位玩家需要執著地使其他玩家相信另一位是邪惡的，否則他們之中可能會有人死亡。,"So fair a day I never did see, nor so fowl a presence hanging over me.",鷹身女妖輪流指向兩位玩家，喚醒第一位玩家並展示「這個能力選擇你」提示卡 + 鷹身女妖的角色代幣，然後指向第二位玩家。,鷹身女妖輪流指向兩位玩家，喚醒第一位玩家並展示「這個能力選擇你」提示卡 + 鷹身女妖的角色代幣，然後指向第二位玩家。,,"瘋狂, 目標"
-hatter,帽匠,如果你死亡，惡魔和僕從們都可以在當晚選擇自己的新角色(相同類型)。,One Hat. Too Hat. Three Hat. Tea Hat. Fore Hat. Thrive Hat. Six Hat. Sticks Hat.,,如果帽匠在今天死亡，喚醒惡魔和僕從們並展示「這個能力選擇你」提示卡 + 帽匠角色代幣，他們可以選擇一個自己類型的角色，如果有多位玩家的角色相同，則示意他們重新選擇，將他們的角色代幣替換成他們選擇的角色。,,今晚開茶會
+hatter,帽匠,如果你死亡，惡魔和爪牙們都可以在當晚選擇自己的新角色(相同類型)。,One Hat. Too Hat. Three Hat. Tea Hat. Fore Hat. Thrive Hat. Six Hat. Sticks Hat.,,如果帽匠在今天死亡，喚醒惡魔和爪牙們並展示「這個能力選擇你」提示卡 + 帽匠角色代幣，他們可以選擇一個自己類型的角色，如果有多位玩家的角色相同，則示意他們重新選擇，將他們的角色代幣替換成他們選擇的角色。,,今晚開茶會
 hellslibrarian,地獄藏書員,在說書人要求安靜時說話的玩家可能會受到懲罰。,噓—請保持安靜，最好不要打擾管理員，聽說他脾氣暴躁。,,,,懲罰
 heretic,異端份子,交換勝負結果(儘管你死亡)。,"After the hail has smashed the roof and splintered the glass of the Cathedral windows, it melts again into the earth, like a dying lamb in the desert sun. Such is the parable of the madman.",,,,
-hermit,隱士,你擁有所有城外人的能力。[-0 或 -1 城外人],"In the lost and forgotten places of the earth, the soul’s light beckons.",,,,"1, 2, 3"
+hermit,隱士,你擁有所有外來者的能力。[-0 或 -1 外來者],"In the lost and forgotten places of the earth, the soul’s light beckons.",,,,"1, 2, 3"
 highpriestess,女祭司,每天晚上，你得知說書人認為你最應該與之交談的一位玩家。,There is life behind the personality that uses personalities as masks. There are times when life puts off the mask and deep answers to deep.,指向一位玩家。,指向一位玩家。,,
 hindu,Hindu,The first 4 players to die are immediately reincarnated as Travellers of the same alignment.,"चत्वारो मृत्युमध्ये पतन्ति, चत्वारो यात्री पुनरुद्गताः। चत्वारो धर्मे स्थितचित्तवृत्तेः, चत्वार एषां न पुनः क्षयः॥",,,,
 huntsman,巡山人,每場遊戲一次，晚上時，選擇一位活著的玩家，如果你選中了少女，他變成一位不在遊戲中的鎮民角色。[+ 少女],"My cabin is warm and sturdy. My axe by the door, my boots drying by the fire, and elk stew a-simmering… Hark! A scream echoes through the valley! The rain and the mud and the cold, cold wind mask the scent of the wolves, but I know the path and my pace is steady. I am coming.",巡山人可以選擇一位玩家，如果他選中了少女，喚醒該玩家並展示「你是」提示卡 + 一個不在遊戲中的鎮民角色代幣。,巡山人可以選擇一位玩家，如果他選中了少女，喚醒該玩家並展示「你是」提示卡 + 一個不在遊戲中的鎮民角色代幣。,,無能力
-imp,小惡魔,每天晚上*，選擇一位玩家，該玩家死亡。如果你以此法殺死自己，一位僕從變成小惡魔。,"We must keep our wits sharp and our sword sharper. Evil walks among us, and will stop at nothing to destroy us good, simple folk, bringing our fine town to ruin. Trust no-one. But, if you must trust someone, trust me.",,小惡魔指向一位玩家，該玩家死亡，如果他選擇自己，將一個活著的僕從角色代幣換成小惡魔的角色代幣，喚醒該玩家並展示「你是」提示卡 + 小惡魔的角色代幣。,,死亡
+imp,小惡魔,每天晚上*，選擇一位玩家，該玩家死亡。如果你以此法殺死自己，一位爪牙變成小惡魔。,"We must keep our wits sharp and our sword sharper. Evil walks among us, and will stop at nothing to destroy us good, simple folk, bringing our fine town to ruin. Trust no-one. But, if you must trust someone, trust me.",,小惡魔指向一位玩家，該玩家死亡，如果他選擇自己，將一個活著的爪牙角色代幣換成小惡魔的角色代幣，喚醒該玩家並展示「你是」提示卡 + 小惡魔的角色代幣。,,死亡
 innkeeper,旅店老闆,每天晚上*，選擇兩位玩家，他們今晚不會死，但其中一位醉到明天黃昏。,"Come inside, fair traveller, and rest your weary bones. Drink and be merry, for the legions of the Dark One shall not harass thee tonight.",,移除先前被保護或醉酒玩家的標記，旅店老闆指向兩位玩家，以「保護」標記他們，其中一位醉酒。,,"保護,醉酒"
-investigator,調查員,在你的第一晚，你得知在某兩位玩家中有一位特定的僕從角色。,今天夜晚真適合散步啊，你認同吧，莫羅佐夫先生？還是該說…莫羅佐夫男爵？,將一個在遊戲中的僕從角色代幣展示給調查員並指向兩位玩家，他們其中一位是該角色。,,,"僕從,非僕從"
+investigator,調查員,在你的第一晚，你得知在某兩位玩家中有一位特定的爪牙角色。,今天夜晚真適合散步啊，你認同吧，莫羅佐夫先生？還是該說…莫羅佐夫男爵？,將一個在遊戲中的爪牙角色代幣展示給調查員並指向兩位玩家，他們其中一位是該角色。,,,"爪牙,非爪牙"
 judge,法官,每場遊戲一次，如果另一位玩家提名，你可以強制使處決成功或失敗。,"I find the defendant guilty of the crimes of murder, fraud, arson, larceny, impersonating an officer of the law, practicing medicine without a license, slander, regicide, and littering.",,,,無能力
 juggler,雜耍藝人,在你的第一天，公開猜測至多五次某位玩家的角色，當晚你得知你猜對了多少。,"For my next trick, as per request, I will need a flower, a bag of beans, a toy snake, a paintbrush, and a motorized gasoline-powered hedge trimming device. I warn you, this trick may be my last. Oh dear.",,如果今天是雜耍藝人的第一天，展示「正確」標記的總數(0/1/2/依此類推)，移除所有標記。,,正確
-kazali,卡札力,每天晚上*，選擇一位玩家，該玩家死亡。[你選擇哪些玩家是哪些僕從，且出現任意數量城外人],Gon(z)a7les6. Take cau8tun. The mech4an4ion is iNvert10d. E99ors insy6tum. Reco{7}fig.,卡札力指向一位玩家及一個僕從角色，將他的角色代幣替換成該僕從的角色代幣，喚醒他並展示「你是」提示卡 + 他的角色代幣，並倒讚表示邪惡，重複等同正常僕從數量的次數。,卡札力指向一位玩家，該玩家死亡。,,死亡
+kazali,卡札力,每天晚上*，選擇一位玩家，該玩家死亡。[你選擇哪些玩家是哪些爪牙，且出現任意數量外來者],Gon(z)a7les6. Take cau8tun. The mech4an4ion is iNvert10d. E99ors insy6tum. Reco{7}fig.,卡札力指向一位玩家及一個爪牙角色，將他的角色代幣替換成該爪牙的角色代幣，喚醒他並展示「你是」提示卡 + 他的角色代幣，並倒讚表示邪惡，重複等同正常爪牙數量的次數。,卡札力指向一位玩家，該玩家死亡。,,死亡
 king,國王,每天晚上，如果死亡的玩家數等於或超過活著的玩家，你得知一個活著的角色。惡魔知道你是誰。,"↑Betwixt the unknown strains of mortal strife→
 And morbid night, sweet↓ with mystery and woe
 ←Lies unfettered joys of fate’s long and colored life
@@ -99,17 +99,17 @@ Who’s garden blooms with each painted Face to Show.",喚醒惡魔並展示「�
 klutz,呆瓜,當你得知你死亡時，公開選擇一位活著的玩家，如果該玩家是邪惡的，你的陣營落敗。,哎呀。,,,,
 knaves,Knaves,"There are 2 Storytellers: one lies & one tells the truth. Once per game, at dusk, they might switch.",Every wall is a door. Every meal is a feast.,,,,
 knight,騎士,在你的第一晚，你得知兩位非惡魔玩家。,一個人說謊，就等於殺害了世界的一部分。,指向兩位非惡魔的玩家。,,,"已得知, 已得知"
-legion,軍團,每天晚上*，可能會有一位玩家死亡。處刑時如果只有邪惡玩家投票則投票失敗。你也被視為僕從。[大多數玩家都是軍團],We are the chill wind on a winter’s day. We are the shadow in the moonless night. We are the poison in your tea and the whisper in your ear. We are everywhere.,,選擇一位玩家，該玩家死亡。,,"即將處決,死亡"
+legion,軍團,每天晚上*，可能會有一位玩家死亡。處刑時如果只有邪惡玩家投票則投票失敗。你也被視為爪牙。[大多數玩家都是軍團],We are the chill wind on a winter’s day. We are the shadow in the moonless night. We are the poison in your tea and the whisper in your ear. We are everywhere.,,選擇一位玩家，該玩家死亡。,,"即將處決,死亡"
 leviathan,利維坦,如果超過一位善良玩家被處決，則你獲勝。所有玩家都知道你在遊戲中。第五天過後，邪惡陣營獲勝。,"To the last, I grapple with thee. From Hell’s heart, I stab at thee. For hate’s sake, I spit my last breath at thee.",以「第一天」標記利維坦。宣布「利維坦在遊戲中，今天是第一天。」,增加利維坦標記的天數。,,"第一天,第二天,第三天,第四天,第五天,善良被處決"
-librarian,圖書管理員,在你的第一晚，你得知在某兩位玩家中有一位特定的城外人角色(或者沒有城外人角色)。,"Certainly madam, under normal circumstances, you may borrow the Codex Malificarium from the library vaults. However, you do not seem to be a member.",將一個在遊戲中的城外人角色代幣展示給圖書管理員並指向兩位玩家，他們其中一位是該角色(或者沒有城外人角色)。,,,"城外人,非城外人"
-lilmonsta,小怪寶,每天晚上，僕從們選擇一位玩家看顧小怪寶並且「是惡魔」。每天晚上*，可能會有一位玩家死亡。[+1 僕從],"Step 1: Be cute.
+librarian,圖書管理員,在你的第一晚，你得知在某兩位玩家中有一位特定的外來者角色(或者沒有外來者角色)。,"Certainly madam, under normal circumstances, you may borrow the Codex Malificarium from the library vaults. However, you do not seem to be a member.",將一個在遊戲中的外來者角色代幣展示給圖書管理員並指向兩位玩家，他們其中一位是該角色(或者沒有外來者角色)。,,,"外來者,非外來者"
+lilmonsta,小怪寶,每天晚上，爪牙們選擇一位玩家看顧小怪寶並且「是惡魔」。每天晚上*，可能會有一位玩家死亡。[+1 爪牙],"Step 1: Be cute.
 Step 2: World domination.
-Step 3: Bweakfast.",喚醒所有僕從並讓他們投票選出看顧小怪寶的人選。,喚醒所有僕從並讓他們投票選出看顧小怪寶的人選，你可以選擇一位玩家，該玩家死亡。,"是惡魔,死亡",
+Step 3: Bweakfast.",喚醒所有爪牙並讓他們投票選出看顧小怪寶的人選。,喚醒所有爪牙並讓他們投票選出看顧小怪寶的人選，你可以選擇一位玩家，該玩家死亡。,"是惡魔,死亡",
 lleech,痢蛭,每天晚上*，選擇一位玩家，該玩家死亡。在你的第一晚，你選擇一位活著的玩家，該玩家中毒，你(只)會在該玩家死亡時死亡。,"Tasty, tasty, tasty, tasty, tasty, tasty, tasty, tasty brai- I mean pie! Yes. Tasty pie. That’s what I meant to say.",痢蛭指向一位玩家，該玩家中毒。,痢蛭指向一位玩家，該玩家死亡。,,"中毒,死亡"
-lordoftyphon,堤豐之首,每天晚上*，選擇一位玩家，該玩家死亡。[邪惡玩家坐在一起，你坐在他們之間。+1僕從。+？～-？城外人],"In the shadowed and forgotten corners of the cosmos, where the stars whisper secrets to the void, lies a truth so profound that the merest glimpse of it unravels the sanity of mortal minds.",喚醒惡魔身旁的僕從們，分別展示「你是」提示卡 + 他們的角色代幣，並倒讚表示邪惡。,堤豐之首指向一位玩家，該玩家死亡。,,死亡
-lunatic,瘋子,你認為自己是惡魔，但你不是，惡魔知道你是誰以及你每天晚上選了誰。,我是黑夜…應該吧。,如果有7位或更多玩家，將若干個僕從展示給瘋子，其數量等同於遊戲中僕從們的數量(這些玩家不一定要是真的僕從)，將三個任意的善良角色代幣展示給瘋子，如果瘋子的惡魔角色會在第一晚行動，讓他進行惡魔的動作，以「攻擊」標記他的目標。喚醒惡魔並告知他真正的角色以及瘋子是誰，如果瘋子有攻擊玩家，指向每個被標記的目標，移除所有「攻擊」標記。,讓瘋子進行惡魔的動作，以「攻擊」標記他的目標，如果瘋子有攻擊玩家，喚醒惡魔並指向每個被標記的目標，移除所有「攻擊」標記。,,"攻擊1,攻擊2,攻擊3"
+lordoftyphon,堤豐之首,每天晚上*，選擇一位玩家，該玩家死亡。[邪惡玩家坐在一起，你坐在他們之間。+1爪牙。+？～-？外來者],"In the shadowed and forgotten corners of the cosmos, where the stars whisper secrets to the void, lies a truth so profound that the merest glimpse of it unravels the sanity of mortal minds.",喚醒惡魔身旁的爪牙們，分別展示「你是」提示卡 + 他們的角色代幣，並倒讚表示邪惡。,堤豐之首指向一位玩家，該玩家死亡。,,死亡
+lunatic,瘋子,你認為自己是惡魔，但你不是，惡魔知道你是誰以及你每天晚上選了誰。,我是黑夜…應該吧。,如果有7位或更多玩家，將若干個爪牙展示給瘋子，其數量等同於遊戲中爪牙們的數量(這些玩家不一定要是真的爪牙)，將三個任意的善良角色代幣展示給瘋子，如果瘋子的惡魔角色會在第一晚行動，讓他進行惡魔的動作，以「攻擊」標記他的目標。喚醒惡魔並告知他真正的角色以及瘋子是誰，如果瘋子有攻擊玩家，指向每個被標記的目標，移除所有「攻擊」標記。,讓瘋子進行惡魔的動作，以「攻擊」標記他的目標，如果瘋子有攻擊玩家，喚醒惡魔並指向每個被標記的目標，移除所有「攻擊」標記。,,"攻擊1,攻擊2,攻擊3"
 lycanthrope,半獸人,每天晚上*，選擇一位活著的玩家，如果該玩家是善良，該玩家死亡且惡魔今晚不會造成死亡，場上一位善良會被視為邪惡的。,Beneath the thin veneer of civilisation lies a howling madness.,,半獸人選擇一位活著的玩家，如果該玩家是善良則他死亡且惡魔今晚不會造成死亡。,,"死亡, 假爪"
-magician,魔術師,惡魔認為你是僕從。僕從們認為你也是惡魔。,"1... 2... Abra... 3... 4... Cadabra... *poof!*
+magician,魔術師,惡魔認為你是爪牙。爪牙們認為你也是惡魔。,"1... 2... Abra... 3... 4... Cadabra... *poof!*
 And, as you can see, ladies and gentlemen, Captain Farnsworth’s bag of gold has disappeared! Gone! Without a trace! Thank you, and goodnight!",,,,
 marionette,提線木偶,你認為自己是某一位善良角色，但你不是。惡魔知道你是誰。[你坐在惡魔旁邊],"Words, words. They're all we have to go on.",選擇一位坐在惡魔旁邊的善良玩家並以「是提線木偶」標記他，喚醒惡魔並告知提線木偶是誰。,,是提線木偶,
 mastermind,主謀,如果惡魔被處決(結束遊戲)，則遊戲繼續進行一天，如果有玩家被處決，該玩家的陣營落敗。,The tentacles of that monster are nailed to the doors of the church. Mothers and children are dancing in the street. Excellent. Everything is proceeding exactly as I have planned.,,,,
@@ -117,10 +117,10 @@ mathematician,數學家,每天晚上，你得知今天(從清晨開始)有多少
 matron,女舍監,每天白天，你可以選擇至多三對玩家互換座位，玩家們不能離開座位講悄悄話。,"Miss Featherbottom, be quiet. Master Rutherford, a teacup needs just the four fingers, please. I know you are a father of nine, but age, or lack there-of as the case may be, is never an excuse for poor manners.",,,,
 mayor,鎮長,如果只有三名玩家存活且今天沒有人被處死，則你的陣營獲勝。如果你在晚上死亡，則可能改為另一位玩家死亡。,"We must put our differences aside, and cease this senseless killing. We are all taxpayers after all. Well, most of us.",,,,
 mezepheles,靈言師,在你的第一晚，你得知一個暗號，第一位說出這個暗號的善良玩家在當晚轉為邪惡陣營。,"That which issues from the heart alone, will bend the hearts of others to your own.",展示祕密的暗號。,喚醒第一位說出靈言師的暗號的善良玩家並展示「你是」提示卡 + 倒讚表示邪惡。,,"無能力,轉為邪惡"
-minstrel,吟遊詩人,每當一個僕從被處死，除了你以外且非旅行者的玩家都醉酒到明天黃昏。,"And I shall hear, tho' soft you tread above me... And all my dreams will warm and sweeter be... If you'll not fail to tell me that you love me... I simply sleep in peace until you come to me.",,,,所有人醉酒
+minstrel,吟遊詩人,每當一個爪牙被處死，除了你以外且非旅行者的玩家都醉酒到明天黃昏。,"And I shall hear, tho' soft you tread above me... And all my dreams will warm and sweeter be... If you'll not fail to tell me that you love me... I simply sleep in peace until you come to me.",,,,所有人醉酒
 monk,僧侶,每天晚上*，選擇一位其他的玩家，該玩家今晚免疫惡魔的負面效果。,"Tis an ill and deathly wind that blows tonight. Come, my brother, take shelter in the abbey while the storm rages. By my word, or by my life, you will be safe.",,先前被保護的玩家不再被保護。僧侶選擇一位其他的玩家，以「保護」標記該玩家。,,保護
 moonchild,月之子,當你得知你死亡時，公開選擇一位活著的玩家，如果該玩家是善良，他今晚會死亡。,"Scorpio looks sideways at the lovers, and you have a choice to make. With silver cross my palm, and your fate shall be revealed. With steel cross my throat, and by the stars you shall regret it.",,如果月之子今天對一位善良玩家使用能力，則該玩家死亡。,,死亡
-mutant,畸形秀演員,如果你執著地使其他玩家相信自己是城外人，你可能會被處決。,我不是怪胎！我是人類！放過我吧！,,,,
+mutant,畸形秀演員,如果你執著地使其他玩家相信自己是外來者，你可能會被處決。,我不是怪胎！我是人類！放過我吧！,,,,
 nightwatchman,守夜人,每場遊戲一次，晚上時，選擇一位玩家，他們得知你是誰。,"The night is cold and lonely, but I have the moon, the stars, the crisp wind and the soft thud of leather boots on cobbled stone for company. Yonder, candlelight flickers behind a murky window...",守夜人玩家可以指向一位玩家。喚醒該玩家，並展示 「這個角色選擇你」卡片 + 守夜人角色代幣，然後指向守夜人。,守夜人玩家可以指向一位玩家。喚醒該玩家，並展示 「這個角色選擇你」卡片 + 守夜人角色代幣，然後指向守夜人。,,無能力
 noble,貴族,在你的第一晚，你得知三位玩家，其中(只有)一位是邪惡的。,"Sarcasm is indeed the lowest form of wit. But speaking in response to your criticism, Sir, it is, nevertheless, a form of wit.",以任意順序指向三位玩家，其中一位是邪惡的。,,,已得知
 nodashii,諾達鯴,每天晚上*，選擇一位玩家，該玩家死亡。在你兩側離你最近的鎮民中毒。,"By the sins of Arnoch, I feel thy laden stench. By the curs-ed sun and her foul legion of tiny grinning gods, I corrupt thee. By the blessed night and the hidden depths of the horrid and unholy sea, I end thy squalid life upon this plane.",,諾達鯴指向一位玩家，該玩家死亡。,,"中毒,死亡"
@@ -139,23 +139,23 @@ Ladies smile and go to town.
 Lords with axe chop forest down.
 What’s yours is mine. What’s mine, divine.
 Silly little Pixie, me.",展示一個在遊戲中的一個鎮民角色代幣。,,,"具有能力,瘋狂"
-plaguedoctor,瘟疫醫生,如果你死亡，則說書人得到一個僕從的能力。,Pleauze shtay shtill. Thinks nid tiime for hillink. Myrhh-myrhh.,,,,(說書人能力)
+plaguedoctor,瘟疫醫生,如果你死亡，則說書人得到一個爪牙的能力。,Pleauze shtay shtill. Thinks nid tiime for hillink. Myrhh-myrhh.,,,,(說書人能力)
 po,珀,每天晚上*，你可以選擇一位玩家，該玩家死亡。如果你上次選擇不行動，則你今晚選擇三位玩家。,你想要一朵花嗎？我好孤獨呀。,,珀可以選擇一位玩家，或是如果阿寶在上一次沒有選擇玩家，則選擇三位玩家。被選擇的玩家死亡。,,"攻擊x3,死亡"
 poisoner,投毒者,每天晚上，選擇一位玩家，該玩家今晚與明天早上中毒。,Add compound Alpha to compound Beta... NOT TOO MUCH!,投毒者指向一位玩家，該玩家中毒。,先前中毒的玩家不再中毒，投毒者指向一位玩家，該玩家中毒。,,中毒
 politician,政客,如果你需要對你陣營的落敗負最大的責任，則你改變陣營並獲勝(儘管你死亡)。,"I'm glad you asked that question. Truly, I am. But I think the REAL question here is...",,,,
 pope,Pope,There are duplicate good characters in play. They might also be bluffs.,...Pulcherrimae.,,,,
-poppygrower,罌粟種植者,僕從們與惡魔不會彼此相認。如果你死亡，則他們在當晚相認。,"In the hidden groves of the deep forest, the black poppy dwells. To see its revelry is to be enchanted. To smell its thick aroma is to be lost forever, a slave to the gods of light and dark.",不要告知惡魔和僕從彼此是誰。,如果罌粟種植者死亡，告知惡魔和僕從彼此是誰。,,邪惡相認
-preacher,傳教士,每天晚上，選擇一位玩家，如果你選中了一位僕從，則他得知此事。所有被選中的僕從都失去能力。,It is better to be rich and healthy than poor and sick.,傳教士選擇一位玩家，如果該玩家是僕從，以「傳教中」標記該玩家，喚醒該玩家並展示「這個能力選擇你」提示卡 + 傳教士的角色代幣。,傳教士選擇一位玩家，如果該玩家是僕從，以「傳教中」標記該玩家，喚醒該玩家並展示「這個能力選擇你」提示卡 + 傳教士的角色代幣。,,傳教中
+poppygrower,罌粟種植者,爪牙們與惡魔不會彼此相認。如果你死亡，則他們在當晚相認。,"In the hidden groves of the deep forest, the black poppy dwells. To see its revelry is to be enchanted. To smell its thick aroma is to be lost forever, a slave to the gods of light and dark.",不要告知惡魔和爪牙彼此是誰。,如果罌粟種植者死亡，告知惡魔和爪牙彼此是誰。,,邪惡相認
+preacher,傳教士,每天晚上，選擇一位玩家，如果你選中了一位爪牙，則他得知此事。所有被選中的爪牙都失去能力。,It is better to be rich and healthy than poor and sick.,傳教士選擇一位玩家，如果該玩家是爪牙，以「傳教中」標記該玩家，喚醒該玩家並展示「這個能力選擇你」提示卡 + 傳教士的角色代幣。,傳教士選擇一位玩家，如果該玩家是爪牙，以「傳教中」標記該玩家，喚醒該玩家並展示「這個能力選擇你」提示卡 + 傳教士的角色代幣。,,傳教中
 princess,公主,在你的第一天，如果你提名並且處決了一位玩家，則惡魔今晚不會殺人。,"Our words are hounds, bound by silken threads, dear lords. Let kindness weave them true, lest the reigns unravel and rend our court.",,如果今天是公主的第一天，如果你提名並且處決了一位玩家，則惡魔今晚不會殺人。,,Doesn't Kill
 professor,教授,每場遊戲一次，晚上時*，選擇一位死亡的玩家，如果該玩家是鎮民，則他復活。,"The process is simple. Attach the hydraulic confabulator to the modified chi matrix amplifier, add 20 CCs of pseudodorafine, keep his Z levels above 20%, and your husband will be fine. Now, all we need is a lightning strike.",,教授可以指向一位玩家，如果該玩家是鎮民，該玩家復活。,,"復活,無能力"
 psychopath,精神病患者,每天白天，在提名開始前，你可以公開選擇一位玩家，該玩家死亡。如果你被處決，你只有在輸掉猜拳時才會死亡。,驚喜！,,,,
 pukka,普卡,每天晚上，選擇一位玩家，該玩家中毒。先前因你而中毒的玩家死亡，並且變得健康。,"You truly have been kind welcoming me into your beautiful home. I am so sorry I accidentally scratched you. A little thing. No matter. But please, take this golden toothpick as a humble token of my regret.",普卡指向一位玩家，該玩家中毒。,普卡指向一位玩家，該玩家中毒，先前中毒的玩家死亡並不再中毒。,,"中毒,死亡"
 puzzlemaster,解謎大師,一位玩家醉酒(即使你死亡)。如果你猜中是哪位玩家(每場遊戲一次)，則你得知誰是惡魔，但如果你猜錯，你會得到不正確的資訊。,"When one begins to think that some thing is merely some other thing, one is usually on the brink of an error. Patience, patience. Don’t confuse just and should with is and isn’t.",,,,"已猜測,醉酒"
 ravenkeeper,守鴉人,如果你在晚上死亡，你醒來並選擇一位玩家，你得知他的角色。,"My birds will avenge me! Fly! Fly, my sweet and dutiful pets! To the manor and to the river! To the alleys and to the salons! Fly!",,如果守鴉人在今晚死亡，守鴉人指向一位玩家，展示該玩家的角色代幣。,,
-recluse,陌客,你的身分可能會被視為邪惡的僕從或惡魔(即使你死亡)。,"Garn git ya darn grub ya mitts ofma lorn yasee. Grr. Natsy pikkins yonder southwise ye begittin afta ya! Git! Me harvy no so widda licks and demmons no be fightin' hadsup ne'er ma kin. Git, assay!",,,,
+recluse,陌客,你的身分可能會被視為邪惡的爪牙或惡魔(即使你死亡)。,"Garn git ya darn grub ya mitts ofma lorn yasee. Grr. Natsy pikkins yonder southwise ye begittin afta ya! Git! Me harvy no so widda licks and demmons no be fightin' hadsup ne'er ma kin. Git, assay!",,,,
 revolutionary,革命者,兩位相鄰的玩家會被設定為相同陣營。每場遊戲一次，其中一位玩家的身分會被視為不正確的陣營或角色。,"United we feigned.
 Divided, we stalled.",,,,不正確
-riot,暴亂,在第三天，所有僕從變成暴亂，被提名者會死亡，該玩家必須立即再提名一次。,Larga vida a la revolución! Mi revolucion!,,,,
+riot,暴亂,在第三天，所有爪牙變成暴亂，被提名者會死亡，該玩家必須立即再提名一次。,Larga vida a la revolución! Mi revolucion!,,,,
 sage,賢者,如果惡魔殺死了你，你得知惡魔是某兩位玩家中的其中一位。,"These mountainous tomes guard the secret, I am sure of it! Twixt word and word, it lies in wait. More candles, boy! More ink! These notes may look arcane, but the infernal puzzle is revealing itself.",,如果賢者被惡魔殺死，指向兩位玩家，其中一位是惡魔。,,
 sailor,水手,每天晚上，選擇一位活著的玩家，你或該玩家醉酒到明天黃昏，你不會死亡。,"I'll drink any one of yer under the table! You! The chatterbox! Reckon you can take me? No? Howza 'bout you, Grandma? You ever tried Old McKillys Extra Spiced Rum before? Guaranteed to put hairs on yer chest! Step aboard, aye!",水手指向一位活著的玩家，水手或該玩家醉酒。,先前醉酒的玩家不再醉酒，水手指向一位活著的玩家，水手或該玩家醉酒。,,醉酒
 saint,聖徒,如果你被處死，你的陣營落敗。,"Wisdom begets peace. Patience begets wisdom. Fear not, for the time shall come when fear too shall pass. Let us pray, and may the unity of our vision make saints of us all.",,,,
@@ -163,17 +163,17 @@ savant,博學者,每天白天，你可以拜訪說書人來得知兩件事，其
 scapegoat,替罪羊,如果你的陣營的玩家被處死，則可能改為你被處死。,"Good evening! Thank you for inviting me to the ball. I'm not from around here, but you sure seem like a friendly bunch, by golly. I'm sure we'll get along just dandy. What's all that rope for?",,,,
 scarletwoman,紅脣女郎,如果有五個或更多非旅行者的玩家存活時惡魔死亡，則你會變成惡魔。,"You have shown me the secrets of the Council of the Purple Flame. We have lain together in fire and in lust and in beastly commune, and I am forever your servant. But tonight, my dear, I am your master.",,如果紅脣女郎今天成為了惡魔，將「你是」提示卡 + 惡魔的角色代幣展示給他。,,是惡魔
 seamstress,女裁縫,每場遊戲一次，晚上時，選擇兩位其他的玩家，你得知他們是否為同一陣營。,"Did you hear that stranger in the cashmere coat put the word on our young Belle? And she said yes? Well, that's nothing compared to what Harry and that juggler got up to at the fair! The things I could say if I was a tattletale... my, yes.",女裁縫可以選擇兩位其他的玩家，如果他有選擇，以點頭或搖頭來告知他們是否屬於同一陣營。,女裁縫可以選擇兩位其他的玩家，如果他有選擇，以點頭或搖頭來告知他們是否屬於同一陣營。,,無能力
-sentinel,哨兵,城外人數量可能會加一或減一。,"Name, please.
+sentinel,哨兵,外來者數量可能會加一或減一。,"Name, please.
 Papers, please.
 Weapons, please.",,,,
 shabaloth,沙巴洛斯,每天晚上*，選擇兩位玩家，這些玩家死亡。昨晚你選擇的其中一位玩家可能會復活。,Blarg f'taag nm mataan! No sho gumtha m'sik na yuuu. Fluuuuuuuuurg h-sikkkh.,,沙巴洛斯前一晚選擇的其中一位玩家可能會復活，沙巴洛斯選擇兩位玩家，這些玩家死亡。,,"復活,死亡"
 shugenja,修行者,在你的第一晚，你得知離你最近的邪惡玩家是順時針或是逆時針方向，如果兩者皆是，則你得到隨機的資訊。,これは夢。それも夢。すべて夢です。,喚醒修行者，指向最近的邪惡玩家方向，如果兩方向相同，指向任意一邊。,,,
 slayer,獵手,每場遊戲一次，白天時，公開選擇一位玩家，如果該玩家是惡魔，他會死亡。,死吧。,,,,無能力
 snakecharmer,舞蛇人,每天晚上，選擇一位活著的玩家，如果該玩家是惡魔，你與他交換陣營與角色，然後他中毒。,"Effendi... I am but a humble man, but my pipe is golden and a single tune will tame the wildest djinn, Inshallah. They say that greed hangs more men than rope. But not I, Effendi... not I.",舞蛇人指向一位玩家，如果該玩家是惡魔，交換他們的角色及陣營，分別喚醒他們並展示「你是」提示卡 + 他們的新角色代幣，新的舞蛇人中毒。,舞蛇人指向一位玩家，如果該玩家是惡魔，交換他們的角色及陣營，分別喚醒他們並展示「你是」提示卡 + 他們的新角色代幣，新的舞蛇人中毒。,,中毒
-snitch,告密者,僕從們會在他們的第一晚得知三個不在遊戲中的角色。,是約翰做的。,在提供僕從資訊後分別喚醒每個僕從並展示三個不在遊戲中的角色代幣(可與展示給其他僕從或惡魔的代幣相同或不同)。,,,
+snitch,告密者,爪牙們會在他們的第一晚得知三個不在遊戲中的角色。,是約翰做的。,在提供爪牙資訊後分別喚醒每個爪牙並展示三個不在遊戲中的角色代幣(可與展示給其他爪牙或惡魔的代幣相同或不同)。,,,
 soldier,士兵,你免疫惡魔的負面效果。,"As David said to Goliath, as Theseus said to the Minotaur, as Arjuna said to Bhagadatta... No.",,,,
 spiritofivory,聖潔之魂,最多存在一個額外的邪惡玩家。,"The Wasteland calls. Bones rise to flesh, then fall to dust. The great spirit grows. The great spirit watches. The great spirit guides. The human listens, or the human is no more.",,,,不再出現邪惡
-spy,間諜,每天晚上，你都可以查看魔典。你的身分可能會被視為善良的鎮民或城外人(即使你死亡)。,"Any brewmaster worth their liquor, knows no concoction pours trouble quicker, than one where spies seem double.",將魔典展示給間諜。,將魔典展示給間諜。,,
+spy,間諜,每天晚上，你都可以查看魔典。你的身分可能會被視為善良的鎮民或外來者(即使你死亡)。,"Any brewmaster worth their liquor, knows no concoction pours trouble quicker, than one where spies seem double.",將魔典展示給間諜。,將魔典展示給間諜。,,
 steward,事務官,在你的第一晚，你得知一位善良玩家。,How DARE you accuse Her Ladyship of wrongdoing? I’ve known her my entire life! All nine years!,指向一位善良玩家。,,,已得知
 stormcatcher,暴風捕手,選擇一個角色名稱。如果該角色在遊戲中，該角色的玩家只能死於處刑，但邪惡玩家知道他是哪位玩家。,"At dawn, the temple’s long shadow creeps to the fountain. At dusk, the obelisk blocks the red glare, cooling warm water under the archway. All lines converge here. A storm is coming, and this, this pebbled and lush and holy place between the apple trees, is the eye.",,,,安全
 summoner,召喚師,你得到三個偽裝。在第三晚，選擇一位玩家和一個惡魔角色，該玩家變成該惡魔並轉為邪惡。[沒有惡魔],"Hail the guardians of the north; by my intellect, thou art cut. Hail the guardians of the east; by my will, thou art dominated. Hail the guardians of the south; by that which lies beyond, the mystery is revealed. Hail the guardians of the west; a shield in the darkness",展示「這些角色不在遊戲中」提示卡 + 三個不在遊戲中的角色代幣,如果今晚是第三晚，召喚師選擇一位玩家 + 角色表上的一個惡魔角色，他成為該惡魔。,,"第一晚,第二晚,第三晚"
@@ -182,11 +182,11 @@ tealady,茶藝師,如果你活著的鄰居都是善良，則他們都不會死�
 thief,竊賊,每天晚上，選擇一位其他的玩家，明天該玩家投下的票都計為負票。,"I aint done nuffink. I weren't even in dat alley last night! It weren't me what stole Mayor Bruno's briefcase wiv all dem fancy dockoments innit. Besides, it was too 'eavy to carry far.",小偷指向一位玩家，以「負數票」標記該玩家。,小偷指向一位玩家，以「負數票」標記該玩家。,,負數票
 tinker,修補匠,你隨時可能死亡。,"I think I see the problem. Luckily, I have an idea! This catapult will shoot twice as far with just a minor adjustment...",,修補匠可能會死亡。,,死亡
 tor,Tor,Players don't know their character or alignment. They learn them when they die.,"With thunder as my voice and lightning as my blade, I, the eternal guardian, feast upon the fools who dare approach the forbidden gate. Behold, my sacred goal! To purge the beetle from the belly of the rocky earth, to ensnare it in a net of stars, on the hilltop where heaven meets earth.",,"If a player died tonight, show the *YOU ARE* info token, their character token, & a thumbs up or thumbs down.",,
-towncrier,城鎮公告員,每天晚上*，你得知僕從們今天是否有提名。,號外！號外！迷宮中有巫術！天才學者將揭示一切！小鎮陷入危險了！號外！,,以點頭或搖頭來告知僕從們今天是否有提名，以「僕從未提名」標記城鎮公告員。,,"僕從提名,僕從未提名"
+towncrier,城鎮公告員,每天晚上*，你得知爪牙們今天是否有提名。,號外！號外！迷宮中有巫術！天才學者將揭示一切！小鎮陷入危險了！號外！,,以點頭或搖頭來告知爪牙們今天是否有提名，以「爪牙未提名」標記城鎮公告員。,,"爪牙提名,爪牙未提名"
 toymaker,玩具匠,惡魔晚上時可以選擇不攻擊(且一局遊戲中至少要做一次)。邪惡玩家正常地獲得起始資訊。,It buzzes! It walks down stairs! It keeps you warm at night! It tastes like sugar! The kiddies love it! Introducing... the brand new... Warm'o-buzzy-wuzzy-walk'a'bot-thingy-contraption! Fun for all ages!,,,,已選擇不攻擊
 undertaker,送葬者,每天晚上*，你得知今天被處死的玩家的角色。,"Hmmm....what have we here? The left boot is worn down to the heel, with flint shavings under the tongue. This is the garb of a Military man.",,如果今天有玩家被處決，將該玩家的角色代幣展示給送葬者。,,處決
 ventriloquist,Ventriloquist,"If a player is mad as a fresh character during their nomination, they might not die if executed today.","Well, folks, gather ‘round! This here’s my pal Charlie, and he’s got a mouth on him that’d make a mule blush. But don’t worry folks, I do all the talkin’... or do I?",,,,Mad
-vigormortis,亡骨魔,每天晚上*，選擇一位玩家，該玩家死亡。你殺死的僕從們會保留他們的能力，並且使其兩側最近的其中一位鎮民中毒。[−1 城外人],百門皆為一門。百匙皆為一匙。百杯皆為一杯，但誰若喝我所賜的水，將永遠不渴；我所賜的水要在他裡頭成為泉源，直湧到永生。,,亡骨魔指向一位玩家，該玩家死亡。如果該玩家是僕從，以「具有能力」標記該玩家並讓他的一位鎮民鄰居中毒。,,"中毒,具有能力,死亡"
+vigormortis,亡骨魔,每天晚上*，選擇一位玩家，該玩家死亡。你殺死的爪牙們會保留他們的能力，並且使其兩側最近的其中一位鎮民中毒。[−1 外來者],百門皆為一門。百匙皆為一匙。百杯皆為一杯，但誰若喝我所賜的水，將永遠不渴；我所賜的水要在他裡頭成為泉源，直湧到永生。,,亡骨魔指向一位玩家，該玩家死亡。如果該玩家是爪牙，以「具有能力」標記該玩家並讓他的一位鎮民鄰居中毒。,,"中毒,具有能力,死亡"
 villageidiot,村夫,每天晚上，選擇一位玩家，你得知他的陣營。[+0 到 +2 村夫，其中一位醉酒],"Roses are blue, and violets are red, Please reverse what I just said.",村夫指向一位玩家，展示該玩家的陣營。,村夫指向一位玩家，展示該玩家的陣營。,,醉酒
 virgin,貞潔者,如果第一次提名你的人是鎮民，該玩家會被立即處死。,I am pure. Let those who are without sin cast themselves down and suffer in my stead. My reputation shall not be stained with your venomous accusations.,,,,無能力
 vizier,維齊爾,所有玩家都知道你是誰。你無法在白天死亡。投票時，若有善良玩家投票，則你可以強制使處決成功。,"An excellent decision, as always, sire. Such a petty crime as bumping into the Bishop indeed deserves your ‘justice’ and ‘mercy’. Take a stroll in the gardens. Visit the gallery and peruse the sculptures of Von Strauf. Relax, sire. Leave everything… to me.",宣布「維齊爾在遊戲中」並指向該玩家。,,,
@@ -197,7 +197,7 @@ widow,寡婦,在你的第一晚，查看魔典並且選擇一位玩家，該玩�
 witch,女巫,每天晚上，選擇一位玩家，如果該玩家於明天提名，則他會死亡，如果只剩下三位玩家存活，你失去這個能力。,"Three drops of goat's blood. A lock of hair, torn in anger. The name is spoken, the shadow cast. Walk left foot first down that brambled path, and don't look back.",女巫指向一位玩家，以「詛咒」標記該玩家。,如果有四位或以上玩家活著，女巫指向一位玩家，以「詛咒」標記該玩家。,,詛咒
 wizard,巫師,每場遊戲一次，許一個願。如果願望成真，可能會有代價和留下有關其性質的線索。,Genies are overrated.,運行巫師的能力（如果適用）。,運行巫師的能力（如果適用）。,,?
 wraith,亡魂,你可以在晚上睜開眼睛，你在其他邪惡玩家行動時也會被喚醒。,"Ra'āb ina pān ṣilli ša dāri. Rigim qallu ina šūri, šītu ša šunātīka iredde, u napšutka idlul ina pān maṣṣartī dāriti.",當其他邪惡玩家行動時，喚醒亡魂。,當其他邪惡玩家行動時，喚醒亡魂。,,
-xaan,限,在第X晚，所有鎮民中毒直到下個黃昏。[城外人數量為X],他們墮落了。一個一個。兩個，三個，五個。,,,,"第一晚, 第二晚, 第三晚, X"
+xaan,限,在第X晚，所有鎮民中毒直到下個黃昏。[外來者數量為X],他們墮落了。一個一個。兩個，三個，五個。,,,,"第一晚, 第二晚, 第三晚, X"
 yaggababble,牙嘎巴布,在你的第一晚，你得知一個暗號，每當你公開說出它，今天都有一位玩家可能死亡。,Murders inside the Rue Morgue? Фальшивые новости! Hounds on the Baskerville moor? Фальшивые новости! Death while sailing the Nile? Фальшивые новости!,展示祕密的暗號。,選擇一些玩家，數量至多為牙嘎巴布今天公開說出暗號的次數，這些玩家死亡。,,死亡
 zealot,狂熱者,如果有五個或更多玩家存活，你在每次提名都需要投票。,I enjoy talking to you. Your mind appeals to me. It resembles my own mind except that you happen to be insane.,,,,
 zenomancer,Zenomancer,"One or more players each have a goal. When achieved, that player learns a piece of true info.","The universe is a verb not a noun, they say, and it is turtles, turtles all the way down. Turtles all the way down, my friend, turtles all the way down.",,,,"Goal, Goal, Goal"

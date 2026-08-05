@@ -120,8 +120,6 @@ export default new Vuex.Store({
       rolesHidden: false,
       zoom: 0,
       unit: resolveViewportUnit(),
-      boardArm: 50,
-      boardTokenAdjust: 0,
       background: ""
     },
     modals: {
@@ -184,8 +182,6 @@ export default new Vuex.Store({
   mutations: {
     setZoom: set("zoom"),
     setUnit: set("unit"),
-    setBoardArm: set("boardArm"),
-    setBoardTokenAdjust: set("boardTokenAdjust"),
     setBackground: set("background"),
     toggleMuted: toggle("isMuted"),
     toggleMenu: toggle("isMenuOpen"),

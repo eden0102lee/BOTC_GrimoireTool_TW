@@ -5,6 +5,7 @@
  */
 const fs = require("fs");
 const path = require("path");
+const { normalizeTeamTerms, normalizeReminders } = require("./team-terms");
 
 const ROOT = path.join(__dirname, "..");
 const CSV_PATH = path.join(ROOT, "data", "raw", "characters_zh_TW.csv");
@@ -53,9 +54,11 @@ function splitCsvLine(line) {
 function parseReminders(value) {
   if (!value) return null;
   try {
-    return JSON.parse(value);
+    return normalizeReminders(JSON.parse(value));
   } catch (e) {
-    return value.split("|").map(s => s.trim()).filter(Boolean);
+    return normalizeReminders(
+      value.split("|").map((s) => s.trim()).filter(Boolean),
+    );
   }
 }
 
@@ -78,10 +81,14 @@ function main() {
 
     updated++;
     const overlay = { id: role.id };
-    if (row.name) overlay.name = row.name;
-    if (row.ability) overlay.ability = row.ability;
-    if (row.firstNightReminder) overlay.firstNightReminder = row.firstNightReminder;
-    if (row.otherNightReminder) overlay.otherNightReminder = row.otherNightReminder;
+    if (row.name) overlay.name = normalizeTeamTerms(row.name);
+    if (row.ability) overlay.ability = normalizeTeamTerms(row.ability);
+    if (row.firstNightReminder) {
+      overlay.firstNightReminder = normalizeTeamTerms(row.firstNightReminder);
+    }
+    if (row.otherNightReminder) {
+      overlay.otherNightReminder = normalizeTeamTerms(row.otherNightReminder);
+    }
     const reminders = parseReminders(row.reminders);
     if (reminders) overlay.reminders = reminders;
     const remindersGlobal = parseReminders(row.remindersGlobal);
@@ -99,10 +106,14 @@ function main() {
     const row = byId.get(role.id);
     if (!row) return role;
     const mergedRole = { ...role };
-    if (row.name) mergedRole.name = row.name;
-    if (row.ability) mergedRole.ability = row.ability;
-    if (row.firstNightReminder) mergedRole.firstNightReminder = row.firstNightReminder;
-    if (row.otherNightReminder) mergedRole.otherNightReminder = row.otherNightReminder;
+    if (row.name) mergedRole.name = normalizeTeamTerms(row.name);
+    if (row.ability) mergedRole.ability = normalizeTeamTerms(row.ability);
+    if (row.firstNightReminder) {
+      mergedRole.firstNightReminder = normalizeTeamTerms(row.firstNightReminder);
+    }
+    if (row.otherNightReminder) {
+      mergedRole.otherNightReminder = normalizeTeamTerms(row.otherNightReminder);
+    }
     const reminders = parseReminders(row.reminders);
     if (reminders) mergedRole.reminders = reminders;
     const remindersGlobal = parseReminders(row.remindersGlobal);

@@ -156,6 +156,10 @@ const actions = {
     );
 
     const next = getters.nextSubPhase;
+    const endedNightId =
+      state.subPhase === "night" && next === "dawn"
+        ? `night-${state.nightNumber}`
+        : null;
     if (state.subPhase === "night" && next === "dawn") {
       commit("advanceDay");
     } else {
@@ -173,6 +177,14 @@ const actions = {
       },
       { root: true },
     );
+
+    if (endedNightId) {
+      dispatch(
+        "battleLog/appendDawnNightDeathReport",
+        { nightPhaseId: endedNightId },
+        { root: true },
+      );
+    }
   },
   retreat({ state, commit, dispatch, getters, rootGetters }) {
     if (!getters.canRetreat) return;

@@ -16,6 +16,7 @@ export const FACT_TYPES = {
 
 const POISON_NAMES = ["中毒"];
 const DRUNK_NAMES = ["醉酒"];
+const IDENTITY_DRUNK_NAMES = ["是酒鬼"];
 const MAD_NAMES = ["瘋狂"];
 
 const newId = () =>
@@ -54,7 +55,10 @@ export function isDrunkReminder(reminder) {
 }
 
 export function isIdentityDrunkReminder(reminder) {
-  return isDrunkReminder(reminder) && reminder.role === "drunk";
+  if (!reminder || reminder.role !== "drunk") return false;
+  const name = reminder.name || "";
+  if (IDENTITY_DRUNK_NAMES.some((n) => name.includes(n))) return true;
+  return isDrunkReminder(reminder);
 }
 
 export function reminderFactTypeForAdd(reminder) {
@@ -168,12 +172,14 @@ export function effectsFromManualTokens(tokens, players) {
 
   // Role-only identity entries (e.g. 酒鬼 setup)
   if (roles.some((r) => r.roleId === "drunk") && primaryPlayer >= 0) {
-    const hasDrunkStatus = statuses.includes("醉酒");
-    if (!hasDrunkStatus) {
+    const hasDrunkIdentity =
+      statuses.includes("醉酒") ||
+      IDENTITY_DRUNK_NAMES.some((n) => statuses.includes(n));
+    if (!hasDrunkIdentity) {
       effects.push({
         type: "addReminder",
         playerIndex: primaryPlayer,
-        reminder: makeBattleLogReminder("醉酒", "drunk"),
+        reminder: makeBattleLogReminder("是酒鬼", "drunk"),
         factType: FACT_TYPES.IDENTITY_DRUNK,
       });
     }
@@ -554,6 +560,23 @@ export function invertEffect(effect) {
         type: "setAbilityLost",
         playerIndex: effect.playerIndex,
         value: !effect.value,
+      };
+    case "setRole":
+      if (effect.previousRole) {
+        return {
+          type: "setRole",
+          playerIndex: effect.playerIndex,
+          role: { ...effect.previousRole },
+          previousRole: effect.role ? { ...effect.role } : null,
+        };
+      }
+      return null;
+    case "setDisguiseRole":
+      return {
+        type: "setDisguiseRole",
+        playerIndex: effect.playerIndex,
+        role: effect.previousRole ? { ...effect.previousRole } : {},
+        previousRole: effect.role ? { ...effect.role } : null,
       };
     case "addReminder":
       return {

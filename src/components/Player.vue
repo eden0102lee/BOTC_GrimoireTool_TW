@@ -227,12 +227,7 @@
 <script>
 import Token from "./Token";
 import { mapGetters, mapState } from "vuex";
-import {
-  getMobileProfile,
-  getPortraitTokenScale,
-  getViewportSize,
-  seatBaseSize,
-} from "../store/boardLayout";
+import { seatBaseSize } from "../store/viewportLayout";
 
 export default {
   components: {
@@ -291,16 +286,7 @@ export default {
     zoom: function() {
       const unit = this.grimoire.unit;
       const count = this.players.length;
-      const adjust = this.grimoire.boardTokenAdjust || 0;
-      const { width, height } = getViewportSize();
-      const profile = getMobileProfile(width, height);
-      const base = seatBaseSize(count);
-      const portraitScale =
-        profile === "iphone16pro" ? getPortraitTokenScale(width) : 1;
-      const size = Math.max(
-        8,
-        (base + this.grimoire.zoom + adjust) * portraitScale,
-      );
+      const size = Math.max(8, seatBaseSize(count) + this.grimoire.zoom);
       return { width: size + unit };
     },
   },
@@ -508,7 +494,7 @@ export default {
         left: 0;
         top: 0;
         width: 100%;
-        background: url("../assets/vote.png") center center no-repeat;
+        background: url($gstone-vote) center center no-repeat;
         background-size: 50%;
         height: 100%;
         pointer-events: none;
@@ -854,7 +840,7 @@ li.move:not(.from) .player .overlay svg.move {
 
 /***** Reminder token *****/
 .circle .reminder {
-  background: url("../assets/reminder.png") center center;
+  background: url($gstone-reminder) center center;
   background-size: 100%;
   width: 50%;
   height: 0;
@@ -865,7 +851,7 @@ li.move:not(.from) .player .overlay svg.move {
   justify-content: center;
   margin: 5px 0 0 -25%;
   border-radius: 50%;
-  @include token-chrome;
+  @include gstone-token-shadow;
   transition: all 200ms;
   cursor: pointer;
 
@@ -894,12 +880,12 @@ li.move:not(.from) .player .overlay svg.move {
     background-size: 100%;
     background-position: center 0;
     background-repeat: no-repeat;
-    background-image: url("../assets/icons/plus.png");
+    background-image: url($gstone-icon-plus);
     transition: opacity 200ms;
   }
 
   &:after {
-    background-image: url("../assets/icons/x.png");
+    background-image: url($gstone-icon-x);
     opacity: 0;
     top: 5%;
   }

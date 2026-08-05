@@ -69,6 +69,11 @@ export default (store) => {
           store.state.roles.get(player.role) ||
           store.getters.rolesJSONbyId.get(player.role) ||
           {},
+        disguiseRole:
+          (player.disguiseRole &&
+            (store.state.roles.get(player.disguiseRole) ||
+              store.getters.rolesJSONbyId.get(player.disguiseRole))) ||
+          {},
       })),
     );
   }
@@ -215,6 +220,8 @@ export default (store) => {
                 ...player,
                 // simplify the stored data
                 role: player.role.id || {},
+                disguiseRole:
+                  (player.disguiseRole && player.disguiseRole.id) || {},
               })),
             ),
           );

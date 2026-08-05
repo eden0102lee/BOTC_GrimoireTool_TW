@@ -47,7 +47,7 @@ djinn,燈神,使用燈神的特殊規則。所有玩家都得知這個規則。,
                                 أسئلتك هي جبل نار في يوم صافٍ.",,,,
 doomsayer,末日預言者,如果有四個或更多玩家活著，白天時，每位活著的玩家可以公開使一位與自己同陣營的玩家死亡(每位玩家限一次)。,"And on the Seventh Day, there shall be a great flood and a pestilence upon the People of the Village of the Ravens! The dead shall rise and the living shall repent! O Woe! O Unholy day! Only by great sacrifice shall they prevail! So sayeth the Sages of Nostros and so sayeth I.",,,,
 dreamer,築夢師,每天晚上，選擇其他一位玩家(非旅行者)，你得知該玩家是一個善良角色或一個邪惡角色，其中一個正確。,我記得鐘匠。天空是紅色的，分形三角形如下雨般落下。我嗅到了紫羅蘭的氣味，聽到了冒泡的聲音。一個眼睛發光、鬍鬚蓬亂的女人對著天空發出嘶嘶聲。然後，我醒了。,築夢師指向一位玩家，將一個善良的角色代幣和一個邪惡的角色代幣展示給他，其中一個是正確的。,築夢師指向一位玩家，將一個善良的角色代幣和一個邪惡的角色代幣展示給他，其中一個是正確的。,,
-drunk,酒鬼,你不知道自己是酒鬼，你認為自己是某一位鎮民，但你不是。,"I’m only a *hic* social drinker, my dear. Admittedly, I am a heavy *burp* socializer.",,,醉酒,
+drunk,酒鬼,你不知道自己是酒鬼，你認為自己是某一位鎮民，但你不是。,"I’m only a *hic* social drinker, my dear. Admittedly, I am a heavy *burp* socializer.",,,是酒鬼,
 duchess,公爵夫人,每天白天，至多三位玩家可以拜訪說書人。當晚*，他們得知有多少拜訪者是邪惡的，但其中一位得到不正確的訊息。,"We shall entertain between the hours of 6 and 7 precisely. Tea at 6:15. Scones at 6:45. Do not be late. Formal wear applies, as always.",,,,"不正確,訪客"
 empath,共情者,每天晚上，你得知你活著的鄰居中有幾位是邪惡的(0/1/2)。,My skin prickles. Something is not right here. I can feel it.,展示共情者的邪惡鄰居數量。,展示共情者的邪惡鄰居數量。,,
 engineer,工程師,每場遊戲一次，晚上時，選擇哪些爪牙或惡魔出現在遊戲中。,"If it bends, great. If it breaks, well, it probably needed fixing anyway.",工程師可以指向角色表上的一個惡魔或數個爪牙，如果他有選擇，根據選擇置換角色代幣，喚醒相關玩家並展示「你是」提示卡 + 他們的新角色代幣。,工程師可以指向角色表上的一個惡魔或數個爪牙，如果他有選擇，根據選擇置換角色代幣，喚醒相關玩家並展示「你是」提示卡 + 他們的新角色代幣。,,無能力

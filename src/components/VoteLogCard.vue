@@ -3,12 +3,22 @@
     <div class="title">{{ $t("recorder.voteTitle") }}</div>
 
     <div class="sentence-row">
-      <select v-model="nominator" class="player-select">
-        <option value="">{{ $t("recorder.pickPlayer") }}</option>
-        <option v-for="(p, i) in players" :key="'nom-' + i" :value="label(p, i)">
-          {{ label(p, i) }}
-        </option>
-      </select>
+      <div class="nominator-field">
+        <label class="show-dead-toggle">
+          <input type="checkbox" v-model="showDeadNominators" />
+          <span>{{ $t("recorder.showDeadPlayers") }}</span>
+        </label>
+        <select v-model="nominator" class="player-select nominator-select">
+          <option value="">{{ $t("recorder.pickPlayer") }}</option>
+          <option
+            v-for="{ p, i } in nominatorPlayerOptions"
+            :key="'nom-' + i"
+            :value="label(p, i)"
+          >
+            {{ nominatorOptionLabel(p, i) }}
+          </option>
+        </select>
+      </div>
       <span class="fixed-text">{{ $t("recorder.voteNominate") }}</span>
       <select v-model="nominee" class="player-select">
         <option value="">{{ $t("recorder.pickPlayer") }}</option>
@@ -21,6 +31,10 @@
       <span class="fixed-text">{{ $t("recorder.voteBallots") }}</span>
     </div>
 
+    <p v-if="nominatorInvalid" class="field-hint">
+      {{ $t("recorder.nominatorMustBeAlive") }}
+    </p>
+
     <div class="voters-block">
       <div class="voters-label">{{ $t("recorder.voteVoters") }}</div>
       <div class="voter-checks">
@@ -28,7 +42,7 @@
           v-for="(p, i) in players"
           :key="'v-' + i"
           class="voter-check"
-          :class="{ on: voterChecked[i] }"
+          :class="{ on: voterChecked[i], dead: p.isDead }"
         >
           <input
             type="checkbox"
@@ -38,11 +52,28 @@
           <span>{{ label(p, i) }}</span>
         </label>
       </div>
+      <div v-if="showDeadVoteHint" class="dead-vote-hint">
+        <p v-if="deadVotersWithGhostVote.length" class="dead-vote-hint-line">
+          {{
+            $t("recorder.deadVoterAutoHint", {
+              names: deadVotersWithGhostVote.join("、"),
+            })
+          }}
+        </p>
+        <p v-if="deadVotersNoGhostVote.length" class="dead-vote-hint-line muted">
+          {{
+            $t("recorder.deadVoterUsedHint", {
+              names: deadVotersNoGhostVote.join("、"),
+            })
+          }}
+        </p>
+      </div>
     </div>
 
     <p class="sentence-preview" v-if="sentence">
       <span class="preview-label">{{ $t("recorder.sentencePreview") }}</span>
       {{ sentence }}
+      <span v-if="scaffoldPreview" class="scaffold-line">{{ scaffoldPreview }}</span>
     </p>
     <p class="sentence-preview empty" v-else>
       {{ $t("recorder.voteHint") }}
@@ -67,11 +98,17 @@
 
 <script>
 import { formatPlayerRoleLabel } from "../store/roleInputConfig";
+import {
+  formatVoteMessage,
+  voterSeatNumbers,
+  currentScaffoldMessage,
+} from "../store/battleLogFormat";
 
 export default {
   name: "VoteLogCard",
   props: {
     players: { type: Array, required: true },
+    dayVotes: { type: Array, default: () => [] },
     editEntryId: { type: String, default: null },
     initialSnapshot: { type: Object, default: null },
   },
@@ -80,11 +117,29 @@ export default {
       nominator: "",
       nominee: "",
       voterChecked: [],
+      showDeadNominators: false,
     };
   },
   computed: {
     editing() {
       return !!this.editEntryId;
+    },
+    nominatorPlayerOptions() {
+      const list = this.players.map((p, i) => ({ p, i }));
+      if (this.showDeadNominators) return list;
+      return list.filter(({ p }) => p && !p.isDead);
+    },
+    isNominatorAlive() {
+      if (!this.nominator) return false;
+      const idx = this.players.findIndex(
+        (p, i) => this.label(p, i) === this.nominator,
+      );
+      return idx >= 0 && this.players[idx] && !this.players[idx].isDead;
+    },
+    nominatorInvalid() {
+      return (
+        !this.editing && !!this.nominator && !this.isNominatorAlive
+      );
     },
     selectedVoters() {
       return this.players
@@ -94,13 +149,54 @@ export default {
     voteCount() {
       return this.selectedVoters.length;
     },
+    deadVotersWithGhostVote() {
+      return this.players
+        .map((p, i) => {
+          if (!this.voterChecked[i] || !p || !p.isDead || p.isVoteless) {
+            return null;
+          }
+          return this.label(p, i);
+        })
+        .filter(Boolean);
+    },
+    deadVotersNoGhostVote() {
+      return this.players
+        .map((p, i) => {
+          if (!this.voterChecked[i] || !p || !p.isDead || !p.isVoteless) {
+            return null;
+          }
+          return this.label(p, i);
+        })
+        .filter(Boolean);
+    },
+    showDeadVoteHint() {
+      return (
+        this.deadVotersWithGhostVote.length > 0 ||
+        this.deadVotersNoGhostVote.length > 0
+      );
+    },
     sentence() {
       if (!this.nominator || !this.nominee) return "";
-      const voters = this.selectedVoters.join("、");
-      return `${this.nominator} 提名 ${this.nominee} 獲得 ${this.voteCount} 票(投票: ${voters})`;
+      const seats = voterSeatNumbers(this.players, this.selectedVoters);
+      return formatVoteMessage(
+        this.nominator,
+        this.nominee,
+        this.voteCount,
+        seats,
+      );
+    },
+    scaffoldPreview() {
+      if (!this.nominator || !this.nominee) return "";
+      const votes = this.dayVotes
+        .filter((v) => v.id !== this.editEntryId)
+        .map((v) => ({ nominee: v.nominee, voteCount: v.voteCount }));
+      votes.push({ nominee: this.nominee, voteCount: this.voteCount });
+      return currentScaffoldMessage(votes, this.players);
     },
     canWrite() {
-      return !!(this.nominator && this.nominee);
+      if (!this.nominator || !this.nominee) return false;
+      if (this.editing) return true;
+      return this.isNominatorAlive;
     },
     canDelete() {
       return this.editing && !this.nominator && !this.nominee && this.voteCount === 0;
@@ -131,6 +227,9 @@ export default {
         if (!snap) return;
         this.nominator = snap.nominator || "";
         this.nominee = snap.nominee || "";
+        if (this.nominator && !this.isNominatorAlive) {
+          this.showDeadNominators = true;
+        }
         const n = this.players.length;
         const checked = Array(n).fill(false);
         const voters = Array.isArray(snap.voters) ? snap.voters : [];
@@ -146,6 +245,13 @@ export default {
     label(p, i) {
       return formatPlayerRoleLabel(p, i);
     },
+    nominatorOptionLabel(p, i) {
+      const base = this.label(p, i);
+      if (p && p.isDead) {
+        return `${base}（${this.$t("recorder.playerDead")}）`;
+      }
+      return base;
+    },
     toggleVoter(i, checked) {
       this.$set(this.voterChecked, i, !!checked);
     },
@@ -153,6 +259,7 @@ export default {
       this.nominator = "";
       this.nominee = "";
       this.voterChecked = Array(this.players.length).fill(false);
+      this.showDeadNominators = false;
     },
     onDismiss() {
       this.reset();
@@ -209,9 +316,41 @@ export default {
 .sentence-row {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-end;
   gap: 4px;
   margin-bottom: 8px;
+}
+
+.nominator-field {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 3px;
+  flex: 0 0 auto;
+  width: 140px;
+  max-width: 140px;
+}
+
+.nominator-field .player-select,
+.nominator-select {
+  flex: none;
+  width: 100%;
+  max-width: 140px;
+  box-sizing: border-box;
+}
+
+.show-dead-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  line-height: 1.2;
+  input {
+    accent-color: #7adfff;
+    flex-shrink: 0;
+  }
 }
 
 .player-select {
@@ -243,6 +382,12 @@ export default {
 
 .voters-block {
   margin-bottom: 8px;
+}
+
+.field-hint {
+  margin: 0 0 8px;
+  font-size: 0.68rem;
+  color: #ffb366;
 }
 
 .voters-label {
@@ -278,6 +423,35 @@ export default {
     background: rgba(30, 70, 90, 0.55);
     color: #fff;
   }
+  &.dead {
+    opacity: 0.85;
+    &.on {
+      border-color: rgba(200, 140, 255, 0.55);
+      background: rgba(60, 35, 70, 0.55);
+    }
+  }
+}
+
+.dead-vote-hint {
+  margin-top: 6px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: rgba(60, 35, 70, 0.55);
+  border: 1px solid rgba(200, 140, 255, 0.45);
+  font-size: 0.68rem;
+  color: #e8c8ff;
+  line-height: 1.4;
+}
+
+.dead-vote-hint-line {
+  margin: 0;
+  & + & {
+    margin-top: 4px;
+  }
+  &.muted {
+    opacity: 0.75;
+    font-size: 0.65rem;
+  }
 }
 
 .sentence-preview {
@@ -297,6 +471,11 @@ export default {
     font-size: 0.65rem;
     opacity: 0.65;
     margin-bottom: 2px;
+  }
+  .scaffold-line {
+    display: block;
+    margin-top: 4px;
+    color: #ffb366;
   }
 }
 

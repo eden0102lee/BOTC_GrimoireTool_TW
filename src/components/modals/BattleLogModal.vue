@@ -315,6 +315,10 @@ h3 {
     margin-right: 8px;
     font-weight: bold;
   }
+  .message {
+    white-space: pre-line;
+    word-break: break-word;
+  }
   .detail {
     display: block;
     opacity: 0.65;

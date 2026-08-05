@@ -32,20 +32,23 @@
       <ul>
         <li class="tabs" :class="tab">
           <font-awesome-icon icon="book-open" @click="tab = 'grimoire'" />
-          <font-awesome-icon icon="broadcast-tower" @click="tab = 'session'" />
           <font-awesome-icon
             icon="users"
             v-if="!session.isSpectator"
             @click="tab = 'players'"
           />
           <font-awesome-icon icon="theater-masks" @click="tab = 'characters'" />
-          <font-awesome-icon icon="question" @click="tab = 'help'" />
+          <font-awesome-icon
+            icon="broadcast-tower"
+            @click="tab = 'gstone'"
+          />
+          <font-awesome-icon icon="question" @click="tab = 'settings'" />
         </li>
 
         <template v-if="tab === 'grimoire'">
-          <li class="headline">{{ $t("menu.grimoire") }}</li>
+          <li class="headline">{{ $t("menu.game") }}</li>
           <li @click="advancePhase" v-if="!session.isSpectator">
-            {{ $t("menu.enterDay") }}
+            {{ $t("gamePhase.nextPhase") }}
             <em>[Q]</em>
           </li>
           <li
@@ -56,6 +59,21 @@
           >
             {{ $t("gamePhase.previousPhase") }}
             <em>[S]</em>
+          </li>
+          <li @click="toggleModal('reference')">
+            {{ $t("menu.referenceSheet") }}
+            <em>[R]</em>
+          </li>
+          <li @click="toggleModal('nightOrder')">
+            {{ $t("menu.nightOrderSheet") }}
+            <em>[N]</em>
+          </li>
+          <li
+            v-if="session.voteHistory.length || !session.isSpectator"
+            @click="toggleModal('voteHistory')"
+          >
+            {{ $t("menu.voteHistory") }}
+            <em>[V]</em>
           </li>
           <li
             @click="toggleRolesHidden"
@@ -68,6 +86,163 @@
             }}
             <em>[H]</em>
           </li>
+          <template v-if="!session.sessionId">
+            <li @click="hostSession" v-if="!session.isSpectator">
+              {{ $t("menu.createTown") }}
+              <em>[C]</em>
+            </li>
+            <li @click="joinSession">
+              {{ $t("menu.joinTown") }}
+              <em>[J]</em>
+            </li>
+          </template>
+          <template v-else>
+            <li v-if="session.ping">
+              {{
+                $t("menu.delayTo", {
+                  target: session.isSpectator
+                    ? $t("menu.host")
+                    : $t("menu.playersLabel")
+                })
+              }}
+              <em>{{ session.ping }}ms</em>
+            </li>
+            <li
+              v-if="!session.isSpectator && session.sessionId"
+              class="lan-info"
+            >
+              {{ $t("menu.lanUrl") }}
+              <em>{{ lanPlayUrl }}</em>
+            </li>
+            <li v-if="session.sessionId">
+              {{ $t("menu.roomCode") }}
+              <em>{{ session.sessionId }}</em>
+            </li>
+            <li
+              v-if="!session.isSpectator && session.sessionId"
+              @click="copyLanUrl"
+            >
+              {{ $t("menu.copyLanLink") }}
+              <em><font-awesome-icon icon="copy"/></em>
+            </li>
+            <li @click="copySessionUrl">
+              {{ $t("menu.copyPlayerLink") }}
+              <em><font-awesome-icon icon="copy"/></em>
+            </li>
+            <li @click="leaveSession">
+              {{ $t("menu.leaveSession") }}
+              <em>{{ session.sessionId }}</em>
+            </li>
+          </template>
+        </template>
+
+        <template v-if="tab === 'players' && !session.isSpectator">
+          <li class="headline">{{ $t("menu.players") }}</li>
+          <li @click="addPlayer" v-if="players.length < 20">
+            {{ $t("menu.addPlayer") }}<em>[A]</em>
+          </li>
+          <li @click="randomizeSeatings" v-if="players.length > 2">
+            {{ $t("menu.randomize") }}
+            <em><font-awesome-icon icon="dice"/></em>
+          </li>
+          <li @click="clearPlayers" v-if="players.length">
+            {{ $t("menu.removeAllPlayers") }}
+            <em><font-awesome-icon icon="trash-alt"/></em>
+          </li>
+        </template>
+
+        <template v-if="tab === 'characters'">
+          <li class="headline">{{ $t("menu.characters") }}</li>
+          <li v-if="!session.isSpectator" @click="toggleModal('edition')">
+            {{ $t("menu.selectEdition") }}
+            <em>[P]</em>
+          </li>
+          <li
+            @click="toggleModal('roles')"
+            v-if="!session.isSpectator && players.length > 4"
+          >
+            {{ $t("menu.chooseAssign") }}
+            <em>[O]</em>
+          </li>
+          <li v-if="!session.isSpectator" @click="distributeRoles">
+            {{ $t("menu.sendCharacters") }}
+            <em>[I]</em>
+          </li>
+          <li v-if="!session.isSpectator" @click="toggleModal('fabled')">
+            {{ $t("menu.addFabled") }}
+            <em>[L]</em>
+          </li>
+          <li @click="clearRoles" v-if="players.length">
+            {{ $t("menu.removeAllRoles") }}
+            <em><font-awesome-icon icon="trash-alt"/></em>
+          </li>
+          <li @click="clearBattleLog" v-if="!session.isSpectator">
+            {{ $t("menu.deleteBattleLog") }}
+            <em><font-awesome-icon icon="trash-alt"/></em>
+          </li>
+          <li @click="clearReminders" v-if="hasAnyReminders">
+            {{ $t("menu.removeAllReminders") }}
+            <em><font-awesome-icon icon="trash-alt"/></em>
+          </li>
+          <li @click="restartNewGame" v-if="!session.isSpectator && players.length">
+            {{ $t("menu.restartNewGame") }}
+            <em><font-awesome-icon icon="redo-alt"/></em>
+          </li>
+        </template>
+
+        <template v-if="tab === 'gstone'">
+          <li class="headline">{{ $t("menu.gstone") }}</li>
+          <li class="disclaimer">{{ $t("menu.disclaimer") }}</li>
+          <li>
+            <a href="https://botc.app/" target="_blank" rel="noopener">
+              {{ $t("menu.linkOfficialGrimoire") }}
+            </a>
+            <em>
+              <a href="https://botc.app/" target="_blank" rel="noopener">
+                <font-awesome-icon icon="external-link-alt" />
+              </a>
+            </em>
+          </li>
+          <li>
+            <a
+              href="https://clocktower.gstonegames.com/grimoire/"
+              target="_blank"
+              rel="noopener"
+            >
+              {{ $t("menu.linkGstoneGrimoire") }}
+            </a>
+            <em>
+              <a
+                href="https://clocktower.gstonegames.com/grimoire/"
+                target="_blank"
+                rel="noopener"
+              >
+                <font-awesome-icon icon="external-link-alt" />
+              </a>
+            </em>
+          </li>
+          <li>
+            <a
+              href="https://clocktower.gstonegames.com/script_tool/"
+              target="_blank"
+              rel="noopener"
+            >
+              {{ $t("menu.linkScriptTool") }}
+            </a>
+            <em>
+              <a
+                href="https://clocktower.gstonegames.com/script_tool/"
+                target="_blank"
+                rel="noopener"
+              >
+                <font-awesome-icon icon="external-link-alt" />
+              </a>
+            </em>
+          </li>
+        </template>
+
+        <template v-if="tab === 'settings'">
+          <li class="headline">{{ $t("menu.settings") }}</li>
           <li @click="toggleNightOrder" v-if="players.length">
             {{ $t("menu.nightOrder") }}
             <em>
@@ -121,122 +296,6 @@
                 :icon="['fas', grimoire.isMuted ? 'volume-mute' : 'volume-up']"
             /></em>
           </li>
-        </template>
-
-        <template v-if="tab === 'session'">
-          <li class="headline" v-if="session.sessionId">
-            {{
-              session.isSpectator ? $t("menu.playing") : $t("menu.hosting")
-            }}
-          </li>
-          <li class="headline" v-else>
-            {{ $t("menu.liveSession") }}
-          </li>
-          <template v-if="!session.sessionId">
-            <li @click="hostSession" v-if="!session.isSpectator">
-              {{ $t("menu.createTown") }}
-              <em>[C]</em>
-            </li>
-            <li @click="joinSession">
-              {{ $t("menu.joinTown") }}
-              <em>[J]</em>
-            </li>
-          </template>
-          <template v-else>
-            <li v-if="session.ping">
-              {{
-                $t("menu.delayTo", {
-                  target: session.isSpectator
-                    ? $t("menu.host")
-                    : $t("menu.playersLabel")
-                })
-              }}
-              <em>{{ session.ping }}ms</em>
-            </li>
-            <li v-if="!session.isSpectator && session.sessionId" class="lan-info">
-              {{ $t("menu.lanUrl") }}
-              <em>{{ lanPlayUrl }}</em>
-            </li>
-            <li v-if="session.sessionId">
-              {{ $t("menu.roomCode") }}
-              <em>{{ session.sessionId }}</em>
-            </li>
-            <li v-if="!session.isSpectator && session.sessionId" @click="copyLanUrl">
-              {{ $t("menu.copyLanLink") }}
-              <em><font-awesome-icon icon="copy"/></em>
-            </li>
-            <li v-if="!session.isSpectator" @click="toggleModal('battleLog')">
-              {{ $t("menu.battleLog") }}
-              <em>[B]</em>
-            </li>
-            <li @click="copySessionUrl">
-              {{ $t("menu.copyPlayerLink") }}
-              <em><font-awesome-icon icon="copy"/></em>
-            </li>
-            <li v-if="!session.isSpectator" @click="distributeRoles">
-              {{ $t("menu.sendCharacters") }}
-              <em>[I]</em>
-            </li>
-            <li
-              v-if="session.voteHistory.length || !session.isSpectator"
-              @click="toggleModal('voteHistory')"
-            >
-              {{ $t("menu.voteHistory") }}<em>[V]</em>
-            </li>
-            <li @click="leaveSession">
-              {{ $t("menu.leaveSession") }}
-              <em>{{ session.sessionId }}</em>
-            </li>
-          </template>
-        </template>
-
-        <template v-if="tab === 'players' && !session.isSpectator">
-          <li class="headline">{{ $t("menu.players") }}</li>
-          <li @click="addPlayer" v-if="players.length < 20">
-            {{ $t("menu.addPlayer") }}<em>[A]</em>
-          </li>
-          <li @click="randomizeSeatings" v-if="players.length > 2">
-            {{ $t("menu.randomize") }}
-            <em><font-awesome-icon icon="dice"/></em>
-          </li>
-          <li @click="clearPlayers" v-if="players.length">
-            {{ $t("menu.removeAllPlayers") }}
-            <em><font-awesome-icon icon="trash-alt"/></em>
-          </li>
-        </template>
-
-        <template v-if="tab === 'characters'">
-          <li class="headline">{{ $t("menu.characters") }}</li>
-          <li v-if="!session.isSpectator" @click="toggleModal('edition')">
-            {{ $t("menu.selectEdition") }}
-            <em>[E]</em>
-          </li>
-          <li
-            @click="toggleModal('roles')"
-            v-if="!session.isSpectator && players.length > 4"
-          >
-            {{ $t("menu.chooseAssign") }}
-          </li>
-          <li v-if="!session.isSpectator" @click="toggleModal('fabled')">
-            {{ $t("menu.addFabled") }}
-            <em>[F]</em>
-          </li>
-          <li @click="clearRoles" v-if="players.length">
-            {{ $t("menu.removeAllRoles") }}
-            <em><font-awesome-icon icon="trash-alt"/></em>
-          </li>
-        </template>
-
-        <template v-if="tab === 'help'">
-          <li class="headline">{{ $t("menu.help") }}</li>
-          <li @click="toggleModal('reference')">
-            {{ $t("menu.referenceSheet") }}
-            <em>[R]</em>
-          </li>
-          <li @click="toggleModal('nightOrder')">
-            {{ $t("menu.nightOrderSheet") }}
-            <em>[N]</em>
-          </li>
           <li @click="toggleModal('battleLog')">
             {{ $t("menu.battleLog") }}
             <em>[B]</em>
@@ -247,16 +306,6 @@
           <li @click="toggleModal('gameState')">
             {{ $t("menu.gameStateJson") }}
             <em><font-awesome-icon icon="file-code"/></em>
-          </li>
-          <li>
-            <a href="https://discord.gg/Gd7ybwWbFk" target="_blank">
-              {{ $t("menu.joinDiscord") }}
-            </a>
-            <em>
-              <a href="https://discord.gg/Gd7ybwWbFk" target="_blank">
-                <font-awesome-icon :icon="['fab', 'discord']" />
-              </a>
-            </em>
           </li>
           <li>
             <a href="https://github.com/bra1n/townsquare" target="_blank">
@@ -282,6 +331,11 @@ export default {
     ...mapState(["grimoire", "session", "edition"]),
     ...mapState("players", ["players"]),
     ...mapGetters("gamePhase", ["canRetreat"]),
+    hasAnyReminders() {
+      return this.players.some(
+        (player) => player.reminders && player.reminders.length > 0,
+      );
+    },
   },
   data() {
     return {
@@ -299,6 +353,15 @@ export default {
     }
   },
   methods: {
+    clearBattleLog() {
+      if (!window.confirm(this.$t("confirm.deleteBattleLog"))) return;
+      this.$store.dispatch("battleLog/resetForNewGame");
+    },
+    restartNewGame() {
+      if (!window.confirm(this.$t("confirm.restartNewGame"))) return;
+      this.$store.dispatch("players/clearRoles");
+      this.$store.dispatch("battleLog/resetForNewGame");
+    },
     setBackground() {
       const background = prompt(this.$t("prompt.backgroundUrl"));
       if (background || background === "") {
@@ -406,6 +469,11 @@ export default {
         this.$store.dispatch("players/clearRoles");
       }
     },
+    clearReminders() {
+      if (confirm(this.$t("confirm.removeAllReminders"))) {
+        this.$store.dispatch("players/clearReminders");
+      }
+    },
     advancePhase() {
       this.$store.dispatch("gamePhase/advance");
     },
@@ -493,7 +561,7 @@ export default {
 
 .menu {
   width: min(
-    220px,
+    240px,
     calc(100vw - 24px - env(safe-area-inset-right, 0px))
   );
   transform-origin: calc(100% - 20px) 22px;
@@ -570,8 +638,8 @@ export default {
         &.grimoire .fa-book-open,
         &.players .fa-users,
         &.characters .fa-theater-masks,
-        &.session .fa-broadcast-tower,
-        &.help .fa-question {
+        &.gstone .fa-broadcast-tower,
+        &.settings .fa-question {
           background: linear-gradient(
             to bottom,
             $townsfolk 0%,
@@ -580,9 +648,17 @@ export default {
         }
       }
 
-      &:not(.headline):not(.tabs):hover {
+      &:not(.headline):not(.tabs):not(.disclaimer):hover {
         cursor: pointer;
         color: red;
+      }
+
+      &.disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        &:hover {
+          color: white;
+        }
       }
 
       em {
@@ -606,6 +682,22 @@ export default {
         rgba(0, 0, 0, 0.5) 80%,
         $demon 100%
       );
+    }
+
+    .disclaimer {
+      display: block;
+      font-size: 70%;
+      line-height: 1.35;
+      opacity: 0.85;
+      min-height: 0;
+      padding: 8px;
+      cursor: default;
+      white-space: normal;
+      text-align: left;
+
+      &:hover {
+        color: white;
+      }
     }
 
     .lan-info {

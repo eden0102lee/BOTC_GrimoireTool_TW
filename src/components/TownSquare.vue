@@ -6,9 +6,7 @@
       'hide-roles': hideRolesOnBoard,
       spectator: session.isSpectator,
       vote: session.nomination,
-      'board-fit': grimoire.boardArm < 50,
     }"
-    :style="boardStyle"
   >
     <ul class="circle" :class="['size-' + players.length]">
       <Player
@@ -26,7 +24,7 @@
     </ul>
 
     <div
-      class="bluffs"
+      class="bluffs fabled_bluffs"
       v-if="players.length"
       :class="{ closed: !isBluffsOpen }"
     >
@@ -47,7 +45,11 @@
       </ul>
     </div>
 
-    <div class="fabled" :class="{ closed: !isFabledOpen }" v-if="fabled.length">
+    <div
+      class="fabled fabled_bluffs"
+      :class="{ closed: !isFabledOpen }"
+      v-if="fabled.length"
+    >
       <h3>
         <span>{{ $t("square.fabled") }}</span>
         <font-awesome-icon icon="times-circle" @click.stop="toggleFabled" />
@@ -97,7 +99,6 @@ import Player from "./Player";
 import Token from "./Token";
 import ReminderModal from "./modals/ReminderModal";
 import RoleModal from "./modals/RoleModal";
-import { syncBoardLayout } from "../store/boardLayout";
 
 export default {
   components: {
@@ -113,11 +114,6 @@ export default {
     }),
     ...mapState(["grimoire", "roles", "session"]),
     ...mapState("players", ["players", "bluffs", "fabled"]),
-    boardStyle() {
-      const arm = this.grimoire.boardArm;
-      if (arm >= 50) return {};
-      return { "--circle-arm": `${arm}%` };
-    },
   },
   data() {
     return {
@@ -129,14 +125,6 @@ export default {
       isBluffsOpen: true,
       isFabledOpen: true,
     };
-  },
-  watch: {
-    isBluffsOpen() {
-      syncBoardLayout(this.$store);
-    },
-    isFabledOpen() {
-      syncBoardLayout(this.$store);
-    },
   },
   methods: {
     toggleBluffs() {
@@ -283,6 +271,7 @@ export default {
 <style lang="scss">
 @use "sass:math";
 @import "../vars.scss";
+@import "../gstone-assets.scss";
 
 #townsquare {
   width: 100%;
@@ -304,7 +293,7 @@ export default {
   > li {
     position: absolute;
     left: 50%;
-    height: min(50%, var(--circle-arm, 50%));
+    height: 50%;
     transform-origin: 0 100%;
     pointer-events: none;
 
@@ -413,8 +402,8 @@ export default {
 #townsquare > .bluffs,
 #townsquare > .fabled {
   position: absolute;
-  bottom: 10px;
-  @include panel-chrome;
+  @include gstone-corner-panel;
+  transform-origin: bottom left;
   transform: scale(1);
   opacity: 1;
   transition: all 200ms ease-in-out;
@@ -422,10 +411,12 @@ export default {
 
   &.bluffs {
     left: 10px;
-    transform-origin: bottom left;
+    bottom: 10px;
   }
+
   &.fabled {
     right: 10px;
+    bottom: 10px;
     transform-origin: bottom right;
   }
 
@@ -438,28 +429,34 @@ export default {
       color: red;
     }
   }
+
   h3 {
     margin: 5px 1vh 0;
     display: flex;
     align-items: center;
     align-content: center;
     justify-content: center;
+
     span {
       flex-grow: 1;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
+
     svg {
       cursor: pointer;
       flex-grow: 0;
+
       &.fa-times-circle {
         margin-left: 1vh;
       }
+
       &.fa-plus-circle {
         margin-left: 1vh;
         display: none;
       }
+
       &:hover path {
         fill: url(#demon);
         stroke-width: 30px;
@@ -467,10 +464,12 @@ export default {
       }
     }
   }
+
   ul {
     display: flex;
     align-items: center;
     justify-content: center;
+
     li {
       width: 14vh;
       height: 14vh;
@@ -479,23 +478,52 @@ export default {
       transition: all 250ms;
     }
   }
+
   &.closed {
-    svg.fa-times-circle {
-      display: none;
-    }
-    svg.fa-plus-circle {
-      display: block;
-    }
     ul li {
       width: 0;
       height: 0;
+      margin: 0;
+
       .night-order {
         opacity: 0;
       }
+
       .token {
         border-width: 0;
       }
     }
+
+    svg.fa-times-circle {
+      display: none;
+    }
+
+    svg.fa-plus-circle {
+      display: block;
+    }
+  }
+}
+
+#townsquare > .bluffs ul li .token .ability {
+  position: absolute;
+  left: 120%;
+  top: auto;
+  right: auto;
+}
+
+#townsquare > .fabled ul li .token .ability {
+  position: absolute;
+  right: 120%;
+  left: auto;
+  top: auto;
+
+  &:before {
+    border-right-color: transparent;
+    border-left-color: $chrome-border;
+    right: auto;
+    left: 100%;
+    margin-right: 0;
+    margin-left: 2px;
   }
 }
 
@@ -508,7 +536,10 @@ export default {
   content: " ";
   opacity: 0;
   transition: opacity 250ms;
-  background-image: url("../assets/icons/x.png");
+  background-image: url($gstone-icon-x);
+  background-size: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
   z-index: 2;
 }
 

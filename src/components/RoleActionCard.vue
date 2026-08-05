@@ -7,14 +7,23 @@
       [team]: true,
     }"
   >
+    <button
+      v-if="isRecorded && !abilityLost"
+      type="button"
+      class="record-delete-btn"
+      :title="$t('recorder.deleteRecord')"
+      @click="deleteRecord"
+    >
+      <font-awesome-icon icon="trash-alt" />
+    </button>
     <div class="card-head">
       <span
         class="icon"
-        v-if="player.role && player.role.id"
+        v-if="displayRoleForIcon.id"
         :style="iconStyle"
       ></span>
       <div class="meta">
-        <div class="role-name">{{ player.role.name || player.role.id }}</div>
+        <div class="role-name">{{ displayRoleName }}</div>
         <div class="player-name">{{ label }}</div>
       </div>
     </div>
@@ -36,7 +45,7 @@
 
     <template v-else-if="showForm">
       <div class="fields">
-        <label v-for="field in configs" :key="field.key" class="field">
+        <label v-for="field in visibleConfigs" :key="field.key" class="field">
           <span>{{ field.label }}</span>
           <select
             v-if="isPlayerInputType(field.type)"
@@ -56,7 +65,7 @@
             v-model="formData[field.key]"
           >
             <option value="">—</option>
-            <option v-for="r in roleOptions" :key="r.id" :value="r.name">
+            <option v-for="r in displayRoleOptions" :key="r.id" :value="r.name">
               {{ r.name }}
             </option>
           </select>
@@ -136,10 +145,15 @@ import {
 } from "../store/roleInputConfig";
 import {
   getRule,
+  getSetupRule,
   inputsFromRule,
-  buildSentence,
   effectsFromRule,
+  parseSetupRoleCardKey,
+  buildSetupRoleCardKey,
+  resolveDisguiseSetupVariant,
 } from "../store/roleInteractionEngine";
+import { buildNaturalRoleMessage } from "../store/battleLogFormat";
+import { resolvePlayerIndex } from "../store/battleLogEffects";
 import {
   isPlayerInputType,
   filterPlayersForInput,
@@ -158,6 +172,12 @@ export default {
     roleOptions: { type: Array, default: () => [] },
     isRecorded: { type: Boolean, default: false },
     recordedEntry: { type: Object, default: null },
+    /** When true, use setup rule (開局設置) instead of night/optional rule. */
+    setupMode: { type: Boolean, default: false },
+    /** Original setup role id (e.g. drunk) when surface role was replaced. */
+    setupRoleId: { type: String, default: "" },
+    /** Optional prefill for form fields (e.g. soldier target = self). */
+    initialFormData: { type: Object, default: null },
   },
   data() {
     return {
@@ -176,6 +196,36 @@ export default {
         (configs || []).forEach((c) => {
           next[c.key] = "";
         });
+        const prefill = this.initialFormData || {};
+        Object.keys(prefill).forEach((key) => {
+          if (Object.prototype.hasOwnProperty.call(next, key) || key) {
+            if (prefill[key] != null && prefill[key] !== "") {
+              next[key] = prefill[key];
+            }
+          }
+        });
+        // Soldier: default target to self
+        const roleId =
+          this.player && this.player.role && this.player.role.id
+            ? String(this.player.role.id).toLowerCase()
+            : "";
+        if (
+          roleId === "soldier" &&
+          Object.prototype.hasOwnProperty.call(next, "target") &&
+          !next.target
+        ) {
+          next.target = this.label;
+        }
+        const setupId = String(this.setupRoleId || roleId || "").toLowerCase();
+        if (
+          this.setupMode &&
+          (setupId === "drunk" || setupId === "marionette") &&
+          setupId === roleId &&
+          Object.prototype.hasOwnProperty.call(next, "p1") &&
+          !next.p1
+        ) {
+          next.p1 = this.label;
+        }
         this.formData = next;
         this.initEffectToggles();
       },
@@ -188,9 +238,75 @@ export default {
     ...mapState("interactionRules", ["overlay"]),
     interactionRule() {
       const role = this.player && this.player.role;
-      if (!role || !role.id) return null;
+      if (!role || !role.id) {
+        if (this.setupMode && this.setupRoleId) {
+          const setupRule = getSetupRule(this.setupRoleId, this.overlay);
+          return setupRule && setupRule.enabled ? setupRule : null;
+        }
+        return null;
+      }
+      if (this.setupMode) {
+        const setupId = this.setupRoleId || role.id;
+        const setupRule = getSetupRule(setupId, this.overlay);
+        return setupRule && setupRule.enabled ? setupRule : null;
+      }
       const rule = getRule(role.id, this.overlay);
       return rule && rule.enabled ? rule : null;
+    },
+    displayRoleOptions() {
+      if (this.disguiseSetupVariant === "markOnly") return [];
+      const ruleId =
+        this.setupRoleId ||
+        (this.interactionRule && this.interactionRule.id) ||
+        (this.player.role && this.player.role.id);
+      const id = String(ruleId || "").toLowerCase();
+      if (this.setupMode && (id === "drunk" || id === "marionette")) {
+        return (this.roleOptions || []).filter(
+          (r) =>
+            r.team === "townsfolk" &&
+            String(r.id || "").toLowerCase() !== id,
+        );
+      }
+      return this.roleOptions || [];
+    },
+    disguiseSetupVariant() {
+      if (!this.setupMode || !this.setupRoleId) return null;
+      const fromSnapshot =
+        this.recordedEntry &&
+        this.recordedEntry.formSnapshot &&
+        this.recordedEntry.formSnapshot.setupVariant;
+      if (fromSnapshot && this.isRecorded && !this.editing) return fromSnapshot;
+      return resolveDisguiseSetupVariant(
+        this.players,
+        this.setupRoleId,
+        this.playerIndex,
+      );
+    },
+    visibleConfigs() {
+      if (!this.setupMode || !this.interactionRule) return this.configs;
+      if (this.disguiseSetupVariant === "markOnly") {
+        return this.configs
+          .filter((c) => c.key === "p1")
+          .map((c) => ({
+            ...c,
+            label: this.$t("recorder.setupGoodPlayer"),
+          }));
+      }
+      const sid = String(
+        this.setupRoleId ||
+          (this.player.role && this.player.role.id) ||
+          "",
+      ).toLowerCase();
+      if (sid !== "drunk" && sid !== "marionette") {
+        return this.configs;
+      }
+      const holderId = String(
+        this.player.role && this.player.role.id,
+      ).toLowerCase();
+      if (sid === holderId && this.playerIndex >= 0) {
+        return this.configs.filter((c) => c.key !== "p1");
+      }
+      return this.configs;
     },
     configs() {
       if (this.interactionRule) {
@@ -216,10 +332,43 @@ export default {
               this.interactionRule.inputs || [],
             ),
         }))
-        .filter((item) => isEffectToggleVisible(item.effect));
+        .filter((item) => isEffectToggleVisible(item.effect))
+        .filter(
+          (item) =>
+            this.disguiseSetupVariant !== "markOnly" ||
+            item.effect.type === "addReminder",
+        );
     },
     label() {
+      if (this.setupMode && this.playerIndex < 0) {
+        return this.$t("recorder.setupUnassignedPlayer") || "（待選玩家）";
+      }
       return formatPlayerRoleLabel(this.player, this.playerIndex);
+    },
+    displayRoleName() {
+      if (this.setupMode && this.setupRoleId) {
+        const id = String(this.setupRoleId).toLowerCase();
+        const fromOptions = (this.roleOptions || []).find(
+          (r) => r && String(r.id || "").toLowerCase() === id,
+        );
+        if (fromOptions && fromOptions.name) return fromOptions.name;
+        if (this.player.role && this.player.role.name) return this.player.role.name;
+        return id === "marionette" ? "提線木偶" : id === "drunk" ? "酒鬼" : id;
+      }
+      return (this.player.role && (this.player.role.name || this.player.role.id)) || "";
+    },
+    displayRoleForIcon() {
+      if (this.setupMode && this.setupRoleId) {
+        const id = String(this.setupRoleId).toLowerCase();
+        return (
+          (this.roleOptions || []).find(
+            (r) => r && String(r.id || "").toLowerCase() === id,
+          ) ||
+          this.player.role ||
+          {}
+        );
+      }
+      return this.player.role || {};
     },
     team() {
       return (this.player.role && this.player.role.team) || "";
@@ -231,7 +380,7 @@ export default {
       return !this.isRecorded || this.editing;
     },
     iconStyle() {
-      const role = this.player.role;
+      const role = this.displayRoleForIcon;
       if (!role || !role.id) return {};
       try {
         const url = require("../assets/icons/" +
@@ -242,18 +391,32 @@ export default {
         return {};
       }
     },
+    liveEffects() {
+      if (!this.interactionRule) return [];
+      return effectsFromRule(
+        this.interactionRule,
+        this.formData,
+        this.players,
+        this.effectToggles,
+        this.$store.state.roles,
+        this.playerIndex,
+        { setupVariant: this.disguiseSetupVariant },
+      );
+    },
     liveSentence() {
       if (!this.interactionRule) return "";
-      return buildSentence(this.interactionRule, {
-        actor: this.player.role.name || this.player.role.id,
+      return buildNaturalRoleMessage(this.interactionRule, {
+        players: this.players,
+        actorIndex: this.playerIndex,
         formData: this.formData,
+        effects: this.liveEffects,
       });
     },
     recordedSummary() {
       if (!this.recordedEntry) return this.$t("recorder.recorded");
       const e = this.recordedEntry;
-      let s = e.message || `${e.actor} -> ${e.action} -> ${e.target}`;
-      if (e.detail) s += ` （${e.detail}）`;
+      let s = e.message || `${e.actor} ${e.action}${e.target && e.target !== "無" ? " " + e.target : ""}`;
+      if (e.detail) s += `\n└ ${e.detail}`;
       return s;
     },
   },
@@ -263,12 +426,22 @@ export default {
       return formatPlayerRoleLabel(p, i);
     },
     playersForField(field) {
-      return filterPlayersForInput(
+      const list = filterPlayersForInput(
         this.players,
         field.type,
         this.playerIndex,
         this.playerOption,
       );
+      if (
+        this.disguiseSetupVariant === "markOnly" &&
+        field.key === "p1"
+      ) {
+        return list.filter(({ player }) => {
+          const team = player && player.role && player.role.team;
+          return team === "townsfolk" || team === "outsider";
+        });
+      }
+      return list;
     },
     effectToggleKey(effect, idx) {
       return effect.id || `effect-${idx}`;
@@ -333,15 +506,38 @@ export default {
       this.editing = false;
       this.detailNote = "";
     },
+    deleteRecord() {
+      if (this.abilityLost) return;
+      if (!window.confirm(this.$t("recorder.confirmCancelRecord"))) return;
+      const key =
+        (this.recordedEntry && this.recordedEntry.roleCardKey) ||
+        this.roleCardKey;
+      this.editing = false;
+      this.$emit("delete", key);
+    },
     write() {
       if (this.abilityLost) return;
+      if (
+        this.setupMode &&
+        this.disguiseSetupVariant === "markOnly" &&
+        (!this.formData.p1 || !String(this.formData.p1).trim())
+      ) {
+        return;
+      }
+      if (
+        this.setupMode &&
+        this.disguiseSetupVariant === "disguise" &&
+        (!this.formData.r1 || !String(this.formData.r1).trim())
+      ) {
+        return;
+      }
       let targetStr = "";
       const details = [];
       const actionLabel =
         (this.interactionRule &&
           this.interactionRule.sentence &&
           this.interactionRule.sentence.action) ||
-        "使用能力";
+        "選擇";
 
       this.configs.forEach((c) => {
         const val = this.formData[c.key];
@@ -366,33 +562,45 @@ export default {
           : this.detailNote.trim();
       }
 
+      const effects = this.interactionRule ? this.liveEffects : null;
+
       const message = this.interactionRule
-        ? buildSentence(this.interactionRule, {
-            actor: this.player.role.name || this.player.role.id,
+        ? buildNaturalRoleMessage(this.interactionRule, {
+            players: this.players,
+            actorIndex: this.playerIndex,
             formData: this.formData,
+            effects,
           })
         : null;
 
-      const effects = this.interactionRule
-        ? effectsFromRule(
-            this.interactionRule,
-            this.formData,
-            this.players,
-            this.effectToggles,
-          )
-        : null;
+      let roleCardKey = this.roleCardKey;
+      if (this.setupMode && this.formData.p1) {
+        const parsed = parseSetupRoleCardKey(this.roleCardKey);
+        const p1Idx = resolvePlayerIndex(this.players, this.formData.p1);
+        if (parsed && p1Idx >= 0) {
+          roleCardKey = buildSetupRoleCardKey(
+            parsed.phaseId,
+            p1Idx,
+            parsed.roleId,
+          );
+        }
+      }
 
       this.$emit("record", {
-        roleCardKey: this.roleCardKey,
-        actor: this.player.role.name || this.player.role.id,
+        roleCardKey,
+        actor: this.displayRoleName,
         action: actionLabel,
         target: targetStr || "無",
         detail: finalDetail || null,
         message,
         effects,
-        roleId: this.player.role.id,
+        roleId: this.setupRoleId || this.player.role.id,
         formSnapshot: {
-          ruleId: this.interactionRule ? this.player.role.id : null,
+          ruleId: this.interactionRule
+            ? this.setupRoleId || this.player.role.id
+            : null,
+          setup: !!this.setupMode,
+          setupVariant: this.disguiseSetupVariant || null,
           formData: { ...this.formData },
           detailNote: this.detailNote,
           effectToggles: { ...this.effectToggles },
@@ -415,6 +623,7 @@ export default {
 @import "../vars.scss";
 
 .role-action-card {
+  position: relative;
   background: rgba(0, 0, 0, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
@@ -536,6 +745,7 @@ export default {
   margin: 4px 0 8px;
   line-height: 1.35;
   word-break: break-word;
+  white-space: pre-line;
 
   .preview-label {
     opacity: 0.65;
@@ -547,6 +757,7 @@ export default {
   font-size: 0.75rem;
   margin: 6px 0;
   word-break: break-word;
+  white-space: pre-line;
 }
 
 .form-actions {
@@ -580,6 +791,29 @@ export default {
     &:hover {
       background: rgba(60, 60, 60, 0.7);
     }
+  }
+}
+
+.record-delete-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 2;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  &:hover {
+    color: #ff6b6b;
+    background: rgba(255, 0, 0, 0.15);
   }
 }
 </style>

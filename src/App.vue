@@ -63,11 +63,6 @@ import BattleLogModal from "@/components/modals/BattleLogModal";
 import InteractionRulesModal from "@/components/modals/InteractionRulesModal";
 import LeftPanels from "@/components/LeftPanels";
 import { bindViewportUnitSync } from "./store/viewportLayout";
-import {
-  applyLayoutProfileClass,
-  bindBoardLayoutSync,
-  getViewportSize,
-} from "./store/boardLayout";
 
 export default {
   components: {
@@ -96,23 +91,15 @@ export default {
     return {
       version,
       _unbindViewport: null,
-      _unbindBoard: null,
     };
   },
   mounted() {
     this._unbindViewport = bindViewportUnitSync(this.$store);
-    this._unbindBoard = bindBoardLayoutSync(this.$store);
-    const { width, height } = getViewportSize();
-    applyLayoutProfileClass(width, height);
   },
   beforeDestroy() {
     if (this._unbindViewport) {
       this._unbindViewport();
       this._unbindViewport = null;
-    }
-    if (this._unbindBoard) {
-      this._unbindBoard();
-      this._unbindBoard = null;
     }
   },
   methods: {
@@ -146,18 +133,22 @@ export default {
         case "n":
           this.$store.commit("toggleModal", "nightOrder");
           break;
-        case "e":
+        case "p":
           if (this.session.isSpectator) return;
           this.$store.commit("toggleModal", "edition");
+          break;
+        case "o":
+          if (this.session.isSpectator) return;
+          if (this.players.length > 4) {
+            this.$store.commit("toggleModal", "roles");
+          }
           break;
         case "c":
           if (this.session.isSpectator) return;
           this.$refs.menu.hostSession();
           break;
         case "b":
-          if (!this.session.isSpectator) {
-            this.$store.commit("toggleModal", "battleLog");
-          }
+          this.$store.commit("toggleModal", "battleLog");
           break;
         case "v":
           if (this.session.voteHistory.length || !this.session.isSpectator) {
@@ -172,7 +163,7 @@ export default {
           if (this.session.isSpectator) return;
           this.$store.dispatch("gamePhase/retreat");
           break;
-        case "f":
+        case "l":
           if (this.session.isSpectator) return;
           this.$store.commit("toggleModal", "fabled");
           break;

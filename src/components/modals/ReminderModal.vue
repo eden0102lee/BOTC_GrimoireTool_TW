@@ -114,8 +114,10 @@ export default {
 </script>
 
 <style scoped lang="scss">
+@import "../../gstone-assets.scss";
+
 ul.reminders .reminder {
-  background: url("../../assets/reminder.png") center center;
+  background: url($gstone-reminder) center center;
   background-size: 100%;
   width: 14vh;
   height: 14vh;

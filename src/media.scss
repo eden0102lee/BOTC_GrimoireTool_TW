@@ -68,10 +68,15 @@
   }
 }
 
-// All portrait / tall layouts — iPhone 16 Pro reference (boardLayout.js)
+// All portrait / tall layouts — iPhone 16 Pro reference
 @media screen and (max-aspect-ratio: 1/1) {
   #controls {
     padding-right: max(44px, calc(36px + var(--safe-right)));
+  }
+
+  .circle > li {
+    top: calc(50% - 50vw) !important;
+    height: 50vw !important;
   }
 }
 
@@ -83,14 +88,6 @@ html.layout-iphone16pro {
 
   body {
     font-size: 1rem;
-  }
-
-  #townsquare {
-    padding: 2px 0;
-  }
-
-  #townsquare.board-fit {
-    padding: 2px 0;
   }
 
   #townsquare .circle .player > .name {
@@ -109,12 +106,6 @@ html.layout-iphone16pro {
   #townsquare .circle .player .reminder .text {
     font-size: 55%;
     font-weight: 700;
-  }
-
-  #townsquare > .bluffs ul li,
-  #townsquare > .fabled ul li {
-    width: 14vh;
-    height: 14vh;
   }
 
   .night-order em {
@@ -140,6 +131,12 @@ html.layout-iphone16pro {
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
+
+    &.left-panels--collapsed {
+      max-height: none;
+      max-width: none;
+      overflow: visible;
+    }
   }
 }
 
@@ -184,21 +181,6 @@ html.layout-iphone16pro {
     display: inline-block;
     vertical-align: bottom;
   }
-  #townsquare > .bluffs,
-  #townsquare > .fabled {
-    bottom: max(6px, var(--safe-bottom));
-  }
-  #townsquare > .bluffs {
-    left: max(6px, var(--safe-left));
-  }
-  #townsquare > .fabled {
-    right: max(6px, var(--safe-right));
-  }
-  #townsquare > .bluffs ul li,
-  #townsquare > .fabled ul li {
-    width: 11vh;
-    height: 11vh;
-  }
   #version {
     right: max(10px, var(--safe-right));
     bottom: max(10px, var(--safe-bottom));
@@ -218,16 +200,22 @@ html.layout-iphone16pro {
   }
 }
 
-// odd aspect ratio
+// odd aspect ratio — short/wide viewports (Gstone fabled_bluffs)
 @media (max-aspect-ratio: 11/7) {
-  .bluffs,
-  .fabled {
+  .fabled_bluffs {
+    transform: scale(0.5) !important;
+
     h3 {
       max-width: 14vh;
     }
+
     ul {
       flex-direction: column;
     }
+  }
+
+  .fabled {
+    transform-origin: bottom right !important;
   }
 }
 
@@ -241,7 +229,7 @@ html.layout-iphone16pro {
   }
 }
 
-// Short viewports — skip name shrink on portrait phones (board-fit handles layout)
+// Short viewports — skip name shrink on landscape phones
 @media screen and (max-height: 850px) and (min-aspect-ratio: 1/1) {
   #townsquare .player > .name {
     font-size: 100%;

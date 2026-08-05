@@ -4,6 +4,7 @@
     v-if="modals.interactionRules"
     @close="toggleModal('interactionRules')"
   >
+    <div class="interaction-rules-body">
     <h3>{{ $t("interactionRules.title") }}</h3>
     <p class="subtitle">{{ $t("interactionRules.subtitle") }}</p>
 
@@ -40,7 +41,7 @@
           class="search"
           :placeholder="$t('interactionRules.search')"
         />
-        <ul>
+        <ul class="role-list-scroll">
           <li
             v-for="item in filteredRoles"
             :key="item.role.id"
@@ -73,24 +74,37 @@
           <div
             v-for="(input, idx) in editRule.inputs"
             :key="'in-' + idx"
-            class="row-block"
+            class="input-row"
           >
-            <input v-model="input.key" placeholder="key" class="short" />
-            <select v-model="input.type">
-              <option value="player">{{ inputTypeLabel("player") }}</option>
-              <option value="alivePlayer">{{ inputTypeLabel("alivePlayer") }}</option>
-              <option value="otherPlayer">{{ inputTypeLabel("otherPlayer") }}</option>
-              <option value="role">{{ inputTypeLabel("role") }}</option>
-              <option value="select">{{ inputTypeLabel("select") }}</option>
-              <option value="number">{{ inputTypeLabel("number") }}</option>
-              <option value="text">{{ inputTypeLabel("text") }}</option>
-            </select>
-            <input v-model="input.label" :placeholder="$t('interactionRules.label')" />
-            <label class="inline-check">
-              <input type="checkbox" v-model="input.required" />
-              req
-            </label>
-            <button type="button" class="mini-btn danger" @click="removeInput(idx)">×</button>
+            <div class="field-grid input-fields">
+              <label class="field">
+                <span class="field-label">key</span>
+                <input v-model="input.key" placeholder="key" />
+              </label>
+              <label class="field">
+                <span class="field-label">{{ $t("interactionRules.inputTypeLabel") }}</span>
+                <select v-model="input.type">
+                  <option value="player">{{ inputTypeLabel("player") }}</option>
+                  <option value="alivePlayer">{{ inputTypeLabel("alivePlayer") }}</option>
+                  <option value="otherPlayer">{{ inputTypeLabel("otherPlayer") }}</option>
+                  <option value="role">{{ inputTypeLabel("role") }}</option>
+                  <option value="select">{{ inputTypeLabel("select") }}</option>
+                  <option value="number">{{ inputTypeLabel("number") }}</option>
+                  <option value="text">{{ inputTypeLabel("text") }}</option>
+                </select>
+              </label>
+              <label class="field field-wide">
+                <span class="field-label">{{ $t("interactionRules.label") }}</span>
+                <input v-model="input.label" :placeholder="$t('interactionRules.label')" />
+              </label>
+            </div>
+            <div class="input-row-actions">
+              <label class="inline-check">
+                <input type="checkbox" v-model="input.required" />
+                {{ $t("interactionRules.required") }}
+              </label>
+              <button type="button" class="mini-btn danger" @click="removeInput(idx)">×</button>
+            </div>
           </div>
         </div>
 
@@ -114,89 +128,109 @@
             class="grimoire-effect-row"
           >
             <div class="effect-summary">{{ formatEffectSummary(effect) }}</div>
-            <div class="row-block effect-fields">
-              <select v-model="effect.type" @change="onEffectTypeChange(effect)">
-                <option
-                  v-for="action in grimoireActionTypes"
-                  :key="action.type"
-                  :value="action.type"
-                >
-                  {{ action.label }}
-                </option>
-              </select>
-              <select v-model="effect.targetFrom">
-                <option value="">{{ $t("interactionRules.pickTarget") }}</option>
-                <option
-                  v-for="input in playerInputsForEffects"
-                  :key="input.key"
-                  :value="input.key"
-                >
-                  {{ input.label || input.key }}
-                </option>
-              </select>
-              <template v-if="effectNeedsReminder(effect.type)">
-                <select
-                  v-model="effect.reminderRole"
-                  class="short"
-                  @change="onReminderRoleChange(effect)"
-                >
-                  <option :value="editRule.id">
-                    {{ editRule.name || editRule.id }}（{{ $t("interactionRules.thisRole") }}）
-                  </option>
-                  <optgroup :label="$t('interactionRules.otherRoleTokens')">
-                    <option
-                      v-for="r in otherScriptRolesWithReminders"
-                      :key="r.id"
-                      :value="r.id"
-                    >
-                      {{ r.name }} — {{ r.reminders.join("、") }}
-                    </option>
-                  </optgroup>
-                  <option :value="genericReminderRole">
-                    {{ $t("interactionRules.genericToken") }}
-                  </option>
-                </select>
-                <select
-                  v-model="effect.reminderName"
-                  @change="onReminderNameChange(effect)"
-                >
-                  <option value="">{{ $t("interactionRules.pickReminder") }}</option>
+            <div class="field-grid effect-fields">
+              <label class="field">
+                <span class="field-label">{{ $t("interactionRules.effectType") }}</span>
+                <select v-model="effect.type" @change="onEffectTypeChange(effect)">
                   <option
-                    v-for="name in reminderOptionsForEffect(effect)"
-                    :key="effect.reminderRole + '-' + name"
-                    :value="name"
+                    v-for="action in grimoireActionTypes"
+                    :key="action.type"
+                    :value="action.type"
                   >
-                    {{ name }}
+                    {{ action.label }}
                   </option>
                 </select>
+              </label>
+              <label class="field">
+                <span class="field-label">{{ $t("interactionRules.pickTarget") }}</span>
+                <select v-model="effect.targetFrom">
+                  <option value="">{{ $t("interactionRules.pickTarget") }}</option>
+                  <option
+                    v-for="input in playerInputsForEffects"
+                    :key="input.key"
+                    :value="input.key"
+                  >
+                    {{ input.label || input.key }}
+                  </option>
+                </select>
+              </label>
+              <template v-if="effectNeedsReminder(effect.type)">
+                <label class="field">
+                  <span class="field-label">{{ $t("interactionRules.reminderRole") }}</span>
+                  <select
+                    v-model="effect.reminderRole"
+                    @change="onReminderRoleChange(effect)"
+                  >
+                    <option :value="editRule.id">
+                      {{ editRule.name || editRule.id }}（{{ $t("interactionRules.thisRole") }}）
+                    </option>
+                    <optgroup :label="$t('interactionRules.otherRoleTokens')">
+                      <option
+                        v-for="r in otherScriptRolesWithReminders"
+                        :key="r.id"
+                        :value="r.id"
+                        :title="r.reminders.join('、')"
+                      >
+                        {{ r.name }}
+                      </option>
+                    </optgroup>
+                    <option :value="genericReminderRole">
+                      {{ $t("interactionRules.genericToken") }}
+                    </option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span class="field-label">{{ $t("interactionRules.pickReminder") }}</span>
+                  <select
+                    v-model="effect.reminderName"
+                    @change="onReminderNameChange(effect)"
+                  >
+                    <option value="">{{ $t("interactionRules.pickReminder") }}</option>
+                    <option
+                      v-for="name in reminderOptionsForEffect(effect)"
+                      :key="effect.reminderRole + '-' + name"
+                      :value="name"
+                    >
+                      {{ name }}
+                    </option>
+                  </select>
+                </label>
               </template>
-              <input
-                v-model="effect.label"
-                :placeholder="$t('interactionRules.cardToggleLabel')"
-              />
-              <select
-                v-if="bindToOptions(idx).length"
-                v-model="effect.bindTo"
-                class="short"
-                :title="$t('interactionRules.bindToHint')"
-              >
-                <option value="">{{ $t("interactionRules.bindToNone") }}</option>
-                <option
-                  v-for="opt in bindToOptions(idx)"
-                  :key="opt.value"
-                  :value="opt.value"
+              <label class="field field-wide">
+                <span class="field-label">{{ $t("interactionRules.cardToggleLabel") }}</span>
+                <input
+                  v-model="effect.label"
+                  :placeholder="$t('interactionRules.cardToggleLabel')"
+                />
+              </label>
+              <label v-if="bindToOptions(idx).length" class="field">
+                <span class="field-label">{{ $t("interactionRules.bindToHint") }}</span>
+                <select
+                  v-model="effect.bindTo"
+                  :title="$t('interactionRules.bindToHint')"
                 >
-                  {{ opt.label }}
-                </option>
-              </select>
-              <label class="inline-check" v-if="!effect.bindTo">
-                <input type="checkbox" v-model="effect.optional" />
-                {{ $t("interactionRules.optionalToggle") }}
+                  <option value="">{{ $t("interactionRules.bindToNone") }}</option>
+                  <option
+                    v-for="opt in bindToOptions(idx)"
+                    :key="opt.value"
+                    :value="opt.value"
+                  >
+                    {{ opt.label }}
+                  </option>
+                </select>
               </label>
-              <label class="inline-check" v-if="effect.optional && !effect.bindTo">
-                <input type="checkbox" v-model="effect.defaultOn" />
-                {{ $t("interactionRules.defaultOn") }}
-              </label>
+              <div class="field field-toggles">
+                <label class="inline-check" v-if="!effect.bindTo">
+                  <input type="checkbox" v-model="effect.optional" />
+                  {{ $t("interactionRules.optionalToggle") }}
+                </label>
+                <label class="inline-check" v-if="effect.optional && !effect.bindTo">
+                  <input type="checkbox" v-model="effect.defaultOn" />
+                  {{ $t("interactionRules.defaultOn") }}
+                </label>
+              </div>
+            </div>
+            <div class="effect-row-actions">
               <button type="button" class="mini-btn danger" @click="removeEffect(idx)">×</button>
             </div>
           </div>
@@ -324,6 +358,7 @@
         <p v-else class="empty-hint">{{ $t("interactionRules.selectRole") }}</p>
       </aside>
     </div>
+    </div>
   </Modal>
 </template>
 
@@ -331,7 +366,6 @@
 import { mapMutations, mapState, mapGetters } from "vuex";
 import Modal from "./Modal";
 import {
-  buildSentence,
   effectsFromRule,
   describeEffects,
   coverageStatus,
@@ -341,6 +375,7 @@ import {
   getRoleInputConfig,
   formatPlayerRoleLabel,
 } from "../../store/roleInputConfig";
+import { buildNaturalRoleMessage } from "../../store/battleLogFormat";
 import {
   COMMUNITY_TRANSLATIONS_SHEET_URL,
   GENERIC_REMINDER_ROLE,
@@ -429,9 +464,19 @@ export default {
     },
     previewSentence() {
       if (!this.editRule) return "";
-      return buildSentence(this.editRule, {
-        actor: this.editRule.name,
+      const effects = effectsFromRule(
+        this.editRule,
+        this.previewForm,
+        this.previewPlayers,
+        this.previewToggles,
+        this.roles,
+        this.previewActorIndex,
+      );
+      return buildNaturalRoleMessage(this.editRule, {
+        players: this.previewPlayers,
+        actorIndex: this.previewActorIndex,
         formData: this.previewForm,
+        effects,
       });
     },
     previewEffectLines() {
@@ -442,6 +487,7 @@ export default {
         this.previewPlayers,
         this.previewToggles,
         this.roles,
+        this.previewActorIndex,
       );
       return describeEffects(effects, this.previewPlayers);
     },
@@ -599,7 +645,7 @@ export default {
       }
       if (this.editRule) {
         if (!this.editRule.sentence) {
-          this.editRule.sentence = { action: "使用能力", template: "{actor} → {action}" };
+          this.editRule.sentence = { action: "選擇", template: "{actor} → {action}" };
         }
         this.syncPreviewForm(this.editRule);
       }
@@ -630,7 +676,7 @@ export default {
         enabled: true,
         inputs: [{ key: "target", type: "player", label: "目標對象" }],
         sentence: {
-          action: "使用能力",
+          action: "選擇",
           template: "{actor} → {action} → 選擇 {target}",
         },
         effects: [],
@@ -737,25 +783,41 @@ export default {
 <style scoped lang="scss">
 @import "../../vars.scss";
 
+.interaction-rules-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+  max-height: calc(94dvh - 80px);
+}
+
 .subtitle {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   opacity: 0.75;
-  margin: 0 0 10px;
+  margin: 0 0 12px;
+  line-height: 1.45;
 }
 
 .toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 12px;
+  gap: 8px;
+  margin-bottom: 14px;
+
+  .button {
+    font-size: 0.82rem;
+    padding: 6px 10px;
+    white-space: nowrap;
+  }
 }
 
 .editor-layout {
   display: grid;
-  grid-template-columns: 200px 1fr 240px;
-  gap: 12px;
-  min-height: 420px;
-  max-height: 65vh;
+  grid-template-columns: minmax(220px, 260px) minmax(0, 1fr) minmax(300px, 340px);
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+  align-items: stretch;
 }
 
 .role-list {
@@ -764,30 +826,50 @@ export default {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 
   .search {
-    padding: 6px 8px;
+    flex: 0 0 auto;
+    flex-shrink: 0;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 10px;
     border: none;
     border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.55);
     color: white;
+    font-size: 0.85rem;
+    position: relative;
+    z-index: 1;
   }
 
-  ul {
+  .role-list-scroll {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    align-content: flex-start;
+    line-height: normal;
     list-style: none;
     margin: 0;
     padding: 0;
     overflow-y: auto;
-    flex: 1;
+    overflow-x: hidden;
+    flex: 1 1 auto;
+    min-height: 0;
   }
 
   li {
-    padding: 6px 8px;
+    flex: 0 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 10px;
     cursor: pointer;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
 
     &:hover,
     &.active {
@@ -810,69 +892,88 @@ export default {
   }
 
   .name {
-    font-size: 0.8rem;
+    font-size: 0.88rem;
+    line-height: 1.3;
+    word-break: break-word;
   }
+
   .badge {
-    font-size: 0.65rem;
+    font-size: 0.72rem;
     opacity: 0.85;
+    line-height: 1.3;
   }
 }
 
 .rule-editor {
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 8px;
-  padding: 10px;
+  padding: 14px;
   overflow-y: auto;
   text-align: left;
+  min-height: 0;
+  min-width: 0;
 
   &.empty {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
-    gap: 8px;
+    gap: 10px;
   }
 }
 
 .editor-head {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
 
   h4 {
     margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.3;
+    word-break: break-word;
   }
 }
 
 .enabled-toggle {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .section {
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 
-  label {
+  > label {
     display: block;
-    font-size: 0.75rem;
-    margin-bottom: 4px;
-    opacity: 0.8;
+    font-size: 0.8rem;
+    margin-bottom: 6px;
+    opacity: 0.85;
   }
 
   input,
   select,
   textarea {
     width: 100%;
-    margin-bottom: 6px;
-    padding: 4px 6px;
+    margin-bottom: 8px;
+    padding: 7px 8px;
     border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.25);
     background: rgba(0, 0, 0, 0.45);
     color: white;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
+    line-height: 1.35;
+    box-sizing: border-box;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 64px;
   }
 }
 
@@ -880,69 +981,122 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.8rem;
+  font-size: 0.88rem;
   font-weight: bold;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+  gap: 8px;
 }
 
 .section-hint {
-  margin: 0 0 8px;
-  font-size: 0.68rem;
-  opacity: 0.7;
-  line-height: 1.35;
+  margin: 0 0 10px;
+  font-size: 0.78rem;
+  opacity: 0.75;
+  line-height: 1.5;
 
   .sheet-link {
     color: #8fd4ff;
     margin-left: 4px;
+    word-break: break-all;
   }
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+
+  &.field-wide {
+    grid-column: 1 / -1;
+  }
+
+  &.field-toggles {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px 16px;
+    align-items: center;
+  }
+
+  input,
+  select {
+    width: 100%;
+    margin-bottom: 0;
+    padding: 7px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(0, 0, 0, 0.45);
+    color: white;
+    font-size: 0.85rem;
+    box-sizing: border-box;
+  }
+}
+
+.field-label {
+  font-size: 0.72rem;
+  opacity: 0.72;
+  line-height: 1.3;
+}
+
+.input-row,
+.grimoire-effect-row {
+  margin-bottom: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.input-row-actions,
+.effect-row-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .grimoire-effects .grimoire-effect-row {
-  margin-bottom: 10px;
-  padding: 6px;
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(255, 214, 153, 0.2);
+  border-color: rgba(255, 214, 153, 0.22);
 }
 
 .effect-summary {
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   color: #ffd699;
-  margin-bottom: 4px;
+  margin-bottom: 10px;
+  line-height: 1.45;
+  word-break: break-word;
 }
 
 .effect-fields {
-  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
-}
-
-.row-block {
-  display: grid;
-  grid-template-columns: 70px 90px 1fr auto auto auto;
-  gap: 4px;
-  margin-bottom: 4px;
-  align-items: center;
-
-  .short {
-    width: 100%;
-  }
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .inline-check {
   display: flex;
   align-items: center;
-  gap: 2px;
-  font-size: 0.65rem;
-  white-space: nowrap;
+  gap: 6px;
+  font-size: 0.8rem;
+  line-height: 1.3;
 }
 
 .mini-btn {
-  padding: 2px 6px;
+  padding: 4px 10px;
   border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.3);
   background: rgba(0, 0, 0, 0.4);
   color: white;
   cursor: pointer;
-  font-size: 0.75rem;
+  font-size: 0.82rem;
+  flex-shrink: 0;
 
   &.danger {
     color: #ffb0b0;
@@ -950,89 +1104,178 @@ export default {
 }
 
 .hint {
-  font-size: 0.7rem;
-  opacity: 0.65;
+  font-size: 0.76rem;
+  opacity: 0.7;
   margin: 0;
+  line-height: 1.45;
 }
 
 .editor-actions {
   display: flex;
-  gap: 8px;
-  margin-top: 8px;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
 }
 
 .preview-panel {
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 8px;
-  padding: 10px;
+  padding: 14px;
   overflow-y: auto;
   text-align: left;
+  min-height: 0;
+  min-width: 0;
 
   h4 {
-    margin: 0 0 8px;
-    font-size: 0.9rem;
+    margin: 0 0 10px;
+    font-size: 0.95rem;
   }
+}
+
+.preview-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .preview-field {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  margin-bottom: 6px;
-  font-size: 0.75rem;
+  gap: 4px;
+  margin-bottom: 8px;
+  font-size: 0.82rem;
+
+  > span {
+    line-height: 1.35;
+    word-break: break-word;
+  }
 
   select,
   input {
-    padding: 3px 4px;
+    padding: 6px 8px;
     border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.25);
     background: rgba(0, 0, 0, 0.45);
     color: white;
+    font-size: 0.85rem;
+    width: 100%;
+    box-sizing: border-box;
   }
 }
 
+.effect-toggles {
+  margin-top: 4px;
+}
+
 .preview-label {
-  font-size: 0.7rem;
-  opacity: 0.7;
+  display: block;
+  font-size: 0.76rem;
+  opacity: 0.72;
+  margin-bottom: 4px;
 }
 
 .preview-sentence p {
-  margin: 4px 0 10px;
-  font-size: 0.8rem;
-  line-height: 1.35;
+  margin: 4px 0 12px;
+  font-size: 0.85rem;
+  line-height: 1.5;
   word-break: break-word;
+  white-space: pre-line;
 }
 
 .preview-effects ul {
   margin: 4px 0 0;
-  padding-left: 16px;
-  font-size: 0.75rem;
+  padding-left: 18px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+
+  li {
+    margin-bottom: 4px;
+    word-break: break-word;
+  }
 
   li.empty {
     list-style: none;
-    margin-left: -16px;
+    margin-left: -18px;
     opacity: 0.6;
   }
 }
 
 .empty-hint {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   opacity: 0.65;
+  line-height: 1.45;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1200px) {
+  .editor-layout {
+    grid-template-columns: minmax(200px, 240px) minmax(0, 1fr);
+    grid-template-rows: auto auto;
+  }
+
+  .preview-panel {
+    grid-column: 1 / -1;
+    max-height: 280px;
+  }
+}
+
+@media (max-width: 760px) {
   .editor-layout {
     grid-template-columns: 1fr;
+  }
+
+  .field-grid,
+  .effect-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .role-list {
+    max-height: 220px;
+  }
+
+  .preview-panel {
     max-height: none;
   }
 }
 </style>
 
 <style lang="scss">
+/* Modal.vue 預設 ul 為 flex-wrap，會破壞左側角色清單的垂直排版 */
+.interaction-rules-modal .role-list .role-list-scroll {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  justify-content: flex-start;
+  align-content: flex-start;
+  line-height: normal;
+}
+
 .interaction-rules-modal .modal {
-  max-width: min(95%, calc(100vw - 24px));
-  width: 1100px;
-  max-height: min(92%, calc(100dvh - 24px));
-  overflow-y: auto;
+  width: min(96vw, 1420px);
+  max-width: min(96vw, 1420px);
+  max-height: min(94dvh, 960px);
+  padding: 14px 18px 18px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  > .slot {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    max-height: 100%;
+  }
+
+  &.maximized {
+    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
+
+    .interaction-rules-body {
+      max-height: calc(100dvh - 60px);
+    }
+  }
 }
 </style>

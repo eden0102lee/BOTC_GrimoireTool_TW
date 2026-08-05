@@ -112,9 +112,9 @@ export default {
   border-radius: 50%;
   width: 100%;
   background: url($gstone-token) center center;
-  background-size: 100%;
+  background-size: 113%;
   text-align: center;
-  @include token-chrome;
+  @include gstone-token-shadow;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -136,7 +136,7 @@ export default {
 
   .icon,
   &:before {
-    background-size: 100%;
+    background-size: 80%;
     background-repeat: no-repeat;
     background-position: center 30%;
     position: absolute;
@@ -153,35 +153,35 @@ export default {
     pointer-events: none;
 
     &.leaf-left {
-      background-image: url("../assets/leaf-left.png");
+      background-image: url($gstone-leaf-left);
     }
 
     &.leaf-orange {
-      background-image: url("../assets/leaf-orange.png");
+      background-image: url($gstone-leaf-orange);
     }
 
     &.leaf-right {
-      background-image: url("../assets/leaf-right.png");
+      background-image: url($gstone-leaf-right);
     }
 
     &.leaf-top1 {
-      background-image: url("../assets/leaf-top1.png");
+      background-image: url($gstone-leaf-top1);
     }
 
     &.leaf-top2 {
-      background-image: url("../assets/leaf-top2.png");
+      background-image: url($gstone-leaf-top2);
     }
 
     &.leaf-top3 {
-      background-image: url("../assets/leaf-top3.png");
+      background-image: url($gstone-leaf-top3);
     }
 
     &.leaf-top4 {
-      background-image: url("../assets/leaf-top4.png");
+      background-image: url($gstone-leaf-top4);
     }
 
     &.leaf-top5 {
-      background-image: url("../assets/leaf-top5.png");
+      background-image: url($gstone-leaf-top5);
     }
   }
 

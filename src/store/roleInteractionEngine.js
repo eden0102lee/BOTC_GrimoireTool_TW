@@ -31,9 +31,11 @@ export function normalizeRule(rule) {
     id: rule.id,
     name: rule.name || rule.id,
     enabled: rule.enabled !== false,
+    activation: rule.activation || null,
+    once: !!rule.once,
     when: rule.when || null,
     inputs: Array.isArray(rule.inputs) ? rule.inputs.slice() : [],
-    sentence: rule.sentence || { action: "使用能力", template: "{actor} → {action}" },
+    sentence: rule.sentence || { action: "選擇", template: "{actor} → {action}" },
     effects: Array.isArray(rule.effects) ? rule.effects.slice() : [],
     notes: rule.notes || "",
   };
@@ -82,11 +84,170 @@ export function getRule(roleId, overlay = {}) {
   return merged.get(String(roleId).toLowerCase()) || null;
 }
 
+export function isOptionalActivation(rule) {
+  if (!rule || rule.enabled === false) return false;
+  return (
+    rule.activation === "optional" ||
+    rule.activation === "setup" ||
+    rule.activation === "trigger"
+  );
+}
+
 export function ruleAppliesTonight(rule, isFirstNight) {
   if (!rule || !rule.enabled) return false;
+  // setup / optional / trigger pool — not auto-listed in night order
+  if (isOptionalActivation(rule)) {
+    return false;
+  }
   const nights = rule.when && rule.when.nights;
   if (!nights || !nights.length) return true;
   return nights.includes(isFirstNight ? "first" : "other");
+}
+
+/** Extra setup-only configs (night rule may coexist on same role). */
+const SETUP_RULES = {
+  fortuneteller: {
+    name: "占卜師",
+    once: true,
+    inputs: [{ key: "p1", type: "player", label: "視為惡魔" }],
+    sentence: {
+      action: "始終將",
+      template: "{actor}始終將 {p1} 視為惡魔",
+    },
+    effects: [],
+    notes: "開局選定一名善良玩家「視為惡魔」（整局）",
+  },
+};
+
+export function getSetupRule(roleId, overlay = {}) {
+  if (!roleId) return null;
+  const id = String(roleId).toLowerCase();
+  const base = getRule(id, overlay);
+  if (base && base.enabled && base.activation === "setup") {
+    return base;
+  }
+  const extra = SETUP_RULES[id];
+  if (!extra) return null;
+  return normalizeRule({
+    id,
+    name: (base && base.name) || extra.name || id,
+    enabled: true,
+    activation: "setup",
+    when: { nights: [] },
+    ...extra,
+  });
+}
+
+export function roleHasSetupAction(role, overlay = {}) {
+  if (!role || !role.id) return false;
+  return !!getSetupRule(role.id, overlay);
+}
+
+export function setupTaskNote(role, overlay = {}) {
+  const setupRule = getSetupRule(role.id, overlay);
+  if (setupRule && setupRule.notes) return setupRule.notes;
+  if (role && role.setup) return "開局設置（詳見角色能力）";
+  return "";
+}
+
+export function buildSetupRoleCardKey(phaseId, playerIndex, roleId) {
+  return `setup|${phaseId}|${playerIndex}|${roleId || ""}`;
+}
+
+export function parseSetupRoleCardKey(roleCardKey) {
+  if (!roleCardKey || !String(roleCardKey).startsWith("setup|")) return null;
+  const parts = String(roleCardKey).split("|");
+  if (parts.length < 4) return null;
+  const playerIndex = parseInt(parts[parts.length - 2], 10);
+  const roleId = parts[parts.length - 1];
+  const phaseId = parts.slice(1, parts.length - 2).join("|");
+  if (Number.isNaN(playerIndex)) return null;
+  return { phaseId, playerIndex, roleId, setup: true };
+}
+
+export const DISGUISE_SETUP_ROLE_IDS = new Set(["drunk", "marionette"]);
+
+export function disguiseIdentityReminderName(setupRoleId) {
+  const id = String(setupRoleId || "").toLowerCase();
+  if (id === "marionette") return "是提線木偶";
+  if (id === "drunk") return "是酒鬼";
+  return "";
+}
+
+export function hasDisguiseRoleAssigned(players, setupRoleId) {
+  const id = String(setupRoleId || "").toLowerCase();
+  return (players || []).some(
+    (p) =>
+      p &&
+      p.role &&
+      String(p.role.id || "").toLowerCase() === id,
+  );
+}
+
+export function hasDisguiseIdentityMarker(players, setupRoleId) {
+  const name = disguiseIdentityReminderName(setupRoleId);
+  if (!name) return false;
+  return (players || []).some((p) =>
+    (p && p.reminders ? p.reminders : []).some(
+      (r) => r && r.name === name,
+    ),
+  );
+}
+
+/** disguise = 已指派身份字卡；markOnly = 僅掛身份標記於善良玩家 */
+export function resolveDisguiseSetupVariant(
+  players,
+  setupRoleId,
+  playerIndex = -1,
+) {
+  const id = String(setupRoleId || "").toLowerCase();
+  if (!DISGUISE_SETUP_ROLE_IDS.has(id)) return null;
+  if (
+    playerIndex >= 0 &&
+    players[playerIndex] &&
+    players[playerIndex].role &&
+    String(players[playerIndex].role.id || "").toLowerCase() === id
+  ) {
+    return "disguise";
+  }
+  return "markOnly";
+}
+
+export function shouldShowMarkOnlyDisguiseSetup(players, setupRoleId) {
+  const id = String(setupRoleId || "").toLowerCase();
+  if (!DISGUISE_SETUP_ROLE_IDS.has(id)) return false;
+  if (hasDisguiseRoleAssigned(players, id)) return false;
+  if (hasDisguiseIdentityMarker(players, id)) return false;
+  return true;
+}
+
+function inferDisguiseSetupVariantFromForm(rule, formData) {
+  if (!rule || rule.activation !== "setup") return null;
+  const id = String(rule.id || "").toLowerCase();
+  if (!DISGUISE_SETUP_ROLE_IDS.has(id)) return null;
+  const fd = formData || {};
+  if (fd.r1 != null && String(fd.r1).trim() !== "") return "disguise";
+  if (fd.p1 != null && String(fd.p1).trim() !== "") return "markOnly";
+  return null;
+}
+
+export function roleHasOptionalAction(role, overlay = {}) {
+  if (!role || !role.id) return false;
+  const rule = getRule(role.id, overlay);
+  if (!rule || rule.enabled === false) return false;
+  return (
+    rule.activation === "optional" ||
+    rule.activation === "trigger"
+  );
+}
+
+/** Optional record picker: trigger/once + setup roles. */
+export function roleHasActivatableRecord(role, overlay = {}) {
+  if (!role || !role.id) return false;
+  return (
+    roleHasOptionalAction(role, overlay) ||
+    roleHasSetupAction(role, overlay)
+  );
 }
 
 export function inputsFromRule(rule) {
@@ -103,7 +264,7 @@ export function buildSentence(rule, ctx) {
     (ctx && ctx.roleName) ||
     rule.name ||
     rule.id;
-  const action = sentenceAction || "使用能力";
+  const action = sentenceAction || "選擇";
 
   let result = template || "{actor} → {action}";
   result = result.replace(/\{actor\}/g, actor);
@@ -123,8 +284,32 @@ export function buildSentence(rule, ctx) {
   return result;
 }
 
-function resolveEffectTargetIndex(targetFrom, formData, players) {
-  if (!targetFrom || !formData) return -1;
+function resolveRoleFromForm(rolesMap, nameOrId) {
+  if (!rolesMap || !nameOrId) return null;
+  const q = String(nameOrId).trim();
+  if (!q) return null;
+  if (typeof rolesMap.get === "function") {
+    const byId = rolesMap.get(q.toLowerCase());
+    if (byId) return byId;
+    for (const role of rolesMap.values()) {
+      if (role && (role.name === q || role.id === q)) return role;
+    }
+  } else if (Array.isArray(rolesMap)) {
+    return (
+      rolesMap.find(
+        (r) => r && (r.name === q || String(r.id).toLowerCase() === q.toLowerCase()),
+      ) || null
+    );
+  }
+  return null;
+}
+
+function resolveEffectTargetIndex(targetFrom, formData, players, actorIndex = -1) {
+  if (!targetFrom) return -1;
+  if (targetFrom === "actor" || targetFrom === "__actor__") {
+    return actorIndex >= 0 ? actorIndex : -1;
+  }
+  if (!formData) return -1;
   const label = formData[targetFrom];
   if (!label) return -1;
   return resolvePlayerIndex(players, label);
@@ -136,20 +321,34 @@ export function effectsFromRule(
   players,
   effectToggles = {},
   rolesMap = null,
+  actorIndex = -1,
+  options = {},
 ) {
   if (!rule || !rule.effects || !rule.effects.length) return [];
   const effects = [];
+  const setupVariant =
+    options.setupVariant ||
+    (options.formSnapshot && options.formSnapshot.setupVariant) ||
+    inferDisguiseSetupVariantFromForm(rule, formData);
 
   rule.effects.forEach((spec, idx) => {
     const enabled = resolveEffectEnabled(spec, idx, rule, effectToggles);
     if (!enabled) return;
 
+    if (setupVariant === "markOnly" && spec.type !== "addReminder") return;
+    if (setupVariant === "disguise" && spec.type === "setDisguiseRole") return;
+
     const playerIndex = resolveEffectTargetIndex(
       spec.targetFrom,
       formData,
       players,
+      actorIndex,
     );
-    if (playerIndex < 0 && spec.targetFrom) return;
+    const needsPlayer =
+      spec.targetFrom &&
+      spec.targetFrom !== "actor" &&
+      spec.targetFrom !== "__actor__";
+    if (playerIndex < 0 && needsPlayer) return;
 
     switch (spec.type) {
       case "setDead":
@@ -169,6 +368,61 @@ export function effectsFromRule(
           value: spec.value !== false,
         });
         break;
+      case "setRole": {
+        let roleObj = null;
+        if (spec.roleId) {
+          roleObj = resolveRoleFromForm(rolesMap, spec.roleId);
+        } else {
+          const roleFrom = spec.roleFrom || "r1";
+          roleObj = resolveRoleFromForm(rolesMap, formData[roleFrom]);
+        }
+        const pi = resolveEffectTargetIndex(
+          spec.targetFrom || "actor",
+          formData,
+          players,
+          actorIndex,
+        );
+        if (pi < 0 || !roleObj) break;
+        const previousRole =
+          players[pi] && players[pi].role ? { ...players[pi].role } : null;
+        if (
+          spec.skipIfAlready &&
+          previousRole &&
+          String(previousRole.id || "").toLowerCase() ===
+            String(roleObj.id || "").toLowerCase()
+        ) {
+          break;
+        }
+        effects.push({
+          type: "setRole",
+          playerIndex: pi,
+          role: { ...roleObj },
+          previousRole,
+        });
+        break;
+      }
+      case "setDisguiseRole": {
+        const roleFrom = spec.roleFrom || "r1";
+        const roleObj = resolveRoleFromForm(rolesMap, formData[roleFrom]);
+        const pi = resolveEffectTargetIndex(
+          spec.targetFrom || "actor",
+          formData,
+          players,
+          actorIndex,
+        );
+        if (pi < 0 || !roleObj) break;
+        const previousDisguise =
+          players[pi] && players[pi].disguiseRole
+            ? { ...players[pi].disguiseRole }
+            : null;
+        effects.push({
+          type: "setDisguiseRole",
+          playerIndex: pi,
+          role: { ...roleObj },
+          previousRole: previousDisguise,
+        });
+        break;
+      }
       case "addReminder": {
         const reminder = makeRoleReminder(
           spec.reminderName || "提醒",
@@ -185,6 +439,7 @@ export function effectsFromRule(
           playerIndex,
           reminder,
           factType,
+          unique: !!spec.unique,
         });
         break;
       }
@@ -225,6 +480,10 @@ export function describeEffects(effects, players) {
         return `${label} 失去能力`;
       case "addReminder":
         return `${label} 加上「${(e.reminder && e.reminder.name) || "提醒"}」`;
+      case "setRole":
+        return `${label} 角色改為「${(e.role && e.role.name) || "?"}」`;
+      case "setDisguiseRole":
+        return `${label} 表面角色改為「${(e.role && e.role.name) || "?"}」`;
       case "removeReminder":
         return `${label} 移除「${(e.reminder && e.reminder.name) || "提醒"}」`;
       default:
@@ -252,7 +511,7 @@ export function draftFromInputConfig(role, inputs) {
       required: false,
     })),
     sentence: {
-      action: "使用能力",
+      action: "選擇",
       template: `{actor} → {action} → ${parts.join(" / ")}`,
     },
     effects: [],

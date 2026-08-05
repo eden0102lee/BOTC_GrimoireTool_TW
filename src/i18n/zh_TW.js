@@ -11,9 +11,11 @@ export default {
   "menu.game": "遊戲",
   "menu.grimoire": "魔典",
   "menu.session": "連線",
+  "menu.gstone": "集石",
   "menu.players": "玩家",
   "menu.characters": "角色",
   "menu.help": "說明",
+  "menu.settings": "設置",
 
   // Game / grimoire tab
   "menu.enterDay": "進入白天",
@@ -30,7 +32,7 @@ export default {
   "menu.disableAnimations": "關閉動畫",
   "menu.muteSounds": "靜音",
 
-  // Session tab
+  // Session / room (shown under 遊戲 when connected)
   "menu.hosting": "說書人",
   "menu.playing": "玩家",
   "menu.liveSession": "線上房間",
@@ -48,7 +50,7 @@ export default {
   "menu.copyPlayerLink": "複製玩家連結",
   "menu.sendCharacters": "發送角色",
   "menu.voteHistory": "投票紀錄",
-  "menu.leaveSession": "離開房間",
+  "menu.leaveSession": "離開小鎮",
 
   // Players tab
   "menu.addPlayer": "新增座位",
@@ -57,11 +59,21 @@ export default {
 
   // Characters tab
   "menu.selectEdition": "選擇劇本",
-  "menu.chooseAssign": "選擇並指派",
-  "menu.addFabled": "新增傳奇／奇遇",
+  "menu.chooseAssign": "分配角色",
+  "menu.addFabled": "傳奇／奇遇角色",
   "menu.removeAllRoles": "移除全部角色",
+  "menu.removeAllReminders": "移除全部標記",
+  "menu.deleteBattleLog": "刪除戰報",
+  "menu.restartNewGame": "重開新局",
 
-  // Help tab
+  // Gstone / links tab
+  "menu.disclaimer":
+    "Blood on the Clocktower 為 Steven Medway 與 The Pandemonium Institute 之商標。《血染鐘樓》中文版由集石（Gstone）發行。本專案及其網站免費提供，與 The Pandemonium Institute、集石均無隸屬或合作關係，亦不對外營利。",
+  "menu.linkOfficialGrimoire": "官方魔典",
+  "menu.linkGstoneGrimoire": "集石魔典",
+  "menu.linkScriptTool": "劇本工具",
+
+  // Settings / help
   "menu.referenceSheet": "角色能力表",
   "menu.nightOrderSheet": "夜間順序表",
   "menu.gameStateJson": "遊戲狀態 JSON",
@@ -79,10 +91,14 @@ export default {
     "是否將已指派的角色發送給所有已就座玩家？",
   "confirm.customImages":
     "確定要允許自訂圖示？惡意劇本作者可能藉此追蹤你的 IP。",
-  "confirm.leaveSession": "確定要離開目前的線上房間？",
+  "confirm.leaveSession": "確定要離開目前的小鎮？",
   "confirm.randomizeSeatings": "確定要隨機打亂座位？",
   "confirm.removeAllPlayers": "確定要移除所有玩家？",
   "confirm.removeAllRoles": "確定要移除所有玩家角色？",
+  "confirm.removeAllReminders": "確定要移除所有玩家身上的提醒標記？",
+  "confirm.deleteBattleLog": "確定要刪除整份戰報？此操作無法復原。",
+  "confirm.restartNewGame":
+    "確定要重開新局？將清除所有角色、標記與戰報，此操作無法復原。",
   "confirm.removePlayer": "確定要移除 {name}？",
 
   // Town info
@@ -258,27 +274,10 @@ export default {
   "vote.go": "開始",
   "vote.nominatedBy": "提名了",
 
-  // Keyboard shortcuts panel
-  "shortcuts.title": "快捷鍵",
-  "shortcuts.show": "顯示快捷鍵",
-  "shortcuts.hide": "隱藏快捷鍵",
-  "shortcuts.gstone": "集石官方",
-  "shortcuts.extras": "本專案擴充",
-  "shortcuts.addPlayer": "添加座位",
-  "shortcuts.createTown": "創建小鎮",
-  "shortcuts.joinTown": "加入小鎮",
-  "shortcuts.enterDay": "進入白天",
-  "shortcuts.previousPhase": "上一階段（晝夜退回）",
-  "shortcuts.reference": "角色能力表",
-  "shortcuts.nightOrder": "夜間順序",
-  "shortcuts.hideRoles": "隱藏角色（投影）",
-  "shortcuts.joinSession": "加入房間（玩家）",
-  "shortcuts.battleLog": "戰報／復盤",
-  "shortcuts.edition": "選擇劇本",
-  "shortcuts.voteHistory": "投票紀錄",
-  "shortcuts.fabled": "新增傳奇／奇遇",
-  "shortcuts.sendCharacters": "發送角色",
-  "shortcuts.closeModal": "關閉視窗",
+  // Left storyteller panels
+  "leftPanels.title": "說書人面板",
+  "leftPanels.show": "說書人面板",
+  "leftPanels.hide": "收合面板",
 
   // Battle log
   "battleLog.title": "戰報／復盤",
@@ -321,6 +320,17 @@ export default {
   "recorder.abilityLostHint": "已失去能力，不計入戰報",
   "recorder.manualTitle": "手動記錄",
   "recorder.addManual": "+手動記錄",
+  "recorder.addOptional": "+可選紀錄",
+  "recorder.setupTitle": "開局設置",
+  "recorder.setupHint": "首夜設置：劇本含酒鬼／提線木偶時，已指派則選善良角色並掛標記（A）；未指派且無標記時可選善良玩家僅掛標記（B）。男爵等依提示完成。",
+  "recorder.setupUnassignedPlayer": "（待選玩家）",
+  "recorder.setupGoodPlayer": "任一善良玩家",
+  "recorder.setupEmpty": "本局無需設置紀錄的角色。",
+  "recorder.optionalTitle": "可選紀錄",
+  "recorder.optionalPickHint": "選擇要記錄的角色（觸發／一次性／設置）",
+  "recorder.optionalEmpty": "場上尚無可選紀錄角色。",
+  "recorder.optionalOnceUsed": "本局已用過",
+  "recorder.optionalDismiss": "關閉",
   "recorder.addVote": "+投票紀錄",
   "recorder.addDeadVote": "+使用遺言票",
   "recorder.voteTitle": "投票紀錄",
@@ -332,6 +342,10 @@ export default {
   "recorder.voteHint": "選擇提名者與被提名者，並勾選投出贊成票的玩家",
   "recorder.deadVotePlayers": "勾選使用遺言票的玩家（0～玩家人數）",
   "recorder.deadVoteHint": "勾選使用遺言票的玩家後寫入",
+  "recorder.deadVoterAutoHint":
+    "寫入後將自動記錄 {names} 使用遺言票",
+  "recorder.deadVoterUsedHint":
+    "{names} 已使用過遺言票，不會重複記錄",
   "recorder.votePhaseHint": "投票階段可用「+投票紀錄」「+使用遺言票」記錄。",
   "recorder.dismissManual": "關閉",
   "recorder.confirmCancelRecord": "確定要取消這筆紀錄嗎？此操作無法復原。",
@@ -358,10 +372,12 @@ export default {
   "recorder.note": "自行註解",
   "recorder.notePlaceholder": "特殊備註（選填）",
   "recorder.noNightActions": "本夜尚無可填選的角色行動（請先指派角色）。",
-  "recorder.dayHint": "日間請用「+手動記錄」記錄提名與白天行動。",
-  "recorder.linkedMode": "戰報連動",
+  "recorder.dayHint":
+    "日間可用「+手動記錄」「+可選紀錄」記錄白天行動與觸發能力。",
+  "recorder.linkedMode": "戰報助手",
   "recorder.newGame": "開啟新局",
-  "recorder.exportBattleLog": "匯出戰報",
+  "recorder.exportBattleLogText": "戰報文本",
+  "recorder.exportBattleLogJson": "戰報 JSON",
   "recorder.importBattleLog": "載入戰報",
   "recorder.deleteBattleLog": "刪除戰報",
   "recorder.confirmDeleteBattleLog": "確定要刪除整份戰報並開始新局？此操作無法復原。",
@@ -379,11 +395,27 @@ export default {
   "recorder.pendingDeadVote": "{name} 使用遺言票？",
   "recorder.pendingPoison": "{name} 中毒？",
   "recorder.pendingDrunk": "{name} 醉酒？",
-  "recorder.pendingIdentityDrunk": "{name} 醉酒標記（開局／身分）？",
+  "recorder.pendingIdentityDrunk": "{name} 「是酒鬼」標記？",
   "recorder.pendingAbilityLost": "{name} 失去能力？",
   "recorder.pendingRemovePoison": "{name} 移除中毒？",
   "recorder.pendingRemoveDrunk": "{name} 移除醉酒？",
   "recorder.pendingGeneric": "{name} 待提交？",
+  "recorder.hideNickname": "隱藏暱稱",
+  "recorder.hideTimestamp": "隱藏時間",
+  "recorder.manualResultLine": "結果行（└）",
+  "recorder.executionTitle": "處決紀錄",
+  "recorder.executionPlayer": "被處決玩家",
+  "recorder.executionDied": "被處決 死亡",
+  "recorder.executionNoDeath": "被處決 沒有死亡",
+  "recorder.noExecution": "無人處決",
+  "recorder.addExecution": "+處決紀錄",
+  "recorder.duskHint": "黃昏階段可用「+處決紀錄」記錄處決結果與存活玩家。",
+  "recorder.voteScaffoldTitle": "處刑台",
+  "recorder.scaffoldEmpty": "處刑台上沒有人",
+  "recorder.nominatorMustBeAlive": "提名者必須為存活玩家",
+  "recorder.showDeadPlayers": "顯示已死亡玩家",
+  "recorder.playerDead": "死亡",
+  "recorder.alivePlayersTitle": "存活玩家",
 
   // Game phase tracker (ST-only)
   "gamePhase.nextPhase": "下一階段",
@@ -425,6 +457,10 @@ export default {
   "interactionRules.bindToHint": "跟隨另一個可選效果（例如勾選目標死亡）",
   "interactionRules.genericToken": "通用標記",
   "interactionRules.label": "標籤",
+  "interactionRules.required": "必填",
+  "interactionRules.inputTypeLabel": "輸入類型",
+  "interactionRules.effectType": "效果類型",
+  "interactionRules.reminderRole": "標記角色",
   "interactionRules.sentenceAction": "動作文字",
   "interactionRules.sentenceTemplate": "句子模板",
   "interactionRules.templateHint": "可用 {actor}、{action} 與各 input key",

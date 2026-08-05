@@ -1,16 +1,3633 @@
 {
   "version": 1,
+  "source": "https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985",
+  "generatedAt": "2026-08-05T05:02:43.543Z",
   "rules": [
+    {
+      "id": "ojo",
+      "name": "奧赫",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "r1",
+          "type": "role",
+          "label": "選擇角色"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → {r1}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "死亡",
+          "reminderRole": "ojo",
+          "optional": true,
+          "defaultOn": true,
+          "label": "自身 死亡"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "lycanthrope",
+      "name": "半獸人",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "殺害",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [
+        {
+          "id": "kill",
+          "type": "setDead",
+          "targetFrom": "target",
+          "value": true,
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標死亡"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "死亡",
+          "reminderRole": "lycanthrope",
+          "bindTo": "kill",
+          "label": "目標掛死亡標記"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "假爪",
+          "reminderRole": "lycanthrope",
+          "optional": true,
+          "defaultOn": false,
+          "label": "目標對象 假爪"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "banshee",
+      "name": "報喪女妖",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "具有能力",
+          "reminderRole": "banshee",
+          "optional": true,
+          "defaultOn": true,
+          "label": "自身 具有能力"
+        }
+      ],
+      "notes": "passive — 試算表/被動，無輸入卡"
+    },
+    {
+      "id": "riot",
+      "name": "暴亂",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "殺害",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "tealady",
+      "name": "茶藝師",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "殺害",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "不會死",
+          "reminderRole": "tealady",
+          "optional": true,
+          "defaultOn": true,
+          "label": "自身 不會死"
+        }
+      ],
+      "notes": "passive — 無夜動喚醒，標記由說書人手動套用"
+    },
+    {
+      "id": "choirboy",
+      "name": "唱詩男孩",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "towncrier",
+      "name": "城鎮公告員",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "res",
+          "type": "select",
+          "label": "結果",
+          "options": [
+            "是 (Yes)",
+            "否 (No)"
+          ]
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → {res}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "爪牙提名",
+          "reminderRole": "towncrier",
+          "optional": true,
+          "defaultOn": true,
+          "label": "自身 爪牙提名"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "爪牙未提名",
+          "reminderRole": "towncrier",
+          "optional": true,
+          "defaultOn": false,
+          "label": "自身 爪牙未提名"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "chef",
+      "name": "廚師",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "num",
+          "type": "number",
+          "label": "得知數字"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → {num}"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "preacher",
+      "name": "傳教士",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "傳教中",
+          "reminderRole": "preacher",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 傳教中"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "assassin",
+      "name": "刺客",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "殺害",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [
+        {
+          "id": "kill",
+          "type": "setDead",
+          "targetFrom": "target",
+          "value": true,
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標死亡"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "死亡",
+          "reminderRole": "assassin",
+          "bindTo": "kill",
+          "label": "目標掛死亡標記"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "villageidiot",
+      "name": "村夫",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "p1",
+          "type": "player",
+          "label": "目標玩家"
+        },
+        {
+          "key": "res",
+          "type": "select",
+          "label": "該玩家陣營",
+          "options": [
+            "善良 (Good)",
+            "邪惡 (Evil)"
+          ]
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → {p1} / {res}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "p1",
+          "reminderName": "醉酒",
+          "reminderRole": "villageidiot",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標玩家 醉酒"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "lordoftyphon",
+      "name": "堤豐之首",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "殺害",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [
+        {
+          "id": "kill",
+          "type": "setDead",
+          "targetFrom": "target",
+          "value": true,
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標死亡"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "死亡",
+          "reminderRole": "lordoftyphon",
+          "bindTo": "kill",
+          "label": "目標掛死亡標記"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "investigator",
+      "name": "調查員",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "p1",
+          "type": "player",
+          "label": "玩家 1"
+        },
+        {
+          "key": "p2",
+          "type": "player",
+          "label": "玩家 2"
+        },
+        {
+          "key": "r1",
+          "type": "role",
+          "label": "對應角色"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → {p1} & {p2} 其中一位是 {r1}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "p1",
+          "reminderName": "爪牙",
+          "reminderRole": "investigator",
+          "optional": false,
+          "defaultOn": true,
+          "label": "玩家 1 爪牙"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "p2",
+          "reminderName": "非爪牙",
+          "reminderRole": "investigator",
+          "optional": false,
+          "defaultOn": true,
+          "label": "玩家 2 非爪牙"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "gambler",
+      "name": "賭徒",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "殺害",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [
+        {
+          "id": "kill",
+          "type": "setDead",
+          "targetFrom": "target",
+          "value": true,
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標死亡"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "死亡",
+          "reminderRole": "gambler",
+          "bindTo": "kill",
+          "label": "目標掛死亡標記"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "fanggu",
+      "name": "方古",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "殺害",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [
+        {
+          "id": "kill",
+          "type": "setDead",
+          "targetFrom": "target",
+          "value": true,
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標死亡"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "死亡",
+          "reminderRole": "fanggu",
+          "bindTo": "kill",
+          "label": "目標掛死亡標記"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "第一位外來者",
+          "reminderRole": "fanggu",
+          "optional": true,
+          "defaultOn": false,
+          "label": "目標對象 第一位外來者"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "lunatic",
+      "name": "瘋子",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "攻擊1",
+          "reminderRole": "lunatic",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 攻擊1"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "攻擊2",
+          "reminderRole": "lunatic",
+          "optional": true,
+          "defaultOn": false,
+          "label": "目標對象 攻擊2"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "攻擊3",
+          "reminderRole": "lunatic",
+          "optional": true,
+          "defaultOn": false,
+          "label": "目標對象 攻擊3"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "snitch",
+      "name": "告密者",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first"
+        ]
+      },
+      "inputs": [],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action}"
+      },
+      "effects": [],
+      "notes": "passive — 試算表/被動，無輸入卡"
+    },
+    {
+      "id": "engineer",
+      "name": "工程師",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "princess",
+      "name": "公主",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "Doesn't Kill",
+          "reminderRole": "princess",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 Doesn't Kill"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "empath",
+      "name": "共情者",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "num",
+          "type": "number",
+          "label": "得知數字"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → {num}"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "widow",
+      "name": "寡婦",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "p1",
+          "type": "player",
+          "label": "目標玩家"
+        },
+        {
+          "key": "r1",
+          "type": "role",
+          "label": "對應角色"
+        }
+      ],
+      "sentence": {
+        "action": "投毒",
+        "template": "{actor} → {action} → {p1} → {r1}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "p1",
+          "reminderName": "中毒",
+          "reminderRole": "widow",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標玩家 中毒"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "p1",
+          "reminderName": "得知寡婦",
+          "reminderRole": "widow",
+          "optional": true,
+          "defaultOn": false,
+          "label": "目標玩家 得知寡婦"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "bureaucrat",
+      "name": "官員",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "票數x3",
+          "reminderRole": "bureaucrat",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 票數x3"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "butler",
+      "name": "管家",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "主人",
+          "reminderRole": "butler",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 主人"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "noble",
+      "name": "貴族",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "p1",
+          "type": "player",
+          "label": "善良玩家 1"
+        },
+        {
+          "key": "p2",
+          "type": "player",
+          "label": "善良玩家 2"
+        },
+        {
+          "key": "evilTarget",
+          "type": "player",
+          "label": "邪惡玩家"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → {p1} & {p2}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "p1",
+          "reminderName": "已得知",
+          "reminderRole": "noble",
+          "optional": true,
+          "defaultOn": true,
+          "label": "善良玩家 1 已得知"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "king",
+      "name": "國王",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "alhadikhia",
+      "name": "哈迪寂亞",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "p1",
+          "type": "player",
+          "label": "玩家 1"
+        },
+        {
+          "key": "p2",
+          "type": "player",
+          "label": "玩家 2"
+        },
+        {
+          "key": "p3",
+          "type": "player",
+          "label": "玩家 3"
+        }
+      ],
+      "sentence": {
+        "action": "殺害",
+        "template": "{actor} → {action} → {p1} & {p2} & {p3}"
+      },
+      "effects": [
+        {
+          "id": "kill",
+          "type": "setDead",
+          "targetFrom": "p1",
+          "value": true,
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標死亡"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "p1",
+          "reminderName": "1",
+          "reminderRole": "alhadikhia",
+          "optional": false,
+          "defaultOn": true,
+          "label": "玩家 1 1"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "p2",
+          "reminderName": "2",
+          "reminderRole": "alhadikhia",
+          "optional": false,
+          "defaultOn": true,
+          "label": "玩家 2 2"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "p3",
+          "reminderName": "3",
+          "reminderRole": "alhadikhia",
+          "optional": false,
+          "defaultOn": true,
+          "label": "玩家 3 3"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "p1",
+          "reminderName": "選擇「死亡」",
+          "reminderRole": "alhadikhia",
+          "optional": true,
+          "defaultOn": false,
+          "label": "玩家 1 選擇「死亡」"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "p1",
+          "reminderName": "選擇「活著」",
+          "reminderRole": "alhadikhia",
+          "optional": true,
+          "defaultOn": false,
+          "label": "玩家 1 選擇「活著」"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "scarletwoman",
+      "name": "紅唇女郎",
+      "enabled": true,
+      "when": {
+        "nights": []
+      },
+      "inputs": [
+        {
+          "key": "r1",
+          "type": "role",
+          "label": "惡魔角色"
+        }
+      ],
+      "sentence": {
+        "action": "成為",
+        "template": "{actor}成為[{r1}]"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "是惡魔",
+          "reminderRole": "scarletwoman",
+          "optional": true,
+          "defaultOn": true,
+          "label": "自身 是惡魔"
+        }
+      ],
+      "notes": "觸發：≥5 名玩家存活（不含旅行者）時惡魔死亡；非夜選擇；可選紀錄",
+      "activation": "optional",
+      "once": false
+    },
+    {
+      "id": "bonecollector",
+      "name": "集骨者",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "殺害",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "具有能力",
+          "reminderRole": "bonecollector",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 具有能力"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "spy",
+      "name": "間諜",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "note",
+          "type": "text",
+          "label": "備註（可留空）"
+        }
+      ],
+      "sentence": {
+        "action": "查看魔典",
+        "template": "{actor} → {action}"
+      },
+      "effects": [],
+      "notes": "每夜查看魔典；勿預設 └ 醉酒/中毒"
+    },
+    {
+      "id": "general",
+      "name": "將軍",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "res",
+          "type": "select",
+          "label": "優勢陣營",
+          "options": [
+            "善良",
+            "邪惡",
+            "均勢"
+          ]
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → {res}"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "zombuul",
+      "name": "殭怖",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "殺害",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [
+        {
+          "id": "kill",
+          "type": "setDead",
+          "targetFrom": "target",
+          "value": true,
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標死亡"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "今天死亡",
+          "reminderRole": "zombuul",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 今天死亡"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "死亡",
+          "reminderRole": "zombuul",
+          "bindTo": "kill",
+          "label": "目標掛死亡標記"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "godfather",
+      "name": "教父",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "外來者死亡",
+          "reminderRole": "godfather",
+          "optional": true,
+          "defaultOn": false,
+          "label": "外來者死亡（今日）"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "死亡",
+          "reminderRole": "godfather",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標死亡標記"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "professor",
+      "name": "教授",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "殺害",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "復活",
+          "reminderRole": "professor",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 復活"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "organgrinder",
+      "name": "街頭風琴手",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "res",
+          "type": "select",
+          "label": "是否醉酒",
+          "options": [
+            "是 (醉酒)",
+            "否 (清醒)"
+          ]
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → {res}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "將被處決",
+          "reminderRole": "organgrinder",
+          "optional": true,
+          "defaultOn": true,
+          "label": "自身 將被處決"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "puzzlemaster",
+      "name": "解謎大師",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "p1",
+          "type": "player",
+          "label": "目標玩家"
+        },
+        {
+          "key": "r1",
+          "type": "role",
+          "label": "對應角色"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → {p1} → {r1}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "p1",
+          "reminderName": "醉酒",
+          "reminderRole": "puzzlemaster",
+          "optional": true,
+          "defaultOn": true,
+          "label": "醉酒玩家標記"
+        }
+      ],
+      "notes": "passive — 無夜動喚醒，標記由說書人手動套用"
+    },
+    {
+      "id": "eviltwin",
+      "name": "鏡像雙子",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "p1",
+          "type": "player",
+          "label": "玩家 1"
+        },
+        {
+          "key": "p2",
+          "type": "player",
+          "label": "玩家 2"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → {p1} & {p2}"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "drunk",
+      "name": "酒鬼",
+      "enabled": true,
+      "when": {
+        "nights": []
+      },
+      "inputs": [
+        {
+          "key": "p1",
+          "type": "player",
+          "label": "酒鬼玩家"
+        },
+        {
+          "key": "r1",
+          "type": "role",
+          "label": "善良角色"
+        }
+      ],
+      "sentence": {
+        "action": "是",
+        "template": "{p1}是[酒鬼]"
+      },
+      "effects": [
+        {
+          "type": "setRole",
+          "targetFrom": "p1",
+          "roleFrom": "r1"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "p1",
+          "reminderName": "是酒鬼",
+          "reminderRole": "drunk",
+          "optional": true,
+          "defaultOn": true,
+          "label": "掛 是酒鬼 標記"
+        }
+      ],
+      "notes": "設置 A：已指派酒鬼時，將角色改為所选善良角色並掛「是酒鬼」；B：未指派且無標記時選善良玩家僅掛標記",
+      "activation": "setup",
+      "once": true
+    },
+    {
+      "id": "baron",
+      "name": "男爵",
+      "enabled": true,
+      "activation": "setup",
+      "once": true,
+      "when": {
+        "nights": []
+      },
+      "inputs": [],
+      "sentence": {
+        "action": "",
+        "template": "本局外來者人數為 {n} +2"
+      },
+      "effects": [],
+      "notes": "開局紀錄即可；本局外來者 +2"
+    },
+    {
+      "id": "legion",
+      "name": "軍團",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "殺害",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "即將處決",
+          "reminderRole": "legion",
+          "optional": true,
+          "defaultOn": true,
+          "label": "即將處決"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "死亡",
+          "reminderRole": "legion",
+          "optional": true,
+          "defaultOn": false,
+          "label": "死亡"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "barista",
+      "name": "咖啡師",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "p1",
+          "type": "player",
+          "label": "目標玩家"
+        },
+        {
+          "key": "res",
+          "type": "select",
+          "label": "附加效果",
+          "options": [
+            "解除醉酒中毒",
+            "能力發動兩次"
+          ]
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → {p1} / {res}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "p1",
+          "reminderName": "清醒&健康",
+          "reminderRole": "barista",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標玩家 清醒&健康"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "p1",
+          "reminderName": "能力x2",
+          "reminderRole": "barista",
+          "optional": true,
+          "defaultOn": false,
+          "label": "目標玩家 能力x2"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "kazali",
+      "name": "卡札力",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "p1",
+          "type": "player",
+          "label": "目標玩家"
+        },
+        {
+          "key": "r1",
+          "type": "role",
+          "label": "對應角色"
+        }
+      ],
+      "sentence": {
+        "action": "殺害",
+        "template": "{actor} → {action} → {p1} → {r1}"
+      },
+      "effects": [
+        {
+          "id": "kill",
+          "type": "setDead",
+          "targetFrom": "p1",
+          "value": true,
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標死亡"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "p1",
+          "reminderName": "死亡",
+          "reminderRole": "kazali",
+          "bindTo": "kill",
+          "label": "目標掛死亡標記"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "boffin",
+      "name": "科學怪人",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 醉酒"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "fearmonger",
+      "name": "恐懼之靈",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "恐懼",
+          "reminderRole": "fearmonger",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 恐懼"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "barber",
+      "name": "理髮師",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "p1",
+          "type": "player",
+          "label": "玩家 1"
+        },
+        {
+          "key": "p2",
+          "type": "player",
+          "label": "玩家 2"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → {p1} & {p2}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "p1",
+          "reminderName": "今晚剪頭髮",
+          "reminderRole": "barber",
+          "optional": true,
+          "defaultOn": true,
+          "label": "玩家 1 今晚剪頭髮"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "leviathan",
+      "name": "利維坦",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "第一天",
+          "reminderRole": "leviathan",
+          "optional": true,
+          "defaultOn": true,
+          "label": "自身 第一天"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "第二天",
+          "reminderRole": "leviathan",
+          "optional": true,
+          "defaultOn": false,
+          "label": "自身 第二天"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "第三天",
+          "reminderRole": "leviathan",
+          "optional": true,
+          "defaultOn": false,
+          "label": "自身 第三天"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "第四天",
+          "reminderRole": "leviathan",
+          "optional": true,
+          "defaultOn": false,
+          "label": "自身 第四天"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "第五天",
+          "reminderRole": "leviathan",
+          "optional": true,
+          "defaultOn": false,
+          "label": "自身 第五天"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "善良被處決",
+          "reminderRole": "leviathan",
+          "optional": true,
+          "defaultOn": false,
+          "label": "自身 善良被處決"
+        }
+      ],
+      "notes": "passive — 試算表/被動，無輸入卡"
+    },
+    {
+      "id": "lleech",
+      "name": "痢蛭",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "投毒",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [
+        {
+          "id": "kill",
+          "type": "setDead",
+          "targetFrom": "target",
+          "value": true,
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標死亡"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "中毒",
+          "reminderRole": "lleech",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 中毒"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "死亡",
+          "reminderRole": "lleech",
+          "bindTo": "kill",
+          "label": "目標掛死亡標記"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "alchemist",
+      "name": "煉金術士",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "r1",
+          "type": "role",
+          "label": "選擇角色"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → {r1}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "是煉金術士",
+          "reminderRole": "alchemist",
+          "optional": true,
+          "defaultOn": true,
+          "label": "自身 是煉金術士"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "mezepheles",
+      "name": "靈言師",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "word",
+          "type": "text",
+          "label": "記錄詞語/短語/問題"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → {word}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "轉為邪惡",
+          "reminderRole": "mezepheles",
+          "optional": true,
+          "defaultOn": true,
+          "label": "自身 轉為邪惡"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "harlot",
+      "name": "流鶯",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [
+        {
+          "id": "kill",
+          "type": "setDead",
+          "targetFrom": "target",
+          "value": true,
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標死亡"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "死亡",
+          "reminderRole": "harlot",
+          "bindTo": "kill",
+          "label": "目標掛死亡標記"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "innkeeper",
+      "name": "旅店老闆",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "p1",
+          "type": "player",
+          "label": "玩家 1"
+        },
+        {
+          "key": "p2",
+          "type": "player",
+          "label": "玩家 2"
+        }
+      ],
+      "sentence": {
+        "action": "保護",
+        "template": "{actor} → {action} → {p1} & {p2}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "p1",
+          "reminderName": "保護",
+          "reminderRole": "innkeeper",
+          "optional": false,
+          "defaultOn": true,
+          "label": "玩家 1 保護"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "p2",
+          "reminderName": "醉酒",
+          "reminderRole": "innkeeper",
+          "optional": false,
+          "defaultOn": true,
+          "label": "玩家 2 醉酒"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "damsel",
+      "name": "落難少女",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action}"
+      },
+      "effects": [],
+      "notes": "passive — 試算表/被動，無輸入卡"
+    },
+    {
+      "id": "pithag",
+      "name": "麻臉巫婆",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "p1",
+          "type": "player",
+          "label": "目標玩家"
+        },
+        {
+          "key": "r1",
+          "type": "role",
+          "label": "對應角色"
+        }
+      ],
+      "sentence": {
+        "action": "殺害",
+        "template": "{actor} → {action} → {p1} → {r1}"
+      },
+      "effects": [
+        {
+          "id": "kill",
+          "type": "setDead",
+          "targetFrom": "p1",
+          "value": true,
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標死亡"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "flowergirl",
+      "name": "賣花女孩",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "res",
+          "type": "select",
+          "label": "結果",
+          "options": [
+            "是 (Yes)",
+            "否 (No)"
+          ]
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → {res}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "惡魔投票",
+          "reminderRole": "flowergirl",
+          "optional": true,
+          "defaultOn": true,
+          "label": "自身 惡魔投票"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "惡魔未投票",
+          "reminderRole": "flowergirl",
+          "optional": true,
+          "defaultOn": false,
+          "label": "自身 惡魔未投票"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "goon",
+      "name": "莽夫",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "醉酒",
+          "reminderRole": "goon",
+          "optional": true,
+          "defaultOn": true,
+          "label": "自身 醉酒"
+        }
+      ],
+      "notes": "passive — 無夜動喚醒，標記由說書人手動套用"
+    },
+    {
+      "id": "hatter",
+      "name": "帽匠",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "殺害",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "今晚開茶會",
+          "reminderRole": "hatter",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 今晚開茶會"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "devilsadvocate",
+      "name": "魔鬼代言人",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "處決保護",
+          "reminderRole": "devilsadvocate",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 處決保護"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "magician",
+      "name": "魔術師",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "farmer",
+      "name": "農夫",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "殺害",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "seamstress",
+      "name": "女裁縫",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "p1",
+          "type": "player",
+          "label": "玩家 1"
+        },
+        {
+          "key": "p2",
+          "type": "player",
+          "label": "玩家 2"
+        },
+        {
+          "key": "res",
+          "type": "select",
+          "label": "結果判斷",
+          "options": [
+            "是 (Yes)",
+            "否 (No)"
+          ]
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → {p1} & {p2} → {res}"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "highpriestess",
+      "name": "女祭司",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "witch",
+      "name": "女巫",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "殺害",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "詛咒",
+          "reminderRole": "witch",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 詛咒"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "nodashii",
+      "name": "諾達鯴",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "投毒",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [
+        {
+          "id": "kill",
+          "type": "setDead",
+          "targetFrom": "target",
+          "value": true,
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標死亡"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "中毒",
+          "reminderRole": "nodashii",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 中毒"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "死亡",
+          "reminderRole": "nodashii",
+          "bindTo": "kill",
+          "label": "目標掛死亡標記"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "po",
+      "name": "珀",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "殺害",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [
+        {
+          "id": "kill",
+          "type": "setDead",
+          "targetFrom": "target",
+          "value": true,
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標死亡"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "攻擊x3",
+          "reminderRole": "po",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 攻擊x3"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "死亡",
+          "reminderRole": "po",
+          "bindTo": "kill",
+          "label": "目標掛死亡標記"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "pukka",
+      "name": "普卡",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "投毒",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 中毒"
+      },
+      "effects": [
+        {
+          "id": "kill",
+          "type": "setDead",
+          "targetFrom": "target",
+          "value": true,
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標死亡"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "中毒",
+          "reminderRole": "pukka",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 中毒"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "死亡",
+          "reminderRole": "pukka",
+          "bindTo": "kill",
+          "label": "目標掛死亡標記"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "knight",
+      "name": "騎士",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "p1",
+          "type": "player",
+          "label": "玩家 1"
+        },
+        {
+          "key": "p2",
+          "type": "player",
+          "label": "玩家 2"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → {p1} & {p2}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "p1",
+          "reminderName": "已得知",
+          "reminderRole": "knight",
+          "optional": true,
+          "defaultOn": true,
+          "label": "玩家 1 已得知"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "balloonist",
+      "name": "氣球駕駛員",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "標記玩家"
+        },
+        {
+          "key": "category",
+          "type": "select",
+          "label": "角色類別",
+          "options": [
+            "爪牙",
+            "外來者",
+            "惡魔",
+            "旅行者",
+            "鎮民"
+          ]
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "已得知(爪牙)",
+          "reminderRole": "balloonist",
+          "optional": true,
+          "defaultOn": false,
+          "label": "標記 已得知(爪牙)"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "已得知(外來者)",
+          "reminderRole": "balloonist",
+          "optional": true,
+          "defaultOn": false,
+          "label": "標記 已得知(外來者)"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "已得知(惡魔)",
+          "reminderRole": "balloonist",
+          "optional": true,
+          "defaultOn": false,
+          "label": "標記 已得知(惡魔)"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "已得知(旅行者)",
+          "reminderRole": "balloonist",
+          "optional": true,
+          "defaultOn": false,
+          "label": "標記 已得知(旅行者)"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "已得知(鎮民)",
+          "reminderRole": "balloonist",
+          "optional": true,
+          "defaultOn": false,
+          "label": "標記 已得知(鎮民)"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "thief",
+      "name": "竊賊",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "負數票",
+          "reminderRole": "thief",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 負數票"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "exorcist",
+      "name": "驅魔人",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "monk",
+      "name": "僧侶",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "otherPlayer",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "保護",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "保護",
+          "reminderRole": "monk",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 保護"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "shabaloth",
+      "name": "沙巴洛斯",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "p1",
+          "type": "player",
+          "label": "玩家 1"
+        },
+        {
+          "key": "p2",
+          "type": "player",
+          "label": "玩家 2"
+        }
+      ],
+      "sentence": {
+        "action": "殺害",
+        "template": "{actor} → {action} → {p1} & {p2}"
+      },
+      "effects": [
+        {
+          "id": "kill",
+          "type": "setDead",
+          "targetFrom": "p1",
+          "value": true,
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標死亡"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "p1",
+          "reminderName": "復活",
+          "reminderRole": "shabaloth",
+          "optional": false,
+          "defaultOn": true,
+          "label": "玩家 1 復活"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "p1",
+          "reminderName": "死亡",
+          "reminderRole": "shabaloth",
+          "bindTo": "kill",
+          "label": "目標掛死亡標記"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "bountyhunter",
+      "name": "賞金獵人",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "已得知",
+          "reminderRole": "bountyhunter",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 已得知"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "oracle",
+      "name": "神諭者",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "num",
+          "type": "number",
+          "label": "得知數字"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → {num}"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "amnesiac",
+      "name": "失憶者",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "ogre",
+      "name": "食人魔",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 醉酒"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "朋友",
+          "reminderRole": "ogre",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 朋友"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "cannibal",
+      "name": "食人族",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [],
+      "sentence": {
+        "action": "投毒",
+        "template": "{actor} → {action}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "中毒",
+          "reminderRole": "cannibal",
+          "optional": true,
+          "defaultOn": false,
+          "label": "自身中毒"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "最後被處死",
+          "reminderRole": "cannibal",
+          "optional": true,
+          "defaultOn": false,
+          "label": "最後被處死（參考）"
+        }
+      ],
+      "notes": "passive — 無夜動喚醒，標記由說書人手動套用"
+    },
+    {
+      "id": "steward",
+      "name": "事務官",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "已得知",
+          "reminderRole": "steward",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 已得知"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "courtier",
+      "name": "侍臣",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "醉酒玩家"
+        },
+        {
+          "key": "r1",
+          "type": "role",
+          "label": "選擇角色"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 醉酒"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "醉酒 1",
+          "reminderRole": "courtier",
+          "optional": true,
+          "defaultOn": true,
+          "label": "醉酒標記 醉酒 1"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "醉酒 2",
+          "reminderRole": "courtier",
+          "optional": true,
+          "defaultOn": false,
+          "label": "醉酒標記 醉酒 2"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "醉酒 3",
+          "reminderRole": "courtier",
+          "optional": true,
+          "defaultOn": false,
+          "label": "醉酒標記 醉酒 3"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "chambermaid",
+      "name": "侍女",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "num",
+          "type": "number",
+          "label": "得知數字"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → {num}"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "ravenkeeper",
+      "name": "守鴉人",
+      "enabled": true,
+      "when": {
+        "nights": []
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "守鴉人選擇"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → 死亡後得知 {target}"
+      },
+      "effects": [],
+      "notes": "觸發：該角色今晚死亡才醒來；可選紀錄",
+      "activation": "optional"
+    },
+    {
+      "id": "nightwatchman",
+      "name": "守夜人",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "mathematician",
+      "name": "數學家",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "num",
+          "type": "number",
+          "label": "得知數字"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → {num}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "異常",
+          "reminderRole": "mathematician",
+          "optional": true,
+          "defaultOn": true,
+          "label": "自身 異常"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "sailor",
+      "name": "水手",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 醉酒"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "醉酒",
+          "reminderRole": "sailor",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 醉酒"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "undertaker",
+      "name": "送葬者",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "r1",
+          "type": "role",
+          "label": "處決角色"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → 今日處決 {r1}"
+      },
+      "effects": [],
+      "notes": "次夜起；當天有人死於處決才有資訊；勿 └ 自身處決"
+    },
+    {
+      "id": "marionette",
+      "name": "提線木偶",
+      "enabled": true,
+      "activation": "setup",
+      "once": true,
+      "when": {
+        "nights": []
+      },
+      "inputs": [
+        {
+          "key": "p1",
+          "type": "player",
+          "label": "提線木偶玩家"
+        },
+        {
+          "key": "r1",
+          "type": "role",
+          "label": "善良角色"
+        }
+      ],
+      "sentence": {
+        "action": "是",
+        "template": "{p1}是[提線木偶]"
+      },
+      "effects": [
+        {
+          "type": "setRole",
+          "targetFrom": "p1",
+          "roleFrom": "r1"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "p1",
+          "reminderName": "是提線木偶",
+          "reminderRole": "marionette",
+          "optional": true,
+          "defaultOn": true,
+          "label": "掛 是提線木偶 標記"
+        }
+      ],
+      "notes": "設置 A：已指派提線木偶時，將角色改為所选善良角色並掛「是提線木偶」；B：未指派且無標記時選善良玩家僅掛標記"
+    },
+    {
+      "id": "poisoner",
+      "name": "投毒者",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "alivePlayer",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "投毒",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 中毒"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "中毒",
+          "reminderRole": "poisoner",
+          "optional": true,
+          "defaultOn": true,
+          "unique": true,
+          "label": "目標對象 中毒"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "librarian",
+      "name": "圖書管理員",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "p1",
+          "type": "player",
+          "label": "玩家 1"
+        },
+        {
+          "key": "p2",
+          "type": "player",
+          "label": "玩家 2"
+        },
+        {
+          "key": "r1",
+          "type": "role",
+          "label": "對應角色"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → {p1} & {p2} 其中一位是 {r1}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "p1",
+          "reminderName": "外來者",
+          "reminderRole": "librarian",
+          "optional": false,
+          "defaultOn": true,
+          "label": "玩家 1 外來者"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "p2",
+          "reminderName": "非外來者",
+          "reminderRole": "librarian",
+          "optional": false,
+          "defaultOn": true,
+          "label": "玩家 2 非外來者"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "vigormortis",
+      "name": "亡骨魔",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "投毒",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [
+        {
+          "id": "kill",
+          "type": "setDead",
+          "targetFrom": "target",
+          "value": true,
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標死亡"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "中毒",
+          "reminderRole": "vigormortis",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 中毒"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "具有能力",
+          "reminderRole": "vigormortis",
+          "optional": true,
+          "defaultOn": false,
+          "label": "目標對象 具有能力"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "死亡",
+          "reminderRole": "vigormortis",
+          "bindTo": "kill",
+          "label": "目標掛死亡標記"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "wraith",
+      "name": "亡魂",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "vizier",
+      "name": "維齊爾",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first"
+        ]
+      },
+      "inputs": [],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action}"
+      },
+      "effects": [],
+      "notes": "passive — 試算表/被動，無輸入卡"
+    },
+    {
+      "id": "plaguedoctor",
+      "name": "瘟疫醫生",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "殺害",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "(說書人能力)",
+          "reminderRole": "plaguedoctor",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 (說書人能力)"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "vortox",
+      "name": "渦流",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "殺害",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [
+        {
+          "id": "kill",
+          "type": "setDead",
+          "targetFrom": "target",
+          "value": true,
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標死亡"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "死亡",
+          "reminderRole": "vortox",
+          "bindTo": "kill",
+          "label": "目標掛死亡標記"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "wizard",
+      "name": "巫師",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "word",
+          "type": "text",
+          "label": "記錄詞語/短語/問題"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → {word}"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "snakecharmer",
+      "name": "舞蛇人",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "投毒",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 中毒"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "中毒",
+          "reminderRole": "snakecharmer",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 中毒"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "cerenovus",
+      "name": "洗腦師",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "p1",
+          "type": "player",
+          "label": "目標玩家"
+        },
+        {
+          "key": "r1",
+          "type": "role",
+          "label": "對應角色"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → {p1} → {r1}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "p1",
+          "reminderName": "瘋狂",
+          "reminderRole": "cerenovus",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標玩家 瘋狂"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "washerwoman",
+      "name": "洗衣婦",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "p1",
+          "type": "player",
+          "label": "玩家 1"
+        },
+        {
+          "key": "p2",
+          "type": "player",
+          "label": "玩家 2"
+        },
+        {
+          "key": "r1",
+          "type": "role",
+          "label": "對應角色"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → {p1} & {p2} 其中一位是 {r1}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "p1",
+          "reminderName": "鎮民",
+          "reminderRole": "washerwoman",
+          "optional": false,
+          "defaultOn": true,
+          "label": "玩家 1 鎮民"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "p2",
+          "reminderName": "非鎮民",
+          "reminderRole": "washerwoman",
+          "optional": false,
+          "defaultOn": true,
+          "label": "玩家 2 非鎮民"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "sage",
+      "name": "賢者",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "xaan",
+      "name": "限",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "投毒",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 中毒"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "第一晚",
+          "reminderRole": "xaan",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 第一晚"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "第二晚",
+          "reminderRole": "xaan",
+          "optional": true,
+          "defaultOn": false,
+          "label": "目標對象 第二晚"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "第三晚",
+          "reminderRole": "xaan",
+          "optional": true,
+          "defaultOn": false,
+          "label": "目標對象 第三晚"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "X",
+          "reminderRole": "xaan",
+          "optional": true,
+          "defaultOn": false,
+          "label": "目標對象 X"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
     {
       "id": "imp",
       "name": "小惡魔",
       "enabled": true,
-      "when": { "nights": ["other"] },
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
       "inputs": [
-        { "key": "target", "type": "player", "label": "目標對象", "required": true }
+        {
+          "key": "target",
+          "type": "alivePlayer",
+          "label": "目標對象"
+        }
       ],
       "sentence": {
-        "action": "使用能力",
+        "action": "殺害",
         "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
       },
       "effects": [
@@ -29,92 +3646,1167 @@
           "reminderName": "死亡",
           "reminderRole": "imp",
           "bindTo": "kill",
+          "unique": true,
           "label": "目標掛死亡標記"
         }
       ],
-      "notes": "勾選「目標死亡」時：設為死亡（帷幕）並掛上小惡魔「死亡」標記；自殺時 target=自己"
+      "notes": "主線：殺害目標。自殺轉生（爪牙成為小惡魔）另條／可選紀錄；可選 effect 關閉時無 └"
     },
     {
-      "id": "poisoner",
-      "name": "投毒者",
+      "id": "lilmonsta",
+      "name": "小怪寶",
       "enabled": true,
-      "when": { "nights": ["other"] },
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
       "inputs": [
-        { "key": "target", "type": "player", "label": "目標對象", "required": true }
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
       ],
       "sentence": {
-        "action": "使用能力",
-        "template": "{actor} → {action} → 選擇 {target} → {target} 中毒"
+        "action": "殺害",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [
+        {
+          "id": "kill",
+          "type": "setDead",
+          "targetFrom": "target",
+          "value": true,
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標死亡"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "是惡魔",
+          "reminderRole": "lilmonsta",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 是惡魔"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "死亡",
+          "reminderRole": "lilmonsta",
+          "bindTo": "kill",
+          "label": "目標掛死亡標記"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "pixie",
+      "name": "小精靈",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "r1",
+          "type": "role",
+          "label": "選擇角色"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → {r1}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "具有能力",
+          "reminderRole": "pixie",
+          "optional": true,
+          "defaultOn": true,
+          "label": "自身 具有能力"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "瘋狂",
+          "reminderRole": "pixie",
+          "optional": true,
+          "defaultOn": false,
+          "label": "自身 瘋狂"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "cacklejack",
+      "name": "笑匠",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → 選擇 {target}"
       },
       "effects": [
         {
           "type": "addReminder",
           "targetFrom": "target",
-          "reminderName": "中毒",
-          "reminderRole": "poisoner",
+          "reminderName": "不是我",
+          "reminderRole": "cacklejack",
           "optional": true,
           "defaultOn": true,
-          "label": "目標中毒"
+          "label": "目標對象 不是我"
         }
       ],
-      "notes": ""
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
     },
     {
-      "id": "washerwoman",
-      "name": "洗衣婦",
+      "id": "sweetheart",
+      "name": "心上人",
       "enabled": true,
-      "when": { "nights": ["first"] },
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "醉酒",
+          "reminderRole": "sweetheart",
+          "optional": true,
+          "defaultOn": true,
+          "label": "自身 醉酒"
+        }
+      ],
+      "notes": "passive — 試算表/被動，無輸入卡"
+    },
+    {
+      "id": "tinker",
+      "name": "修補匠",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
       "inputs": [
-        { "key": "p1", "type": "player", "label": "玩家 1", "required": true },
-        { "key": "p2", "type": "player", "label": "玩家 2", "required": true },
-        { "key": "r1", "type": "role", "label": "對應角色", "required": true }
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "殺害",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "死亡",
+          "reminderRole": "tinker",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 死亡"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "shugenja",
+      "name": "修行者",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "dir",
+          "type": "select",
+          "label": "方向",
+          "options": [
+            "左/順時針",
+            "右/逆時針",
+            "相同"
+          ]
+        }
       ],
       "sentence": {
         "action": "得知",
-        "template": "{actor} → {action} → {p1} & {p2} 其中一位是 {r1}"
+        "template": "{actor} → {action} → {dir}"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "apprentice",
+      "name": "學徒",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "是學徒",
+          "reminderRole": "apprentice",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 是學徒"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "huntsman",
+      "name": "巡山人",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "yaggababble",
+      "name": "牙嘎巴布",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "word",
+          "type": "text",
+          "label": "記錄詞語/短語/問題"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → {word}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "死亡",
+          "reminderRole": "yaggababble",
+          "optional": true,
+          "defaultOn": true,
+          "label": "自身 死亡"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "cultleader",
+      "name": "異教領袖",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "minstrel",
+      "name": "吟遊詩人",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 醉酒"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "所有人醉酒",
+          "reminderRole": "minstrel",
+          "optional": true,
+          "defaultOn": true,
+          "label": "自身 所有人醉酒"
+        }
+      ],
+      "notes": "passive — 無夜動喚醒，標記由說書人手動套用"
+    },
+    {
+      "id": "hermit",
+      "name": "隱士",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "1",
+          "reminderRole": "hermit",
+          "optional": true,
+          "defaultOn": true,
+          "label": "能力 1"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "2",
+          "reminderRole": "hermit",
+          "optional": true,
+          "defaultOn": false,
+          "label": "能力 2"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "3",
+          "reminderRole": "hermit",
+          "optional": true,
+          "defaultOn": false,
+          "label": "能力 3"
+        }
+      ],
+      "notes": "passive — 無夜動喚醒，標記由說書人手動套用"
+    },
+    {
+      "id": "poppygrower",
+      "name": "罌粟種植者",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "殺害",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "邪惡相認",
+          "reminderRole": "poppygrower",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 邪惡相認"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "harpy",
+      "name": "鷹身女妖",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "p1",
+          "type": "player",
+          "label": "玩家 1"
+        },
+        {
+          "key": "p2",
+          "type": "player",
+          "label": "玩家 2"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → {p1} & {p2}"
       },
       "effects": [
         {
           "type": "addReminder",
           "targetFrom": "p1",
-          "reminderName": "鎮民",
-          "reminderRole": "washerwoman",
-          "label": "玩家1 鎮民"
+          "reminderName": "瘋狂",
+          "reminderRole": "harpy",
+          "optional": false,
+          "defaultOn": true,
+          "label": "玩家 1 瘋狂"
         },
         {
           "type": "addReminder",
           "targetFrom": "p2",
-          "reminderName": "非鎮民",
-          "reminderRole": "washerwoman",
-          "label": "玩家2 非鎮民"
+          "reminderName": "目標",
+          "reminderRole": "harpy",
+          "optional": false,
+          "defaultOn": true,
+          "label": "玩家 2 目標"
         }
       ],
-      "notes": "首夜資訊：在魔典上為兩名玩家分別掛上鎮民／非鎮民標記"
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
     },
     {
-      "id": "monk",
-      "name": "僧侶",
+      "id": "moonchild",
+      "name": "月之子",
       "enabled": true,
-      "when": { "nights": ["other"] },
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
       "inputs": [
-        { "key": "target", "type": "player", "label": "目標對象", "required": true }
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
       ],
       "sentence": {
-        "action": "使用能力",
-        "template": "{actor} → {action} → 選擇 {target} → {target} 受保護"
+        "action": "得知",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
       },
       "effects": [
         {
           "type": "addReminder",
           "targetFrom": "target",
-          "reminderName": "保護",
-          "reminderRole": "monk",
+          "reminderName": "死亡",
+          "reminderRole": "moonchild",
           "optional": true,
           "defaultOn": true,
-          "label": "目標受保護"
+          "label": "目標對象 死亡"
         }
       ],
-      "notes": ""
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "acrobat",
+      "name": "雜技演員",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "殺害",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 醉酒"
+      },
+      "effects": [
+        {
+          "id": "kill",
+          "type": "setDead",
+          "targetFrom": "target",
+          "value": true,
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標死亡"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "死亡",
+          "reminderRole": "acrobat",
+          "bindTo": "kill",
+          "label": "目標掛死亡標記"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "juggler",
+      "name": "雜耍藝人",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "num",
+          "type": "number",
+          "label": "得知數字"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → {num}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "正確",
+          "reminderRole": "juggler",
+          "optional": true,
+          "defaultOn": true,
+          "label": "自身 正確"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "gossip",
+      "name": "造謠者",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "殺害",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "死亡",
+          "reminderRole": "gossip",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 死亡"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "fortuneteller",
+      "name": "占卜師",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "p1",
+          "type": "player",
+          "label": "玩家 1"
+        },
+        {
+          "key": "p2",
+          "type": "player",
+          "label": "玩家 2"
+        },
+        {
+          "key": "res",
+          "type": "select",
+          "label": "結果判斷",
+          "options": [
+            "是",
+            "否"
+          ]
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → 查驗 {p1} & {p2} → {res}"
+      },
+      "effects": [],
+      "notes": "res 用 是/否；「始終將…視為惡魔」僅開局一次（另記／可選紀錄），勿每夜掛標記"
+    },
+    {
+      "id": "summoner",
+      "name": "召喚師",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "第一晚",
+          "reminderRole": "summoner",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 第一晚"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "第二晚",
+          "reminderRole": "summoner",
+          "optional": true,
+          "defaultOn": false,
+          "label": "目標對象 第二晚"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "第三晚",
+          "reminderRole": "summoner",
+          "optional": true,
+          "defaultOn": false,
+          "label": "目標對象 第三晚"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "philosopher",
+      "name": "哲學家",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → 選擇 {target} → {target} 醉酒"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "是哲學家",
+          "reminderRole": "philosopher",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標對象 是哲學家"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "醉酒",
+          "reminderRole": "philosopher",
+          "optional": true,
+          "defaultOn": false,
+          "label": "目標對象 醉酒"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "Drunk",
+          "reminderRole": "philosopher",
+          "optional": true,
+          "defaultOn": false,
+          "label": "目標對象 Drunk"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "Is the Philosopher",
+          "reminderRole": "philosopher",
+          "optional": true,
+          "defaultOn": false,
+          "label": "目標對象 Is the Philosopher"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "clockmaker",
+      "name": "鐘錶匠",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "num",
+          "type": "number",
+          "label": "得知數字"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → {num}"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "dreamer",
+      "name": "築夢師",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "p1",
+          "type": "otherPlayer",
+          "label": "目標玩家"
+        },
+        {
+          "key": "r1",
+          "type": "role",
+          "label": "善良角色"
+        },
+        {
+          "key": "r2",
+          "type": "role",
+          "label": "邪惡角色"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → {p1} → {r1} / {r2}"
+      },
+      "effects": [],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "bishop",
+      "name": "主教",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "選擇",
+        "template": "{actor} → {action} → 選擇 {target}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "提名善良",
+          "reminderRole": "bishop",
+          "optional": true,
+          "defaultOn": true,
+          "label": "自身 提名善良"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "actor",
+          "reminderName": "提名邪惡",
+          "reminderRole": "bishop",
+          "optional": true,
+          "defaultOn": false,
+          "label": "自身 提名邪惡"
+        }
+      ],
+      "notes": "passive — 無夜動喚醒，標記由說書人手動套用"
+    },
+    {
+      "id": "grandmother",
+      "name": "祖母",
+      "enabled": true,
+      "when": {
+        "nights": [
+          "first",
+          "other"
+        ]
+      },
+      "inputs": [
+        {
+          "key": "p1",
+          "type": "player",
+          "label": "目標玩家"
+        },
+        {
+          "key": "r1",
+          "type": "role",
+          "label": "對應角色"
+        }
+      ],
+      "sentence": {
+        "action": "得知",
+        "template": "{actor} → {action} → {p1} → {r1}"
+      },
+      "effects": [
+        {
+          "type": "addReminder",
+          "targetFrom": "p1",
+          "reminderName": "孫子",
+          "reminderRole": "grandmother",
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標玩家 孫子"
+        }
+      ],
+      "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+    },
+    {
+      "id": "slayer",
+      "name": "獵手",
+      "enabled": true,
+      "activation": "optional",
+      "once": true,
+      "when": {
+        "nights": []
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "alivePlayer",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "獵殺",
+        "template": "{actor} → {action} → {target}"
+      },
+      "effects": [
+        {
+          "id": "kill",
+          "type": "setDead",
+          "targetFrom": "target",
+          "value": true,
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標死亡"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "死亡",
+          "reminderRole": "slayer",
+          "bindTo": "kill",
+          "label": "目標掛死亡標記"
+        }
+      ],
+      "notes": "白天公開使用，每局一次；目標為惡魔才死亡；可選紀錄"
+    },
+    {
+      "id": "gunslinger",
+      "name": "槍手",
+      "enabled": true,
+      "activation": "optional",
+      "once": false,
+      "when": {
+        "nights": []
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "alivePlayer",
+          "label": "目標對象"
+        }
+      ],
+      "sentence": {
+        "action": "槍殺",
+        "template": "{actor} → {action} → {target}"
+      },
+      "effects": [
+        {
+          "id": "kill",
+          "type": "setDead",
+          "targetFrom": "target",
+          "value": true,
+          "optional": true,
+          "defaultOn": true,
+          "label": "目標死亡"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "target",
+          "reminderName": "死亡",
+          "reminderRole": "gunslinger",
+          "bindTo": "kill",
+          "label": "目標掛死亡標記"
+        }
+      ],
+      "notes": "白天首次投票統計後可選一名剛投票者；可選紀錄"
+    },
+    {
+      "id": "soldier",
+      "name": "士兵",
+      "enabled": true,
+      "activation": "optional",
+      "once": false,
+      "when": {
+        "nights": []
+      },
+      "inputs": [
+        {
+          "key": "target",
+          "type": "player",
+          "label": "士兵"
+        }
+      ],
+      "sentence": {
+        "action": "",
+        "template": "惡魔選擇了 {target}",
+        "fixedResults": [
+          "無效"
+        ]
+      },
+      "effects": [],
+      "notes": "被動：惡魔負面能力落在士兵上時記錄；可選紀錄"
+    },
+    {
+      "id": "virgin",
+      "name": "貞潔者",
+      "enabled": true,
+      "activation": "optional",
+      "once": true,
+      "when": {
+        "nights": []
+      },
+      "inputs": [
+        {
+          "key": "nominator",
+          "type": "player",
+          "label": "提名者"
+        }
+      ],
+      "sentence": {
+        "action": "提名",
+        "template": "{nominator}提名 {actor}"
+      },
+      "effects": [
+        {
+          "id": "kill",
+          "type": "setDead",
+          "targetFrom": "nominator",
+          "value": true,
+          "optional": true,
+          "defaultOn": true,
+          "label": "提名者被處決死亡"
+        },
+        {
+          "type": "addReminder",
+          "targetFrom": "nominator",
+          "reminderName": "死亡",
+          "reminderRole": "virgin",
+          "bindTo": "kill",
+          "label": "提名者掛死亡標記"
+        }
+      ],
+      "notes": "首次被提名且提名者為鎮民 → 提名者立刻處決；可選紀錄"
+    },
+    {
+      "id": "saint",
+      "name": "聖徒",
+      "enabled": true,
+      "activation": "optional",
+      "once": false,
+      "when": {
+        "nights": []
+      },
+      "inputs": [
+        {
+          "key": "align",
+          "type": "select",
+          "label": "陣營",
+          "options": [
+            "善良",
+            "邪惡"
+          ]
+        }
+      ],
+      "sentence": {
+        "action": "",
+        "template": "{actor}死於處決，[{align}]陣營落敗"
+      },
+      "effects": [],
+      "notes": "死於處決 → 所屬陣營落敗；可選紀錄"
+    },
+    {
+      "id": "mayor",
+      "name": "鎮長",
+      "enabled": true,
+      "activation": "optional",
+      "once": false,
+      "when": {
+        "nights": []
+      },
+      "inputs": [
+        {
+          "key": "scenario",
+          "type": "select",
+          "label": "情境",
+          "options": [
+            "三人獲勝",
+            "代死"
+          ]
+        },
+        {
+          "key": "align",
+          "type": "select",
+          "label": "陣營",
+          "options": [
+            "善良",
+            "邪惡"
+          ]
+        },
+        {
+          "key": "target",
+          "type": "player",
+          "label": "代替死亡玩家"
+        }
+      ],
+      "sentence": {
+        "action": "",
+        "template": "{actor}鎮長情境"
+      },
+      "effects": [
+        {
+          "id": "kill",
+          "type": "setDead",
+          "targetFrom": "target",
+          "value": true,
+          "optional": true,
+          "defaultOn": false,
+          "label": "代替死亡"
+        }
+      ],
+      "notes": "1) 三人存活且白天無處決 → 陣營獲勝 2) 夜裡將死時可能他人代死；可選紀錄"
     }
-  ]
+  ],
+  "sourceNote": "TB skill-card patches applied via scripts/apply-tb-skill-cards-to-rules.js"
 }

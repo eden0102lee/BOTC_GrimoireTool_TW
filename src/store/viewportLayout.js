@@ -1,7 +1,37 @@
 /**
  * GStone-style viewport unit: landscape → vh, portrait → vw.
- * Keeps the seat circle sized to the shorter axis on each orientation.
+ * Layout profile classes for LeftPanels and typography tweaks.
  */
+
+export function getViewportSize() {
+  if (typeof window === "undefined") {
+    return { width: 402, height: 874 };
+  }
+  const vv = window.visualViewport;
+  return {
+    width: vv ? vv.width : window.innerWidth,
+    height: vv ? vv.height : window.innerHeight,
+  };
+}
+
+export function isPortraitLayout(width, height) {
+  return height >= width;
+}
+
+export function applyLayoutProfileClass(width, height) {
+  if (typeof document === "undefined") return;
+  const portrait = isPortraitLayout(width, height);
+  document.documentElement.classList.toggle("layout-portrait", portrait);
+  document.documentElement.classList.toggle("layout-iphone16pro", portrait);
+  document.documentElement.classList.toggle("layout-landscape", !portrait);
+}
+
+export function seatBaseSize(playerCount) {
+  if (playerCount < 7) return 18;
+  if (playerCount <= 10) return 16;
+  if (playerCount <= 15) return 14;
+  return 12;
+}
 
 export function resolveViewportUnit(
   width = typeof window !== "undefined" ? window.innerWidth : 1024,
@@ -12,10 +42,9 @@ export function resolveViewportUnit(
 
 export function syncViewportUnit(store) {
   if (typeof window === "undefined" || !store) return;
-  const unit = resolveViewportUnit(
-    window.visualViewport ? window.visualViewport.width : window.innerWidth,
-    window.visualViewport ? window.visualViewport.height : window.innerHeight,
-  );
+  const { width, height } = getViewportSize();
+  applyLayoutProfileClass(width, height);
+  const unit = resolveViewportUnit(width, height);
   if (store.state.grimoire.unit !== unit) {
     store.commit("setUnit", unit);
   }

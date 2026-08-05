@@ -5,6 +5,7 @@ const NEWPLAYER = {
   name: "",
   id: "",
   role: {},
+  disguiseRole: {},
   reminders: [],
   isVoteless: false,
   isDead: false,
@@ -104,6 +105,13 @@ const actions = {
     }
     commit("set", players);
     commit("setBluff");
+  },
+  clearReminders({ state, commit }) {
+    state.players.forEach((player) => {
+      if (player.reminders && player.reminders.length) {
+        commit("update", { player, property: "reminders", value: [] });
+      }
+    });
   }
 };
 

@@ -122,6 +122,14 @@
       {{ $t("recorder.sentenceHint") }}
     </p>
 
+    <label class="result-line-toggle">
+      <input type="checkbox" v-model="useResultLine" />
+      <span>{{ $t("recorder.manualResultLine") }}</span>
+    </label>
+    <p v-if="useResultLine && resultLineText" class="result-line-preview">
+      └ {{ resultLineText }}
+    </p>
+
     <div class="actions">
       <button type="button" class="btn clear" @click="onDismiss">
         {{ $t("recorder.dismissManual") }}
@@ -159,10 +167,12 @@ export default {
     editEntryId: { type: String, default: null },
     linkedMode: { type: Boolean, default: false },
     excludePlayerIndex: { type: Number, default: -1 },
+    initialUseResultLine: { type: Boolean, default: false },
   },
   data() {
     return {
       tokens: [],
+      useResultLine: false,
       verbs: ["選擇", "得知", "標記", "提名", "使用能力", "白天行動", "其他"],
       statuses: MANUAL_STATUSES,
     };
@@ -176,6 +186,19 @@ export default {
         .map((t) => (t.value != null ? String(t.value).trim() : ""))
         .filter(Boolean)
         .join(" ");
+    },
+    mainSentence() {
+      return this.tokens
+        .filter((t) => t.type !== "input")
+        .map((t) => (t.value != null ? String(t.value).trim() : ""))
+        .filter(Boolean)
+        .join(" ");
+    },
+    resultLineText() {
+      return this.tokens
+        .filter((t) => t.type === "input" && String(t.value).trim())
+        .map((t) => String(t.value).trim())
+        .join(" ｜ ");
     },
     canWrite() {
       return this.tokens.some(
@@ -196,6 +219,14 @@ export default {
       immediate: true,
       handler() {
         this.syncTokensFromInitial();
+      },
+    },
+    initialUseResultLine: {
+      immediate: true,
+      handler(val) {
+        if (!this.editEntryId) {
+          this.useResultLine = !!val;
+        }
       },
     },
     linkedMode() {
@@ -221,8 +252,10 @@ export default {
           value: t.value != null ? t.value : "",
           roleId: t.roleId || null,
         }));
+        this.useResultLine = !!this.initialUseResultLine;
       } else if (!this.editEntryId) {
         this.tokens = [];
+        this.useResultLine = false;
       }
     },
     label(p, i) {
@@ -290,6 +323,7 @@ export default {
     },
     reset() {
       this.tokens = [];
+      this.useResultLine = false;
       this.clearPreview();
     },
     onDismiss() {
@@ -323,14 +357,22 @@ export default {
       const action =
         actions[0] || statuses[0] || (inputs.length ? "備註" : "行動");
 
+      let message = this.sentence;
+      let detail = null;
+      if (this.useResultLine && inputs.length) {
+        message = this.mainSentence || inputs.join(" ｜ ");
+        detail = inputs.join(" ｜ ");
+      }
+
       this.$emit("record", {
         actor,
         action,
         target: players[1] || "無",
-        detail: inputs.length ? inputs.join(" ｜ ") : null,
+        detail,
         status: null,
-        message: this.sentence,
+        message,
         formSnapshot: {
+          useResultLine: this.useResultLine,
           tokens: this.tokens.map((t) => ({
             type: t.type,
             value: t.value,
@@ -517,6 +559,27 @@ export default {
     opacity: 0.65;
     margin-bottom: 2px;
   }
+}
+
+.result-line-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 6px;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  input {
+    margin: 0;
+  }
+}
+
+.result-line-preview {
+  margin: 0 0 8px;
+  padding: 4px 8px;
+  font-size: 0.72rem;
+  opacity: 0.8;
+  border-left: 2px solid rgba(255, 200, 80, 0.35);
 }
 
 .actions {
