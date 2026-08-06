@@ -380,4 +380,8 @@ function main() {
   console.log(`total rules: ${data.rules.length}`);
 }
 
-main();
+if (require.main === module) {
+  main();
+}
+
+module.exports = { PATCHES, NEW_RULES, deepMergeRule, main };

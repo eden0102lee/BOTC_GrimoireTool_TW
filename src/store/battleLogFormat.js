@@ -456,6 +456,15 @@ export function buildNaturalRoleMessage(rule, { players, actorIndex, formData, e
   } else if (
     (action === "得知" || template.includes("死亡後")) &&
     template.includes("死亡後") &&
+    fd.p1 &&
+    fd.p2
+  ) {
+    const p1 = labelForKey(players, fd, "p1");
+    const p2 = labelForKey(players, fd, "p2");
+    main = `${actor}死亡後得知 ${joinPlayerLabels(p1, p2)}其中一位是惡魔`;
+  } else if (
+    (action === "得知" || template.includes("死亡後")) &&
+    template.includes("死亡後") &&
     fd.target
   ) {
     const t = labelForKey(players, fd, "target");
@@ -466,6 +475,15 @@ export function buildNaturalRoleMessage(rule, { players, actorIndex, formData, e
     fd.r1
   ) {
     main = `${actor}得知 今日處決 [${fd.r1}]`;
+  } else if (
+    fd.p1 &&
+    fd.p2 &&
+    fd.num != null &&
+    String(fd.num).trim() !== ""
+  ) {
+    const p1 = labelForKey(players, fd, "p1");
+    const p2 = labelForKey(players, fd, "p2");
+    main = `${actor}得知 ${joinPlayerLabels(p1, p2)}中有 [${fd.num}] 位因自身能力醒來`;
   } else if (action === "得知" && fd.num != null && String(fd.num).trim() !== "") {
     main = `${actor}得知 [${fd.num}]`;
   } else if (fd.res && String(fd.res).trim() !== "") {
@@ -496,6 +514,12 @@ export function buildNaturalRoleMessage(rule, { players, actorIndex, formData, e
   } else if (fd.p1 && fd.r1) {
     const p1 = labelForKey(players, fd, "p1");
     main = `${actor}${action} ${p1} [${fd.r1}]`;
+  } else if (fd.target && fd.r1) {
+    const t = labelForKey(players, fd, "target") || fd.target;
+    main =
+      action === "猜測"
+        ? `${actor}${action} ${t} 是 [${fd.r1}]`
+        : `${actor}${action} ${t} [${fd.r1}]`;
   } else if (fd.target) {
     const t = labelForKey(players, fd, "target") || fd.target;
     main = action ? `${actor}${action} ${t}` : `${actor}${t}`;

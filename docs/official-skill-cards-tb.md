@@ -1,15 +1,14 @@
 # 官方角色技能資訊卡（TB）
 
 > 自動產生：`node scripts/export-official-skill-cards.js <edition>`  
-> 更新：2026-08-05  
+> 更新：2026-08-06  
 > **請直接改各角色欄位後整檔覆蓋**；留空表示不確定。
 
 ## 審核後套用
 
-1. 改完 `docs/official-skill-cards-<edition>.md` 後整檔覆蓋。
-2. TB 版執行 `node scripts/apply-tb-skill-cards-to-rules.js` 寫入 `roleInteractionRules.json`。
-3. 例句可改 `docs/official-sentence-edit-tb.md`（或審核版 `official-sentence-review-*.md`）。
-4. 重新匯出：`npm run export:skill-cards -- all`、`npm run export:sentence-examples -- all`。
+1. 改完 `docs/official-skill-cards-<edition>.md` 後整檔覆蓋（規則欄位與例句皆在此檔）。
+2. 執行 `npm run apply:skill-cards` 寫入 `roleInteractionRules.json`（戰報互動）。
+3. 重新匯出（可選）：`npm run export:skill-cards -- all`（會依 JSON+OVERRIDES 覆寫 md，手改例句請先備份）。
 
 ## 代碼說明
 
@@ -88,7 +87,7 @@
 └ 小明【03.男爵】爪牙
 └ 小美【04.僧侶】非爪牙
 ```
-- 備註: sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985
+- 備註: 
 
 ### empath | 共情者
 
@@ -108,7 +107,7 @@
 ```
 小華【01.共情者】得知 [2]
 ```
-- 備註: sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985
+- 備註: 
 
 ### bureaucrat | 官員
 
@@ -129,7 +128,7 @@
 小華【01.官員】選擇 小明【03.洗衣婦】
 └ 小明【03.洗衣婦】票數x3
 ```
-- 備註: sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985
+- 備註: 
 
 ### butler | 管家
 
@@ -150,7 +149,7 @@
 小華【01.管家】選擇 小明【03.洗衣婦】
 └ 小明【03.洗衣婦】主人
 ```
-- 備註: sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985
+- 備註: 
 
 ### scarletwoman | 紅唇女郎
 
@@ -333,7 +332,7 @@
 小華【01.竊賊】選擇 小明【03.洗衣婦】
 └ 小明【03.洗衣婦】負數票
 ```
-- 備註: sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985
+- 備註: 
 
 ### monk | 僧侶
 
@@ -354,7 +353,7 @@
 小華【01.僧侶】保護 小明【03.洗衣婦】
 └ 小明【03.洗衣婦】保護
 ```
-- 備註: sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985
+- 備註: 
 
 ### saint | 聖徒
 
@@ -374,7 +373,7 @@
 ```
 小華【01.聖徒】死於處決，[善良]陣營落敗
 ```
-- 備註: 死於處決 → 所屬陣營落敗；可選紀錄
+- 備註: 
 
 ### soldier | 士兵
 
@@ -415,7 +414,7 @@
 ```
 小華【01.守鴉人】死亡後得知 小明【03.洗衣婦】
 ```
-- 備註: 觸發：該角色今晚死亡才醒來；可選紀錄
+- 備註: 
 
 ### undertaker | 送葬者
 
@@ -476,7 +475,7 @@
 小華【01.投毒者】投毒 小明【03.洗衣婦】
 └ 小明【03.洗衣婦】中毒
 ```
-- 備註: sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985
+- 備註: 
 
 ### librarian | 圖書管理員
 
@@ -498,7 +497,7 @@
 └ 小明【03.洗衣婦】外來者
 └ 小美【04.僧侶】非外來者
 ```
-- 備註: sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985
+- 備註: 
 
 ### washerwoman | 洗衣婦
 
@@ -520,7 +519,7 @@
 └ 小明【03.圖書管理員】鎮民
 └ 小美【04.男爵】非鎮民
 ```
-- 備註: sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985
+- 備註: 
 
 ### imp | 小惡魔
 

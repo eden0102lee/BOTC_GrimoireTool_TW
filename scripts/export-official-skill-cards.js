@@ -249,6 +249,543 @@ const OVERRIDES = {
     verb: "(無)",
     notes: "生成可選字卡",
   },
+
+  // —— BMR ——
+  chambermaid: {
+    timing: ["everyNight"],
+    impact: ["info"],
+    target: "other",
+    example:
+      "小華【01.侍女】得知 小明【03.水手】 小美【04.賭徒】中有 [1] 位因自身能力醒來",
+    verb: "得知",
+    notes: "選兩名存活他玩家；回 0/1/2",
+  },
+  courtier: {
+    timing: ["once", "everyNight"],
+    impact: ["status"],
+    target: "other",
+    trigger: "每局一次選擇角色；其玩家醉酒三天三夜",
+    example:
+      "小華【01.侍臣】選擇 [小惡魔]\n└ 小明【03.小惡魔】醉酒 3",
+    verb: "選擇",
+    notes: "輸入為角色；標記醉酒 1/2/3 遞減",
+  },
+  exorcist: {
+    timing: ["fromNight2"],
+    impact: ["info", "special"],
+    target: "other",
+    example:
+      "小華【01.驅魔人】選擇 小明【03.小惡魔]\n└ 小明【03.小惡魔】得知驅魔人且今晚不因自身能力醒來",
+    verb: "選擇",
+    notes: "不可與昨晚同目標；命中惡魔才有 └",
+  },
+  fool: {
+    timing: ["once", "trigger"],
+    impact: ["life", "special"],
+    target: "self",
+    trigger: "第一次「死亡」時不會死",
+    example: "小華【01.弄臣】第一次死亡 → 倖免\n└ 小華【01.弄臣】無能力",
+    verb: "(無)",
+    notes: "被動；通常掛「無能力」後不再觸發",
+  },
+  gambler: {
+    timing: ["fromNight2"],
+    impact: ["life", "info"],
+    target: "both",
+    example:
+      "小華【01.賭徒】猜測 小明【03.水手】是 [水手]\n└ 猜錯，小華【01.賭徒】死亡",
+    verb: "猜測",
+    notes: "猜對可無 └ 或寫「猜對」；粗填",
+  },
+  gossip: {
+    timing: ["fromNight2", "trigger"],
+    impact: ["life"],
+    target: "other",
+    trigger: "白天公開聲明；當晚若正確則一名玩家死亡",
+    example:
+      "小華【01.造謠者】聲明正確\n└ 小明【03.水手】死亡",
+    verb: "(無)",
+    notes: "夜裡由說書人選死者；聲明本身可另記",
+  },
+  grandmother: {
+    timing: ["firstOnly", "trigger"],
+    impact: ["info", "life", "special"],
+    target: "other",
+    trigger: "孫子被惡魔殺死 → 祖母死亡",
+    example:
+      "1.\n小華【01.祖母】得知 小明【03.水手】是 [水手]\n└ 小明【03.水手】孫子\n2.\n小明【03.水手】被惡魔殺害\n└ 小華【01.祖母】死亡",
+    verb: "得知",
+  },
+  innkeeper: {
+    timing: ["fromNight2"],
+    impact: ["special", "status"],
+    target: "other",
+    example:
+      "小華【01.旅店老闆】保護 小明【03.水手】 小美【04.賭徒】\n└ 小明【03.水手】保護\n└ 小美【04.賭徒】醉酒",
+    verb: "保護",
+  },
+  minstrel: {
+    timing: ["trigger"],
+    impact: ["status"],
+    target: "both",
+    trigger: "有爪牙被處決",
+    example:
+      "小明【03.刺客】被處決\n└ 小華【01.吟遊詩人】觸發：除己外全員醉酒至明昏",
+    verb: "(無)",
+    notes: "白天觸發；標記「所有人醉酒」",
+  },
+  pacifist: {
+    timing: ["trigger"],
+    impact: ["life", "special"],
+    target: "other",
+    trigger: "善良玩家被處決時可能不死",
+    example:
+      "小明【03.水手】被處決\n└ 和平主義者：小明【03.水手】倖免",
+    verb: "(無)",
+    notes: "被動／說書人裁定；無夜動",
+  },
+  professor: {
+    timing: ["once", "fromNight2"],
+    impact: ["life"],
+    target: "other",
+    example:
+      "小華【01.教授】復活 小明【03.水手]\n└ 小明【03.水手】復活",
+    verb: "復活",
+    notes: "目標須為死亡鎮民；非鎮民則無效",
+  },
+  sailor: {
+    timing: ["everyNight"],
+    impact: ["status", "special"],
+    target: "both",
+    example:
+      "小華【01.水手】選擇 小明【03.賭徒】\n└ 小明【03.賭徒】醉酒",
+    verb: "選擇",
+    notes: "己或目標醉酒；水手不會死（被動）",
+  },
+  tealady: {
+    timing: ["trigger"],
+    impact: ["special"],
+    target: "other",
+    trigger: "兩側存活鄰居皆善良 → 他們不會死",
+    example: "(無)",
+    verb: "(無)",
+    notes: "被動；標記「不會死」由說書人手動",
+  },
+  goon: {
+    timing: ["trigger"],
+    impact: ["status", "alignment"],
+    target: "both",
+    trigger: "每晚首位以能力選中你的玩家醉酒，你轉為其陣營",
+    example:
+      "小明【03.普卡】選擇 小華【01.莽夫】\n└ 小明【03.普卡】醉酒\n└ 小華【01.莽夫】陣營改為 [邪惡]",
+    verb: "(無)",
+    notes: "被動紀錄；粗填",
+  },
+  lunatic: {
+    timing: ["everyNight"],
+    impact: ["info", "special"],
+    target: "both",
+    example:
+      "1.\n小華【01.瘋子】（以為自己是惡魔）殺害 小明【03.水手】\n└ 小明【03.水手】攻擊1\n2.\n惡魔得知瘋子目標：小明【03.水手】",
+    verb: "選擇",
+    notes: "瘋子假殺＋告知真惡魔；無真實死亡除非他因",
+  },
+  moonchild: {
+    timing: ["trigger", "fromNight2"],
+    impact: ["life"],
+    target: "other",
+    trigger: "得知自己死亡時公開選一名存活玩家；若善良則當晚死",
+    example:
+      "小華【01.月之子】死亡時選擇 小明【03.水手】\n└ 小明【03.水手】死亡",
+    verb: "選擇",
+  },
+  tinker: {
+    timing: ["fromNight2", "trigger"],
+    impact: ["life"],
+    target: "self",
+    trigger: "隨時可能死亡（說書人裁定）",
+    example: "小華【01.修補匠】死亡",
+    verb: "(無)",
+    notes: "可無主動選擇；夜裡可能直接死",
+  },
+  assassin: {
+    timing: ["once", "fromNight2"],
+    impact: ["life"],
+    target: "other",
+    example:
+      "小華【01.刺客】殺害 小明【03.水手】\n└ 小明【03.水手】死亡",
+    verb: "殺害",
+    notes: "無視「不會死」；每局一次",
+  },
+  devilsadvocate: {
+    timing: ["everyNight"],
+    impact: ["special"],
+    target: "other",
+    example:
+      "小華【01.魔鬼代言人】選擇 小明【03.水手】\n└ 小明【03.水手】處決保護",
+    verb: "選擇",
+    notes: "不可與昨晚同目標",
+  },
+  godfather: {
+    timing: ["setup", "firstOnly", "fromNight2"],
+    impact: ["info", "life", "special"],
+    target: "both",
+    trigger: "當日有外來者死亡 → 當晚可殺一人",
+    example:
+      "1.\n本局外來者人數調整 −1 或 +1\n2.\n小華【01.教父】得知場上外來者：[呆瓜] [修補匠]\n3.\n小華【01.教父】殺害 小明【03.水手】\n└ 小明【03.水手】死亡",
+    verb: "得知",
+    notes: "首夜資訊；殺人僅在外來者白日死後",
+  },
+  mastermind: {
+    timing: ["trigger"],
+    impact: ["special"],
+    target: "both",
+    trigger: "惡魔被處決後遊戲多一日；再有人處決則其陣營敗",
+    example:
+      "惡魔被處決，主謀生效：遊戲再進行一天\n└ 翌日小明【03.水手】被處決 → [善良]陣營落敗",
+    verb: "(無)",
+  },
+  po: {
+    timing: ["fromNight2"],
+    impact: ["life"],
+    target: "other",
+    example:
+      "1.\n小華【01.珀】殺害 小明【03.水手】\n└ 小明【03.水手】死亡\n2.\n（上晚未行動）小華【01.珀】殺害三人\n└ 小明【03.水手】死亡\n└ 小美【04.賭徒】死亡\n└ 小強【05.弄臣】死亡",
+    verb: "殺害",
+    notes: "未行動後隔晚可殺三；標記攻擊x3",
+  },
+  pukka: {
+    timing: ["everyNight"],
+    impact: ["status", "life"],
+    target: "other",
+    example:
+      "小華【01.普卡】投毒 小明【03.水手】\n└ 小明【03.水手】中毒\n└ 小美【04.賭徒】死亡（先前中毒）",
+    verb: "投毒",
+  },
+  shabaloth: {
+    timing: ["fromNight2"],
+    impact: ["life"],
+    target: "other",
+    example:
+      "小華【01.沙巴洛斯】殺害 小明【03.水手】 小美【04.賭徒】\n└ 小明【03.水手】死亡\n└ 小美【04.賭徒】死亡\n└ （可選）小強【05.弄臣】復活",
+    verb: "殺害",
+  },
+  zombuul: {
+    timing: ["fromNight2", "trigger"],
+    impact: ["life", "special"],
+    target: "both",
+    trigger: "當日無人死亡才夜殺；第一次死亡不真正死（視為已死）",
+    example:
+      "1.\n小華【01.僵怖】殺害 小明【03.水手】\n└ 小明【03.水手】死亡\n2.\n小華【01.僵怖】第一次「死亡」→ 仍存活但視為已死",
+    verb: "殺害",
+  },
+  apprentice: {
+    timing: ["firstOnly"],
+    impact: ["role", "special"],
+    target: "self",
+    example:
+      "小華【01.學徒】獲得 [水手] 能力\n└ 小華【01.學徒】是學徒",
+    verb: "獲得",
+    notes: "善→鎮民能力／邪→爪牙能力；換代幣+標記",
+  },
+  bishop: {
+    timing: ["trigger"],
+    impact: ["special"],
+    target: "both",
+    trigger: "僅說書人可提名；每天至少提名一名不同陣營者",
+    example: "(無)",
+    verb: "(無)",
+    notes: "旅行者被動；提名流程由說書人執行",
+  },
+  judge: {
+    timing: ["once", "trigger"],
+    impact: ["special"],
+    target: "both",
+    trigger: "他玩家提名時，可強制處決成功或失敗（每局一次）",
+    example:
+      "小華【01.法官】裁定本次處決 [成功]",
+    verb: "裁定",
+  },
+  matron: {
+    timing: ["trigger"],
+    impact: ["special"],
+    target: "other",
+    trigger: "白天可換至多三對座位；不可離座密談",
+    example: "小華【01.女舍監】互換座位：小明↔小美、小強↔小芳",
+    verb: "(無)",
+  },
+  voudon: {
+    timing: ["trigger"],
+    impact: ["special"],
+    target: "both",
+    trigger: "僅己與死者可投票；死者票無代幣／無門檻",
+    example: "(無)",
+    verb: "(無)",
+    notes: "旅行者被動；影響投票規則",
+  },
+
+  // —— SNV ——
+  artist: {
+    timing: ["once", "trigger"],
+    impact: ["info"],
+    target: "self",
+    trigger: "白天私下問是非題（每局一次）",
+    example: "小華【01.藝術家】詢問說書人：[是]",
+    verb: "詢問",
+  },
+  clockmaker: {
+    timing: ["firstOnly"],
+    impact: ["info"],
+    target: "self",
+    example: "小華【01.鐘錶匠】得知 [2]",
+    verb: "得知",
+    notes: "惡魔到最近爪牙距離（鄰座=1）",
+  },
+  dreamer: {
+    timing: ["everyNight"],
+    impact: ["info"],
+    target: "other",
+    example:
+      "小華【01.築夢師】得知 小明【03.藝術家】是 [藝術家] 或 [方古]",
+    verb: "得知",
+    notes: "一善一邪角色，其一正確",
+  },
+  flowergirl: {
+    timing: ["fromNight2"],
+    impact: ["info", "special"],
+    target: "self",
+    example: "小華【01.賣花女孩】得知 [惡魔有投票]",
+    verb: "得知",
+  },
+  juggler: {
+    timing: ["fromNight2", "trigger"],
+    impact: ["info", "special"],
+    target: "self",
+    trigger: "首日公開猜至多五次；當晚得知猜對數",
+    example:
+      "小華【01.雜耍藝人】得知猜對 [3]",
+    verb: "得知",
+  },
+  mathematician: {
+    timing: ["everyNight"],
+    impact: ["info", "special"],
+    target: "self",
+    example: "小華【01.數學家】得知 [1]",
+    verb: "得知",
+    notes: "今日能力異常作用的玩家人數",
+  },
+  oracle: {
+    timing: ["fromNight2"],
+    impact: ["info"],
+    target: "self",
+    example: "小華【01.神諭者】得知 [2]",
+    verb: "得知",
+    notes: "死亡玩家中邪惡數量",
+  },
+  philosopher: {
+    timing: ["once", "everyNight"],
+    impact: ["role", "status", "special"],
+    target: "both",
+    example:
+      "小華【01.哲學家】選擇 [數學家]\n└ 小華【01.哲學家】是哲學家（獲數學家能力）\n└ 小明【03.數學家】醉酒",
+    verb: "選擇",
+    notes: "選善良角色；在場則對方醉酒",
+  },
+  sage: {
+    timing: ["trigger", "fromNight2"],
+    impact: ["info"],
+    target: "other",
+    trigger: "被惡魔殺死時得知兩名玩家之一為惡魔",
+    example:
+      "小華【01.賢者】死亡後得知 小明【03.方古】 小美【04.藝術家】其中一位是惡魔",
+    verb: "得知",
+  },
+  savant: {
+    timing: ["trigger"],
+    impact: ["info"],
+    target: "self",
+    trigger: "每個白天可問說書人兩條資訊（一真一假）",
+    example: "小華【01.博學者】得知兩條資訊（一真一假）",
+    verb: "得知",
+    notes: "白天私下；通常不寫結構化戰報",
+  },
+  seamstress: {
+    timing: ["once", "everyNight"],
+    impact: ["info"],
+    target: "other",
+    example:
+      "小華【01.女裁縫】得知 小明【03.藝術家】 小美【04.方古】是否同陣營 → [否]",
+    verb: "得知",
+  },
+  snakecharmer: {
+    timing: ["everyNight"],
+    impact: ["role", "alignment", "status"],
+    target: "both",
+    example:
+      "小華【01.舞蛇人】選擇 小明【03.方古】\n└ 互換角色／陣營\n└ 小明【03.舞蛇人】中毒",
+    verb: "選擇",
+    notes: "僅命中惡魔時交換；新舞蛇人中毒",
+  },
+  towncrier: {
+    timing: ["fromNight2"],
+    impact: ["info", "special"],
+    target: "self",
+    example: "小華【01.城鎮公告員】得知 [爪牙有提名]",
+    verb: "得知",
+  },
+  barber: {
+    timing: ["trigger", "fromNight2"],
+    impact: ["role"],
+    target: "other",
+    trigger: "理髮師死亡之夜，惡魔可換兩名玩家角色",
+    example:
+      "小華【01.理髮師】死亡\n└ 惡魔交換 小明【03.藝術家】 ↔ 小美【04.方古】角色",
+    verb: "(無)",
+    notes: "標記「今晚剪頭髮」",
+  },
+  klutz: {
+    timing: ["trigger"],
+    impact: ["special"],
+    target: "other",
+    trigger: "得知死亡時公開選一名存活者；若邪惡則己方陣營敗",
+    example:
+      "小華【01.呆瓜】死亡時選擇 小明【03.方古】\n└ [善良]陣營落敗",
+    verb: "選擇",
+  },
+  mutant: {
+    timing: ["trigger"],
+    impact: ["special"],
+    target: "self",
+    trigger: "若執著讓人相信自己是外來者，可能被處決",
+    example: "(無)",
+    verb: "(無)",
+    notes: "被動／說書人裁定",
+  },
+  sweetheart: {
+    timing: ["trigger", "fromNight2"],
+    impact: ["status"],
+    target: "other",
+    trigger: "心上人死亡時一名玩家開始醉酒",
+    example:
+      "小華【01.心上人】死亡\n└ 小明【03.藝術家】醉酒",
+    verb: "(無)",
+  },
+  cerenovus: {
+    timing: ["everyNight"],
+    impact: ["status"],
+    target: "other",
+    example:
+      "小華【01.洗腦師】選擇 小明【03.藝術家】瘋狂為 [鐘錶匠]\n└ 小明【03.藝術家】瘋狂",
+    verb: "選擇",
+  },
+  eviltwin: {
+    timing: ["firstOnly", "trigger"],
+    impact: ["info", "special"],
+    target: "other",
+    trigger: "善側雙胞胎被處決→邪勝；雙方皆活時善不能勝",
+    example:
+      "小華【01.鏡像雙子】與 小明【03.藝術家】互認\n└ 小明【03.藝術家】雙胞胎",
+    verb: "(無)",
+  },
+  pithag: {
+    timing: ["fromNight2"],
+    impact: ["role", "life"],
+    target: "other",
+    example:
+      "小華【01.麻臉巫婆】選擇 小明【03.藝術家】變成 [男爵]\n└ 小明【03.男爵】（角色不在場才變）",
+    verb: "選擇",
+    notes: "若變出新惡魔，當晚惡魔擊殺由說書人決定",
+  },
+  witch: {
+    timing: ["everyNight"],
+    impact: ["special", "life"],
+    target: "other",
+    example:
+      "小華【01.女巫】詛咒 小明【03.藝術家】\n└ 小明【03.藝術家】詛咒\n（若其明日提名 → 死亡）",
+    verb: "詛咒",
+    notes: "僅三人存活時失去能力",
+  },
+  fanggu: {
+    timing: ["setup", "fromNight2", "once"],
+    impact: ["life", "role", "alignment"],
+    target: "both",
+    trigger: "殺到外來者時可改為己死、對方變邪惡方古（每局一次）",
+    example:
+      "1.\n本局外來者 +1\n2.\n小華【01.方古】殺害 小明【03.藝術家】\n└ 小明【03.藝術家】死亡\n3.\n小華【01.方古】殺害 小美【04.呆瓜】（外來者）\n└ 小華【01.方古】死亡\n└ 小美【04.方古】成為邪惡方古",
+    verb: "殺害",
+  },
+  nodashii: {
+    timing: ["setup", "fromNight2"],
+    impact: ["life", "status"],
+    target: "both",
+    example:
+      "1.\n諾-達鯴導致 小美【04.鐘錶匠】小強【05.數學家】中毒\n2.\n小華【01.諾-達鯴】殺害 小明【03.藝術家】\n└ 小明【03.藝術家】死亡",
+    verb: "殺害",
+    notes:
+      "setup 時對兩側最近鎮民掛中毒（座位／角色變動時需更新）；夜殺為 fromNight2",
+  },
+  vigormortis: {
+    timing: ["setup", "fromNight2"],
+    impact: ["life", "status", "special"],
+    target: "both",
+    example:
+      "小華【01.亡骨魔】殺害 小明【03.洗腦師】\n└ 小明【03.洗腦師】死亡\n└ 小明【03.洗腦師】具有能力\n└ 小美【04.藝術家】中毒",
+    verb: "殺害",
+    notes: "殺爪牙→保留能力＋鄰近一鎮民中毒；開局 −1 外來者",
+  },
+  vortox: {
+    timing: ["fromNight2", "trigger"],
+    impact: ["life", "info", "special"],
+    target: "both",
+    trigger: "白天無處決 → 邪惡獲勝；鎮民資訊必錯",
+    example:
+      "1.\n小華【01.渦流】殺害 小明【03.藝術家】\n└ 小明【03.藝術家】死亡\n2.\n白天無處決 → [邪惡]陣營獲勝",
+    verb: "殺害",
+  },
+  barista: {
+    timing: ["everyNight"],
+    impact: ["special", "info"],
+    target: "other",
+    example:
+      "咖啡師效果 → 小明【03.藝術家】[清醒&健康]\n（或）小明【03.藝術家】[能力x2]",
+    verb: "(無)",
+    notes: "旅行者；隨機兩效果之一，告知該玩家",
+  },
+  bonecollector: {
+    timing: ["once", "fromNight2"],
+    impact: ["special"],
+    target: "other",
+    example:
+      "小華【01.集骨者】選擇 小明【03.藝術家】（死亡）\n└ 小明【03.藝術家】具有能力",
+    verb: "選擇",
+    notes: "至明昏恢復能力；每局一次",
+  },
+  butcher: {
+    timing: ["trigger"],
+    impact: ["special"],
+    target: "other",
+    trigger: "白天首次處決後可再提名一人",
+    example: "小華【01.屠夫】追加提名 小明【03.藝術家】",
+    verb: "(無)",
+  },
+  deviant: {
+    timing: ["trigger"],
+    impact: ["special"],
+    target: "self",
+    trigger: "今天夠有趣則不會被放逐",
+    example: "(無)",
+    verb: "(無)",
+    notes: "旅行者被動；說書人裁定",
+  },
+  harlot: {
+    timing: ["fromNight2"],
+    impact: ["info", "life"],
+    target: "both",
+    example:
+      "小華【01.流鶯】選擇 小明【03.藝術家】（對方同意）\n└ 小華【01.流鶯】得知 [藝術家]\n└ （可選）雙方死亡",
+    verb: "選擇",
+    notes: "對方須同意；說書人可讓雙方死",
+  },
 };
 
 function inferTiming(role) {
@@ -319,10 +856,9 @@ function header() {
 
 ## 審核後套用
 
-1. 改完 \`docs/official-skill-cards-<edition>.md\` 後整檔覆蓋。
-2. TB 版執行 \`node scripts/apply-tb-skill-cards-to-rules.js\` 寫入 \`roleInteractionRules.json\`。
-3. 例句可改 \`docs/official-sentence-edit-tb.md\`（或審核版 \`official-sentence-review-*.md\`）。
-4. 重新匯出：\`npm run export:skill-cards -- all\`、\`npm run export:sentence-examples -- all\`。
+1. 改完 \`docs/official-skill-cards-<edition>.md\` 後整檔覆蓋（規則欄位與例句皆在此檔）。
+2. 執行 \`npm run apply:skill-cards\` 寫入 \`roleInteractionRules.json\`（戰報互動）。
+3. 重新匯出（可選）：\`npm run export:skill-cards -- all\`（會依 JSON+OVERRIDES 覆寫 md，手改例句請先備份）。
 
 ## 代碼說明
 
@@ -376,7 +912,9 @@ function cardBlock(role, rule, ov) {
   const example =
     (ov && ov.example) ||
     (rule ? `（請依規則補例句；action=${verb}）` : "(無)");
-  const notes = (ov && ov.notes) || (rule && rule.notes) || "";
+  const notes = ov
+    ? ov.notes || ""
+    : (rule && rule.notes) || "";
   const ability = (role.ability || "").replace(/\n/g, " ");
   const activation = (rule && rule.activation) || "";
   const enabled =
