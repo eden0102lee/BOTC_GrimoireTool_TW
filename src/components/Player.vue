@@ -122,14 +122,14 @@
       </div>
       <div
         class="name"
-        @click="isMenuOpen = !isMenuOpen"
+        @click.stop="toggleMenu"
         :class="{ active: isMenuOpen }"
       >
         <span>{{ player.name }}</span>
       </div>
 
       <transition name="fold">
-        <ul class="menu" v-if="isMenuOpen">
+        <ul class="menu" v-if="isMenuOpen" @click.stop>
           <template v-if="!session.isSpectator">
             <li @click="changeName">
               <font-awesome-icon icon="user-edit" />{{ $t("player.rename") }}
@@ -296,7 +296,36 @@ export default {
       isSwap: false
     };
   },
+  created() {
+    this.$root.$on("close-player-menus", this.closeMenu);
+  },
+  beforeDestroy() {
+    this.$root.$off("close-player-menus", this.closeMenu);
+    document.removeEventListener("click", this.closeMenu);
+  },
+  watch: {
+    isMenuOpen(open) {
+      if (open) {
+        this.$nextTick(() => {
+          document.addEventListener("click", this.closeMenu);
+        });
+      } else {
+        document.removeEventListener("click", this.closeMenu);
+      }
+    },
+  },
   methods: {
+    toggleMenu() {
+      if (this.isMenuOpen) {
+        this.isMenuOpen = false;
+        return;
+      }
+      this.$root.$emit("close-player-menus");
+      this.isMenuOpen = true;
+    },
+    closeMenu() {
+      this.isMenuOpen = false;
+    },
     toggleStatus() {
       if (this.hideRolesOnBoard && !this.session.isSpectator) {
         if (!this.player.isDead) {
@@ -778,16 +807,22 @@ li.move:not(.from) .player .overlay svg.move {
   bottom: -5px;
   text-align: left;
   white-space: nowrap;
-  max-width: min(220px, calc(100vw - 32px));
+  width: max-content;
+  min-width: 7.5em;
+  max-width: min(240px, calc(100vw - 24px));
   @include panel-chrome;
-  padding: 2px 5px;
+  padding: 4px 8px;
   margin-left: 15px;
   cursor: pointer;
+  z-index: 30;
 
   li {
     min-height: 36px;
     display: flex;
+    flex-direction: row;
     align-items: center;
+    gap: 6px;
+    white-space: nowrap;
   }
 
   &:before {
@@ -815,7 +850,9 @@ li.move:not(.from) .player .overlay svg.move {
   }
 
   svg {
-    margin-right: 2px;
+    margin-right: 0;
+    flex-shrink: 0;
+    width: 1em;
   }
 }
 

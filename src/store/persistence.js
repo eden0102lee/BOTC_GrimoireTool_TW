@@ -36,6 +36,13 @@ export default (store) => {
   if (localStorage.getItem("rolesHidden")) {
     store.commit("toggleRolesHidden", true);
   }
+  if (
+    localStorage.getItem("centerMarkHidden") ||
+    localStorage.edition !== undefined ||
+    localStorage.roles !== undefined
+  ) {
+    store.commit("setShowCenterMark", false);
+  }
   updatePagetitle();
   if (localStorage.roles !== undefined) {
     store.commit("setCustomRoles", JSON.parse(localStorage.roles));
@@ -178,6 +185,7 @@ export default (store) => {
         break;
       case "setEdition":
         localStorage.setItem("edition", JSON.stringify(payload));
+        localStorage.setItem("centerMarkHidden", "1");
         if (state.edition.isOfficial) {
           localStorage.removeItem("roles");
         }

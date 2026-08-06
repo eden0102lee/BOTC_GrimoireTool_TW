@@ -4,27 +4,24 @@
       <h3>{{ $t("edition.select") }}</h3>
       <ul class="editions">
         <li
-          v-for="edition in editions"
+          v-for="edition in selectableEditions"
           class="edition"
           :class="['edition-' + edition.id]"
           :style="{
             backgroundImage: `url(${editionLogoUrl(edition)})`
           }"
           :key="edition.id"
-          @click="setEdition(edition)"
+          @click="pickEdition(edition)"
         >
           {{ $editionName(edition) }}
         </li>
-        <li
-          class="edition edition-custom"
-          @click="isCustom = true"
-          :style="{
-            backgroundImage: `url(${CUSTOM_EDITION_LOGO})`
-          }"
-        >
-          {{ $t("edition.custom") }}
-        </li>
       </ul>
+      <div class="custom-entry">
+        <button type="button" class="custom-btn" @click="isCustom = true">
+          <font-awesome-icon icon="file-upload" />
+          {{ $t("edition.custom") }}
+        </button>
+      </div>
     </div>
     <div class="custom" v-else>
       <h3>{{ $t("edition.loadCustom") }}</h3>
@@ -77,10 +74,10 @@
 import editionJSON from "../../editions";
 import { mapMutations, mapState } from "vuex";
 import Modal from "./Modal";
-import {
-  CUSTOM_EDITION_LOGO,
-  editionLogoUrl
-} from "../../edition-logos";
+import { editionLogoUrl } from "../../edition-logos";
+
+/** Temporarily show only base editions with Wiki English logos. */
+const SELECTABLE_EDITION_IDS = ["tb", "bmr", "snv"];
 
 export default {
   components: {
@@ -91,7 +88,6 @@ export default {
       editions: editionJSON,
       isCustom: false,
       editionLogoUrl,
-      CUSTOM_EDITION_LOGO,
       scripts: [
         [
           "Deadly Penance Day",
@@ -120,8 +116,18 @@ export default {
       ]
     };
   },
-  computed: mapState(["modals"]),
+  computed: {
+    ...mapState(["modals"]),
+    selectableEditions() {
+      return this.editions.filter((edition) =>
+        SELECTABLE_EDITION_IDS.includes(edition.id)
+      );
+    }
+  },
   methods: {
+    pickEdition(edition) {
+      this.setEdition(edition);
+    },
     openUpload() {
       this.$refs.upload.click();
     },
@@ -198,22 +204,85 @@ export default {
 </script>
 
 <style scoped lang="scss">
+ul.editions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  gap: clamp(4px, 1.5vw, 12px);
+}
+
 ul.editions .edition {
   font-family: PiratesBay, sans-serif;
   letter-spacing: 1px;
   text-align: center;
-  padding-top: 15%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  box-sizing: border-box;
+  aspect-ratio: 1 / 1;
+  padding: clamp(4px, 1.2vw, 10px) clamp(4px, 1vw, 8px)
+    clamp(6px, 1.5vw, 12px);
   background-position: center center;
-  background-size: 100% auto;
+  background-size: cover;
   background-repeat: no-repeat;
-  width: 30%;
-  margin: 5px;
-  font-size: 120%;
+  // Fluid tile: shrink on phones, cap on desktop
+  width: clamp(88px, 28vw, 200px);
+  max-width: calc(33.33% - 8px);
+  margin: 0;
+  font-size: clamp(0.75rem, 2.8vw, 1.1rem);
+  line-height: 1.2;
   text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000,
     1px 1px 0 #000, 0 0 5px rgba(0, 0, 0, 0.75);
   cursor: pointer;
   &:hover {
     color: red;
+  }
+}
+
+.custom-entry {
+  display: flex;
+  justify-content: center;
+  margin: clamp(8px, 2vw, 14px) 8px 4px;
+}
+
+.custom-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-family: inherit;
+  font-size: clamp(0.9rem, 3.2vw, 1rem);
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.45);
+
+  &:hover {
+    color: #ff6b6b;
+    border-color: rgba(255, 107, 107, 0.8);
+  }
+}
+
+@media screen and (max-width: 767.98px) {
+  ul.editions .edition {
+    width: clamp(96px, 40vw, 160px);
+    max-width: calc(50% - 6px);
+  }
+  .custom-btn {
+    width: 100%;
+    max-width: min(320px, 92vw);
+  }
+}
+
+@media screen and (max-width: 380px) {
+  ul.editions .edition {
+    width: clamp(80px, 42vw, 140px);
+    font-size: 0.8rem;
   }
 }
 

@@ -18,7 +18,7 @@
       <header
         class="stack-header"
         :class="{ resizing: isResizing }"
-        @mousedown="onResizeStart"
+        @pointerdown="onResizeStart"
       >
         <span class="stack-title">{{ $t("leftPanels.title") }}</span>
         <button
@@ -26,7 +26,7 @@
           class="collapse-btn"
           :title="$t('leftPanels.hide')"
           @click="setExpanded(false)"
-          @mousedown.stop
+          @pointerdown.stop
         >
           <font-awesome-icon icon="times-circle" />
         </button>
@@ -93,6 +93,7 @@ export default {
       expanded: readInitialExpanded(),
       panelWidth: readInitialWidth(),
       isResizing: false,
+      resizePointerId: null,
       resizeStartX: 0,
       resizeStartWidth: 0,
     };
@@ -106,28 +107,56 @@ export default {
       localStorage.setItem(STORAGE_KEY, value ? "1" : "0");
     },
     onResizeStart(event) {
-      if (event.button !== 0) return;
+      // Primary button only for mouse; touch/pen use button 0
+      if (event.pointerType === "mouse" && event.button !== 0) return;
       event.preventDefault();
       this.isResizing = true;
+      this.resizePointerId = event.pointerId;
       this.resizeStartX = event.clientX;
       this.resizeStartWidth = this.panelWidth;
-      document.addEventListener("mousemove", this.onResizeMove);
-      document.addEventListener("mouseup", this.onResizeEnd);
+      if (event.currentTarget.setPointerCapture) {
+        try {
+          event.currentTarget.setPointerCapture(event.pointerId);
+        } catch (_) {
+          /* ignore unsupported / already captured */
+        }
+      }
+      document.addEventListener("pointermove", this.onResizeMove, {
+        passive: false,
+      });
+      document.addEventListener("pointerup", this.onResizeEnd);
+      document.addEventListener("pointercancel", this.onResizeEnd);
     },
     onResizeMove(event) {
       if (!this.isResizing) return;
+      if (
+        this.resizePointerId != null &&
+        event.pointerId !== this.resizePointerId
+      ) {
+        return;
+      }
+      event.preventDefault();
       const delta = event.clientX - this.resizeStartX;
       this.panelWidth = clampWidth(this.resizeStartWidth + delta);
     },
-    onResizeEnd() {
+    onResizeEnd(event) {
       if (!this.isResizing) return;
+      if (
+        event &&
+        this.resizePointerId != null &&
+        event.pointerId !== this.resizePointerId
+      ) {
+        return;
+      }
       this.isResizing = false;
+      this.resizePointerId = null;
       localStorage.setItem(WIDTH_KEY, String(this.panelWidth));
       this.teardownResizeListeners();
     },
     teardownResizeListeners() {
-      document.removeEventListener("mousemove", this.onResizeMove);
-      document.removeEventListener("mouseup", this.onResizeEnd);
+      document.removeEventListener("pointermove", this.onResizeMove);
+      document.removeEventListener("pointerup", this.onResizeEnd);
+      document.removeEventListener("pointercancel", this.onResizeEnd);
     },
   },
 };
@@ -138,7 +167,8 @@ export default {
   position: fixed;
   left: max(8px, env(safe-area-inset-left, 0px));
   top: max(8px, env(safe-area-inset-top, 0px));
-  z-index: 60;
+  // Above menu (75) and bluffs (50); below modal (100)
+  z-index: 90;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -146,10 +176,16 @@ export default {
   font-size: 0.85rem;
   line-height: 1.3;
   box-sizing: border-box;
+  // Keep panel within the visible viewport (mobile chrome / home indicator)
+  max-height: calc(
+    100dvh - max(8px, env(safe-area-inset-top, 0px)) -
+      max(8px, env(safe-area-inset-bottom, 0px))
+  );
 
   &.left-panels--collapsed {
     width: auto !important;
     max-width: none !important;
+    max-height: none;
     gap: 0;
   }
 
@@ -185,12 +221,24 @@ export default {
   align-items: stretch;
   gap: 8px;
   min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  max-height: 100%;
+  overflow: hidden;
   box-sizing: border-box;
 
   > * {
     width: 100%;
     min-width: 0;
     box-sizing: border-box;
+    flex-shrink: 0;
+  }
+
+  // Recorder fills leftover height and scrolls internally
+  > :last-child {
+    flex: 1 1 auto;
+    flex-shrink: 1;
+    min-height: 0;
   }
 }
 

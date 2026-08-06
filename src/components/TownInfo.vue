@@ -113,8 +113,6 @@ export default {
   align-content: center;
   justify-content: center;
   flex-wrap: wrap;
-  background: url("../assets/demon-head.png") center center no-repeat;
-  background-size: auto 100%;
 
   li {
     font-weight: bold;
@@ -168,13 +166,12 @@ export default {
   }
 
   li.edition {
-    width: 220px;
-    height: 200px;
+    width: clamp(72px, 22vmin, 220px);
+    height: clamp(66px, 20vmin, 200px);
     max-width: 100%;
-    max-height: 100%;
     background-position: center center;
     background-repeat: no-repeat;
-    background-size: 100% auto;
+    background-size: cover;
     position: absolute;
     top: -25%;
   }
@@ -188,8 +185,8 @@ export default {
     font-size: 90%;
   }
   .info li.edition {
-    width: 150px;
-    height: 130px;
+    width: clamp(64px, 28vw, 160px);
+    height: clamp(58px, 25vw, 145px);
     top: -18%;
   }
 }
@@ -210,8 +207,16 @@ export default {
     }
   }
   .info li.edition {
-    width: 110px;
-    height: 90px;
+    width: clamp(56px, 30vw, 130px);
+    height: clamp(50px, 27vw, 118px);
+    top: -14%;
+  }
+}
+
+@media screen and (max-height: 600px) {
+  .info li.edition {
+    width: clamp(48px, 18vmin, 120px);
+    height: clamp(44px, 16vmin, 110px);
     top: -12%;
   }
 }

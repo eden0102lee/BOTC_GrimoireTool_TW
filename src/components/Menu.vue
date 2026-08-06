@@ -192,7 +192,6 @@
 
         <template v-if="tab === 'gstone'">
           <li class="headline">{{ $t("menu.gstone") }}</li>
-          <li class="disclaimer">{{ $t("menu.disclaimer") }}</li>
           <li>
             <a href="https://botc.app/" target="_blank" rel="noopener">
               {{ $t("menu.linkOfficialGrimoire") }}

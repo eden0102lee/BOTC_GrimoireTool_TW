@@ -722,14 +722,29 @@ export default {
   }
   &.effect-toggle {
     flex-direction: row;
-    align-items: center;
+    align-items: flex-start;
     gap: 8px;
+
+    span {
+      flex: 1 1 auto;
+      min-width: 0;
+      line-height: 1.35;
+      word-break: normal;
+      overflow-wrap: anywhere;
+    }
+
+    input[type="checkbox"] {
+      width: auto;
+      flex-shrink: 0;
+      margin: 2px 0 0;
+      accent-color: #46d5ff;
+    }
   }
   span {
     opacity: 0.7;
   }
   select,
-  input {
+  input:not([type="checkbox"]) {
     width: 100%;
     padding: 3px 4px;
     border-radius: 4px;

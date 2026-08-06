@@ -118,6 +118,7 @@ export default new Vuex.Store({
       isMuted: false,
       isImageOptIn: false,
       rolesHidden: false,
+      showCenterMark: true,
       zoom: 0,
       unit: resolveViewportUnit(),
       background: ""
@@ -190,6 +191,7 @@ export default new Vuex.Store({
     toggleNight: toggle("isNight"),
     toggleImageOptIn: toggle("isImageOptIn"),
     toggleRolesHidden: toggle("rolesHidden"),
+    setShowCenterMark: set("showCenterMark"),
     toggleModal({ modals }, name) {
       if (name) {
         modals[name] = !modals[name];
@@ -282,6 +284,7 @@ export default new Vuex.Store({
       } else {
         state.edition = edition;
       }
+      state.grimoire.showCenterMark = false;
       state.modals.edition = false;
     }
   },

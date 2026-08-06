@@ -1,6 +1,6 @@
 /**
  * GStone-style viewport unit: landscape → vh, portrait → vw.
- * Layout profile classes for LeftPanels and typography tweaks.
+ * Layout profile classes for LeftPanels default expanded state.
  */
 
 export function getViewportSize() {
@@ -22,8 +22,9 @@ export function applyLayoutProfileClass(width, height) {
   if (typeof document === "undefined") return;
   const portrait = isPortraitLayout(width, height);
   document.documentElement.classList.toggle("layout-portrait", portrait);
-  document.documentElement.classList.toggle("layout-iphone16pro", portrait);
   document.documentElement.classList.toggle("layout-landscape", !portrait);
+  // Drop legacy class from v2.19 iPhone typography overrides
+  document.documentElement.classList.remove("layout-iphone16pro");
 }
 
 export function seatBaseSize(playerCount) {

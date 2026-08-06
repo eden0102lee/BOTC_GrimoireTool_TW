@@ -1,4 +1,5 @@
 /*** Media queries ***/
+/* Board / token / bluffs follow Gstone grimoire; .left-panels is TW-only. */
 
 :root {
   --safe-top: env(safe-area-inset-top, 0px);
@@ -42,16 +43,20 @@
     padding: 10px;
   }
   .left-panels {
-    max-height: calc(
-      100dvh - max(16px, var(--safe-top)) - max(16px, var(--safe-bottom))
-    );
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
+    top: max(8px, var(--safe-top));
+    bottom: max(8px, var(--safe-bottom));
+    max-height: none;
+    overflow: hidden;
     max-width: min(
       340px,
       calc(100vw - max(16px, var(--safe-left)) - max(8px, var(--safe-right)))
     );
+
+    &.left-panels--collapsed {
+      bottom: auto;
+      max-height: none;
+      overflow: visible;
+    }
   }
   .modal {
     max-width: calc(100vw - 24px) !important;
@@ -68,7 +73,7 @@
   }
 }
 
-// All portrait / tall layouts — iPhone 16 Pro reference
+// Portrait / tall — Gstone circle arms use 50vw
 @media screen and (max-aspect-ratio: 1/1) {
   #controls {
     padding-right: max(44px, calc(36px + var(--safe-right)));
@@ -78,61 +83,22 @@
     top: calc(50% - 50vw) !important;
     height: 50vw !important;
   }
-}
 
-html.layout-portrait,
-html.layout-iphone16pro {
-  font-size: 16px;
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
-
-  body {
-    font-size: 1rem;
-  }
-
-  #townsquare .circle .player > .name {
-    font-size: max(15px, 1.125rem);
-    line-height: 1.2;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    -webkit-font-smoothing: antialiased;
-
-    span {
-      max-width: 20vw;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
-    }
-  }
-
-  #townsquare .circle .player .reminder .text {
-    font-size: 55%;
-    font-weight: 700;
-  }
-
-  .night-order em {
-    width: 32px;
-    height: 32px;
-    font-size: 1rem;
-  }
-
+  // TW storyteller panel only (not board chrome)
   .left-panels {
     font-size: 0.9375rem;
     line-height: 1.35;
+    top: max(8px, var(--safe-top));
+    bottom: max(8px, var(--safe-bottom));
     max-width: min(
       300px,
       calc(100vw - max(12px, var(--safe-left)) - max(12px, var(--safe-right)))
     );
-    max-height: min(
-      58dvh,
-      calc(
-        100dvh - max(72px, var(--safe-top)) - max(48px, var(--safe-bottom))
-      )
-    );
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
+    max-height: none;
+    overflow: hidden;
 
     &.left-panels--collapsed {
+      bottom: auto;
       max-height: none;
       max-width: none;
       overflow: visible;
@@ -140,19 +106,17 @@ html.layout-iphone16pro {
   }
 }
 
-// Small devices — landscape phones only (portrait uses layout-portrait above)
-@media screen and (max-width: 767.98px) and (min-aspect-ratio: 1/1) {
+// Small devices (landscape phones, less than 768px)
+@media screen and (max-width: 767.98px) {
   html,
   body {
-    font-size: 0.95em;
+    font-size: 0.9em;
   }
   .player > .name {
     top: 0;
   }
   .player > .menu {
     bottom: 0;
-    max-width: min(220px, calc(100vw - 32px));
-    white-space: normal;
     &:before {
       bottom: 0;
     }
@@ -161,18 +125,20 @@ html.layout-iphone16pro {
     gap: 4px;
     left: max(8px, var(--safe-left));
     top: max(8px, var(--safe-top));
-    max-height: min(
-      52dvh,
-      calc(
-        100dvh - max(64px, var(--safe-top)) - max(40px, var(--safe-bottom))
-      )
-    );
-  }
-  .left-panels .phase-recorder {
-    max-height: min(38dvh, calc(100dvh - 180px));
+    bottom: max(8px, var(--safe-bottom));
+    max-height: none;
+    overflow: hidden;
+
+    &.left-panels--collapsed {
+      bottom: auto;
+      overflow: visible;
+    }
   }
   #townsquare {
     padding: 6px 4px;
+  }
+  #townsquare .circle .player > .name {
+    font-size: 85%;
   }
   #townsquare .circle .player > .name span {
     max-width: 14vh;
@@ -192,11 +158,11 @@ html.layout-iphone16pro {
   }
 }
 
-// Old phones — keep landscape smaller; portrait uses block above
-@media screen and (max-width: 575.98px) and (min-aspect-ratio: 1/1) {
+// Old phones
+@media screen and (max-width: 575.98px) {
   html,
   body {
-    font-size: 0.9em;
+    font-size: 0.8em;
   }
 }
 
@@ -229,10 +195,10 @@ html.layout-iphone16pro {
   }
 }
 
-// Short viewports — skip name shrink on landscape phones
-@media screen and (max-height: 850px) and (min-aspect-ratio: 1/1) {
+// Gstone-style height tweaks for short viewports
+@media screen and (max-height: 850px) {
   #townsquare .player > .name {
-    font-size: 100%;
+    font-size: 88%;
   }
 }
 

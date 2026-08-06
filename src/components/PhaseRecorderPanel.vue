@@ -45,16 +45,9 @@
           {{ $t("recorder.tabPreview") }}
         </button>
       </div>
-      <button
-        type="button"
-        class="collapse-btn"
-        @click="collapsed = !collapsed"
-      >
-        {{ collapsed ? $t("recorder.expand") : $t("recorder.collapse") }}
-      </button>
     </div>
 
-    <div v-show="!collapsed" class="recorder-body">
+    <div class="recorder-body">
       <template v-if="activeTab === 'preview'">
         <div class="game-header-line">
           {{ gameHeader || $t("recorder.gameHeaderEmpty") }}
@@ -635,8 +628,6 @@ import { pendingLabelKey, FACT_TYPES, resolvePlayerIndex } from "../store/battle
 const SETUP_UNASSIGNED = -1;
 
 const MANUAL_END = "__end__";
-const RECORDER_COLLAPSED_KEY = "phaseRecorderCollapsed";
-const MOBILE_MQ = "(max-width: 767.98px)";
 
 function parseRoleCardKey(roleCardKey) {
   if (!roleCardKey) return null;
@@ -647,17 +638,6 @@ function parseRoleCardKey(roleCardKey) {
   const phaseId = parts.slice(0, parts.length - 2).join("|");
   if (Number.isNaN(playerIndex)) return null;
   return { phaseId, playerIndex, roleId };
-}
-
-function readInitialCollapsed() {
-  const stored = localStorage.getItem(RECORDER_COLLAPSED_KEY);
-  if (stored !== null) {
-    return stored === "1";
-  }
-  if (typeof window !== "undefined" && window.matchMedia) {
-    return window.matchMedia(MOBILE_MQ).matches;
-  }
-  return false;
 }
 
 export default {
@@ -671,7 +651,6 @@ export default {
   },
   data() {
     return {
-      collapsed: readInitialCollapsed(),
       activeTab: "phase",
       manualFormOpen: false,
       voteFormOpen: false,
@@ -687,9 +666,6 @@ export default {
     };
   },
   watch: {
-    collapsed(value) {
-      localStorage.setItem(RECORDER_COLLAPSED_KEY, value ? "1" : "0");
-    },
     "currentPhase.id"() {
       this.manualFormOpen = false;
       this.voteFormOpen = false;
@@ -1749,9 +1725,8 @@ export default {
   min-width: 0;
   max-width: none;
   box-sizing: border-box;
-  max-height: calc(
-    100dvh - max(160px, calc(120px + env(safe-area-inset-top, 0px) + env(safe-area-inset-bottom, 0px)))
-  );
+  // Prefer parent (.panel-stack) height; fall back when used alone
+  max-height: 100%;
   display: flex;
   flex-direction: column;
   background: rgba(0, 0, 0, 0.65);
@@ -1835,21 +1810,6 @@ export default {
   }
 }
 
-.collapse-btn {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
-  border-radius: 4px;
-  padding: 8px 10px;
-  min-height: 36px;
-  font-size: 0.7rem;
-  cursor: pointer;
-  flex-shrink: 0;
-  &:hover {
-    color: #46d5ff;
-  }
-}
-
 .preview-toolbar {
   margin-bottom: 8px;
   text-align: left;
@@ -1918,7 +1878,9 @@ export default {
 .recorder-body {
   padding: 8px 10px;
   overflow-y: auto;
-  flex: 1;
+  -webkit-overflow-scrolling: touch;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .phase-hint {
