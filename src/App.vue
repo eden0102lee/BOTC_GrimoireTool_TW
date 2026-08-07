@@ -45,7 +45,7 @@
 
 <script>
 import { mapState } from "vuex";
-import { version } from "../package.json";
+import pkg from "../package.json";
 import TownSquare from "./components/TownSquare";
 import TownInfo from "./components/TownInfo";
 import Menu from "./components/Menu";
@@ -89,7 +89,7 @@ export default {
   },
   data() {
     return {
-      version,
+      version: pkg.version,
       _unbindViewport: null,
     };
   },
