@@ -115,128 +115,463 @@
         >
           <h4 class="preview-phase">=== {{ section.label }} ===</h4>
           <ul class="preview-list">
-            <li v-for="e in section.entries" :key="e.id">
-              <span v-if="!hideTimestamp" class="preview-time">{{
-                formatTime(e.timestamp)
-              }}</span>
-              <span class="preview-msg">{{ entryMessage(e) }}</span>
-              <span
-                v-if="e.detail && e.detail !== '無備註'"
-                class="preview-detail"
-                >└ {{ e.detail }}</span
-              >
+            <li
+              v-for="(e, eIdx) in section.entries"
+              :key="e.id"
+              class="preview-item"
+            >
+              <div class="preview-sort">
+                <button
+                  type="button"
+                  class="sort-btn"
+                  :disabled="eIdx === 0"
+                  :title="$t('recorder.moveUp')"
+                  @click="movePreviewEntry(section, e, -1)"
+                >
+                  <font-awesome-icon icon="chevron-up" />
+                </button>
+                <button
+                  type="button"
+                  class="sort-btn"
+                  :disabled="eIdx === section.entries.length - 1"
+                  :title="$t('recorder.moveDown')"
+                  @click="movePreviewEntry(section, e, 1)"
+                >
+                  <font-awesome-icon icon="chevron-down" />
+                </button>
+              </div>
+              <div class="preview-body">
+                <span v-if="!hideTimestamp" class="preview-time">{{
+                  formatTime(e.timestamp)
+                }}</span>
+                <span class="preview-msg">{{ entryMessage(e) }}</span>
+                <span
+                  v-if="e.detail && e.detail !== '無備註'"
+                  class="preview-detail"
+                  >└ {{ e.detail }}</span
+                >
+              </div>
             </li>
           </ul>
         </div>
       </template>
 
       <template v-else>
-      <div v-if="linkedMode && openPendingFacts.length" class="pending-block">
-        <div class="pending-title">
-          <font-awesome-icon icon="exclamation-triangle" />
-          {{ $t("recorder.pendingTitle", { n: openPendingFacts.length }) }}
-        </div>
-        <div
-          v-for="fact in openPendingFacts"
-          :key="fact.id"
-          class="pending-row"
-          :class="{ recommended: isRecommended(fact) }"
-        >
-          <span class="pending-label">{{ pendingLabel(fact) }}</span>
-          <div class="pending-actions">
-            <button
-              type="button"
-              class="pending-dismiss"
-              :title="$t('recorder.dismissPending')"
-              @click="dismissPending(fact)"
-            >
-              <font-awesome-icon icon="times" />
-            </button>
-            <button
-              type="button"
-              class="pending-action"
-              :class="{ primary: isRecommended(fact) }"
-              @click="commitPending(fact)"
-            >
-              {{ pendingActionLabel(fact) }}
-            </button>
+        <div v-if="linkedMode && openPendingFacts.length" class="pending-block">
+          <div class="pending-title">
+            <font-awesome-icon icon="exclamation-triangle" />
+            {{ $t("recorder.pendingTitle", { n: openPendingFacts.length }) }}
+          </div>
+          <div
+            v-for="fact in openPendingFacts"
+            :key="fact.id"
+            class="pending-row"
+            :class="{ recommended: isRecommended(fact) }"
+          >
+            <span class="pending-label">{{ pendingLabel(fact) }}</span>
+            <div class="pending-actions">
+              <button
+                type="button"
+                class="pending-dismiss"
+                :title="$t('recorder.dismissPending')"
+                @click="dismissPending(fact)"
+              >
+                <font-awesome-icon icon="times" />
+              </button>
+              <button
+                type="button"
+                class="pending-action"
+                :class="{ primary: isRecommended(fact) }"
+                @click="commitPending(fact)"
+              >
+                {{ pendingActionLabel(fact) }}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <p class="phase-hint">{{ displayLabel }}</p>
+        <p class="phase-hint">{{ displayLabel }}</p>
 
-      <div
-        v-if="isNight && isFirstNight && setupCards.length"
-        class="setup-block"
-      >
-        <h4 class="setup-title">{{ $t("recorder.setupTitle") }}</h4>
-        <p class="setup-hint">{{ $t("recorder.setupHint") }}</p>
-        <ul class="setup-task-list">
-          <li
-            v-for="task in setupTasks"
-            :key="task.key"
-            class="setup-task-item"
-            :class="{ done: task.isRecorded }"
-          >
-            <span class="setup-task-label">{{ task.label }}</span>
-            <span v-if="task.note" class="setup-task-note">{{ task.note }}</span>
-            <span v-if="task.isRecorded" class="setup-task-done">{{
-              $t("recorder.recorded")
-            }}</span>
-          </li>
-        </ul>
         <div
-          v-for="card in setupCards"
-          :key="card.roleCardKey"
-          class="setup-card-wrap"
+          v-if="isNight && isFirstNight && setupCards.length"
+          class="setup-block"
         >
-          <RoleActionCard
-            :player="card.player"
-            :player-index="card.playerIndex"
-            :role-card-key="card.roleCardKey"
-            :setup-role-id="card.setupRoleId"
-            :reminder="card.reminder"
-            :players="players"
-            :role-options="scriptRoles"
-            :is-recorded="card.isRecorded"
-            :recorded-entry="card.recordedEntry"
-            :setup-mode="true"
-            @record="onSetupRoleRecord"
-            @delete="onDeleteRoleCard"
-          />
-        </div>
-      </div>
-
-      <template v-if="isNight">
-        <div v-for="row in nightRows" :key="row.key">
+          <h4 class="setup-title">{{ $t("recorder.setupTitle") }}</h4>
+          <p class="setup-hint">{{ $t("recorder.setupHint") }}</p>
+          <ul class="setup-task-list">
+            <li
+              v-for="task in setupTasks"
+              :key="task.key"
+              class="setup-task-item"
+              :class="{ done: task.isRecorded }"
+            >
+              <span class="setup-task-label">{{ task.label }}</span>
+              <span v-if="task.note" class="setup-task-note">{{
+                task.note
+              }}</span>
+              <span v-if="task.isRecorded" class="setup-task-done">{{
+                $t("recorder.recorded")
+              }}</span>
+            </li>
+          </ul>
           <div
-            v-if="
-              row.type === 'manualSlot' &&
+            v-for="card in setupCards"
+            :key="card.roleCardKey"
+            class="setup-card-wrap"
+          >
+            <RoleActionCard
+              :player="card.player"
+              :player-index="card.playerIndex"
+              :role-card-key="card.roleCardKey"
+              :setup-role-id="card.setupRoleId"
+              :reminder="card.reminder"
+              :players="players"
+              :role-options="scriptRoles"
+              :is-recorded="card.isRecorded"
+              :recorded-entry="card.recordedEntry"
+              :setup-mode="true"
+              @record="onSetupRoleRecord"
+              @delete="onDeleteRoleCard"
+            />
+          </div>
+        </div>
+
+        <template v-if="isNight">
+          <div v-for="row in nightRows" :key="row.key">
+            <div
+              v-if="
+                row.type === 'manualSlot' &&
                 !manualFormOpen &&
                 !optionalPickerOpen
-            "
-            class="add-actions-row"
-          >
-            <button
-              type="button"
-              class="add-manual-btn"
-              @click="openManualForm"
+              "
+              class="add-actions-row"
             >
-              {{ $t("recorder.addManual") }}
-            </button>
-            <button
-              type="button"
-              class="add-manual-btn add-optional-btn"
-              @click="openOptionalPicker"
+              <button
+                type="button"
+                class="add-manual-btn"
+                @click="openManualForm"
+              >
+                {{ $t("recorder.addManual") }}
+              </button>
+              <button
+                type="button"
+                class="add-manual-btn add-optional-btn"
+                @click="openOptionalPicker"
+              >
+                {{ $t("recorder.addOptional") }}
+              </button>
+            </div>
+            <div
+              v-else-if="row.type === 'manualSlot' && optionalPickerOpen"
+              class="optional-picker"
             >
-              {{ $t("recorder.addOptional") }}
-            </button>
+              <div class="optional-picker-head">
+                <span>{{ $t("recorder.optionalTitle") }}</span>
+                <button
+                  type="button"
+                  class="optional-dismiss"
+                  @click="closeOptionalPicker"
+                >
+                  {{ $t("recorder.optionalDismiss") }}
+                </button>
+              </div>
+              <p class="optional-hint">{{ $t("recorder.optionalPickHint") }}</p>
+              <p v-if="!optionalCandidates.length" class="empty-hint">
+                {{ $t("recorder.optionalEmpty") }}
+              </p>
+              <button
+                v-for="c in optionalCandidates"
+                :key="'pick-' + c.playerIndex + '-' + c.role.id"
+                type="button"
+                class="optional-pick-btn"
+                :class="{ disabled: c.onceUsed && !c.recordedThisPhase }"
+                :disabled="c.onceUsed && !c.recordedThisPhase"
+                @click="selectOptionalCandidate(c)"
+              >
+                <span class="optional-pick-label">{{ c.label }}</span>
+                <span v-if="c.onceUsed" class="optional-once-tag">{{
+                  $t("recorder.optionalOnceUsed")
+                }}</span>
+              </button>
+            </div>
+            <ManualLogCard
+              v-else-if="row.type === 'manualSlot' && manualFormOpen"
+              :players="players"
+              :script-roles="scriptRoles"
+              :linked-mode="linkedMode"
+              :initial-tokens="manualPrefillTokens"
+              @record="onManualRecord"
+              @dismiss="closeManualForm"
+            />
+            <div
+              v-else-if="
+                row.type === 'manualRecorded' && !isEditingManual(row.entry)
+              "
+              class="manual-recorded-card"
+            >
+              <button
+                type="button"
+                class="record-delete-btn"
+                :title="$t('recorder.deleteRecord')"
+                @click="confirmDeleteRecord(row.entry)"
+              >
+                <font-awesome-icon icon="trash-alt" />
+              </button>
+              <div class="manual-label">{{ $t("recorder.manualTitle") }}</div>
+              <div class="manual-summary">{{ row.entry.message }}</div>
+              <span class="manual-detail" v-if="row.entry.detail"
+                >└ {{ row.entry.detail }}</span
+              >
+              <button
+                type="button"
+                class="btn edit"
+                @click="startEditManual(row.entry)"
+              >
+                {{ $t("recorder.editRecord") }}
+              </button>
+            </div>
+            <ManualLogCard
+              v-else-if="
+                row.type === 'manualRecorded' && isEditingManual(row.entry)
+              "
+              :key="'edit-night-' + row.entry.id"
+              :players="players"
+              :script-roles="scriptRoles"
+              :linked-mode="linkedMode"
+              :edit-entry-id="row.entry.id"
+              :initial-tokens="manualEditTokens(row.entry)"
+              :initial-use-result-line="manualEditUseResultLine(row.entry)"
+              @record="onManualRecord"
+              @delete="onDeleteManual"
+              @dismiss="closeManualEdit"
+            />
+            <div
+              v-else-if="row.type === 'optionalRole'"
+              class="optional-card-wrap"
+            >
+              <div v-if="!row.card.isRecorded" class="optional-card-bar">
+                <span class="optional-card-tag">{{
+                  $t("recorder.optionalTitle")
+                }}</span>
+                <button
+                  type="button"
+                  class="optional-dismiss"
+                  @click="dismissOptionalCard(row.card)"
+                >
+                  {{ $t("recorder.optionalDismiss") }}
+                </button>
+              </div>
+              <RoleActionCard
+                :player="row.card.player"
+                :player-index="row.card.playerIndex"
+                :role-card-key="row.card.roleCardKey"
+                :card-key="row.card.cardKey"
+                :reminder="row.card.reminder"
+                :players="players"
+                :role-options="scriptRoles"
+                :is-recorded="row.card.isRecorded"
+                :recorded-entry="row.card.recordedEntry"
+                @record="onOptionalRoleRecord"
+                @delete="onDeleteRoleCard"
+              />
+            </div>
+            <RoleActionCard
+              v-else-if="row.type === 'role'"
+              :player="row.card.player"
+              :player-index="row.card.playerIndex"
+              :role-card-key="row.card.roleCardKey"
+              :reminder="row.card.reminder"
+              :players="players"
+              :role-options="scriptRoles"
+              :is-recorded="row.card.isRecorded"
+              :recorded-entry="row.card.recordedEntry"
+              @record="onRoleRecord"
+              @delete="onDeleteRoleCard"
+            />
           </div>
-          <div
-            v-else-if="row.type === 'manualSlot' && optionalPickerOpen"
-            class="optional-picker"
+          <p v-if="!nightCards.length && !setupCards.length" class="empty-hint">
+            {{ $t("recorder.noNightActions") }}
+          </p>
+        </template>
+
+        <template v-else>
+          <div v-if="dayAbilityCards.length" class="day-ability-block">
+            <h4 class="day-ability-title">
+              {{ $t("recorder.dayAbilityTitle") }}
+            </h4>
+            <p class="day-ability-hint">{{ $t("recorder.dayAbilityHint") }}</p>
+            <div
+              v-for="card in dayAbilityCards"
+              :key="'day-ability-' + card.roleCardKey"
+              class="day-ability-card-wrap"
+            >
+              <RoleActionCard
+                :player="card.player"
+                :player-index="card.playerIndex"
+                :role-card-key="card.roleCardKey"
+                :card-key="card.cardKey"
+                :day-mode="true"
+                :day-number="dayNumber"
+                :reminder="card.reminder"
+                :players="players"
+                :role-options="scriptRoles"
+                :is-recorded="card.isRecorded"
+                :recorded-entry="card.recordedEntry"
+                @record="onOptionalRoleRecord"
+                @delete="onDeleteRoleCard"
+              />
+            </div>
+          </div>
+          <template v-for="entry in phaseDayEntries">
+            <div
+              v-if="!isEditingEntry(entry)"
+              :key="'rec-' + (entry.manualKey || entry.id)"
+              class="manual-recorded-card"
+              :class="{
+                vote: entry.category === 'vote',
+                scaffold: entry.category === 'voteScaffold',
+                execution:
+                  entry.category === 'execution' ||
+                  entry.category === 'noExecution',
+                alive: entry.category === 'alivePlayers',
+                'dead-vote': entry.category === 'deadVote',
+              }"
+            >
+              <button
+                v-if="entry.category === 'manual'"
+                type="button"
+                class="record-delete-btn"
+                :title="$t('recorder.deleteRecord')"
+                @click="confirmDeleteRecord(entry)"
+              >
+                <font-awesome-icon icon="trash-alt" />
+              </button>
+              <div class="manual-label">
+                {{
+                  entry.category === "vote"
+                    ? $t("recorder.voteTitle")
+                    : entry.category === "voteScaffold"
+                    ? $t("recorder.voteScaffoldTitle")
+                    : entry.category === "execution"
+                    ? $t("recorder.executionTitle")
+                    : entry.category === "noExecution"
+                    ? $t("recorder.noExecution")
+                    : entry.category === "alivePlayers"
+                    ? $t("recorder.alivePlayersTitle")
+                    : entry.category === "deadVote"
+                    ? $t("recorder.deadVoteTitle")
+                    : $t("recorder.manualTitle")
+                }}
+              </div>
+              <div class="manual-summary">{{ entry.message }}</div>
+              <span class="manual-detail" v-if="entry.detail"
+                >└ {{ entry.detail }}</span
+              >
+              <button
+                type="button"
+                class="btn edit"
+                @click="startEditEntry(entry)"
+              >
+                {{ $t("recorder.editRecord") }}
+              </button>
+            </div>
+            <VoteLogCard
+              v-else-if="entry.category === 'vote'"
+              :key="'edit-vote-' + (entry.manualKey || entry.id)"
+              :players="players"
+              :day-votes="dayVoteSnapshots"
+              :edit-entry-id="entry.id"
+              :initial-snapshot="voteEditSnapshot(entry)"
+              @record="onVoteRecord"
+              @delete="onDeleteManual"
+              @dismiss="closeManualEdit"
+            />
+            <DeadVoteLogCard
+              v-else-if="entry.category === 'deadVote'"
+              :key="'edit-dead-' + (entry.manualKey || entry.id)"
+              :players="players"
+              :edit-entry-id="entry.id"
+              :initial-snapshot="voteEditSnapshot(entry)"
+              @record="onDeadVoteRecord"
+              @delete="onDeleteManual"
+              @dismiss="closeManualEdit"
+            />
+            <ManualLogCard
+              v-else
+              :key="'edit-' + (entry.manualKey || entry.id)"
+              :players="players"
+              :script-roles="scriptRoles"
+              :linked-mode="linkedMode"
+              :edit-entry-id="entry.id"
+              :initial-tokens="manualEditTokens(entry)"
+              :initial-use-result-line="manualEditUseResultLine(entry)"
+              @record="onManualRecord"
+              @delete="onDeleteManual"
+              @dismiss="closeManualEdit"
+            />
+          </template>
+          <button
+            v-if="isVoting && !voteFormOpen"
+            type="button"
+            class="add-manual-btn add-vote-btn"
+            @click="openVoteForm"
           >
+            {{ $t("recorder.addVote") }}
+          </button>
+          <VoteLogCard
+            v-else-if="isVoting && voteFormOpen"
+            :players="players"
+            :day-votes="dayVoteSnapshots"
+            @record="onVoteRecord"
+            @dismiss="closeVoteForm"
+          />
+          <button
+            v-if="isVoting && !deadVoteFormOpen"
+            type="button"
+            class="add-manual-btn add-dead-vote-btn"
+            @click="openDeadVoteForm"
+          >
+            {{ $t("recorder.addDeadVote") }}
+          </button>
+          <DeadVoteLogCard
+            v-else-if="isVoting && deadVoteFormOpen"
+            :players="players"
+            :initial-snapshot="deadVotePrefill"
+            @record="onDeadVoteRecord"
+            @dismiss="closeDeadVoteForm"
+          />
+          <button
+            v-if="isDusk && !executionFormOpen"
+            type="button"
+            class="add-manual-btn add-execution-btn"
+            @click="openExecutionForm"
+          >
+            {{ $t("recorder.addExecution") }}
+          </button>
+          <ExecutionLogCard
+            v-else-if="isDusk && executionFormOpen"
+            :players="players"
+            :default-nominee="duskNominee"
+            @record="onExecutionRecord"
+            @dismiss="closeExecutionForm"
+          />
+          <button
+            v-if="!manualFormOpen && !optionalPickerOpen"
+            type="button"
+            class="add-manual-btn"
+            @click="openManualForm"
+          >
+            {{ $t("recorder.addManual") }}
+          </button>
+          <button
+            v-if="!manualFormOpen && !optionalPickerOpen"
+            type="button"
+            class="add-manual-btn add-optional-btn"
+            @click="openOptionalPicker"
+          >
+            {{ $t("recorder.addOptional") }}
+          </button>
+          <div v-if="optionalPickerOpen && !isNight" class="optional-picker">
             <div class="optional-picker-head">
               <span>{{ $t("recorder.optionalTitle") }}</span>
               <button
@@ -253,7 +588,7 @@
             </p>
             <button
               v-for="c in optionalCandidates"
-              :key="'pick-' + c.playerIndex + '-' + c.role.id"
+              :key="'day-pick-' + c.playerIndex + '-' + c.role.id"
               type="button"
               class="optional-pick-btn"
               :class="{ disabled: c.onceUsed && !c.recordedThisPhase }"
@@ -266,121 +601,28 @@
               }}</span>
             </button>
           </div>
-          <ManualLogCard
-            v-else-if="row.type === 'manualSlot' && manualFormOpen"
-            :players="players"
-            :script-roles="scriptRoles"
-            :linked-mode="linkedMode"
-            :initial-tokens="manualPrefillTokens"
-            @record="onManualRecord"
-            @dismiss="closeManualForm"
-          />
           <div
-            v-else-if="row.type === 'manualRecorded' && !isEditingManual(row.entry)"
-            class="manual-recorded-card"
-          >
-            <button
-              type="button"
-              class="record-delete-btn"
-              :title="$t('recorder.deleteRecord')"
-              @click="confirmDeleteRecord(row.entry)"
-            >
-              <font-awesome-icon icon="trash-alt" />
-            </button>
-            <div class="manual-label">{{ $t("recorder.manualTitle") }}</div>
-            <div class="manual-summary">{{ row.entry.message }}</div>
-            <span class="manual-detail" v-if="row.entry.detail"
-              >└ {{ row.entry.detail }}</span
-            >
-            <button
-              type="button"
-              class="btn edit"
-              @click="startEditManual(row.entry)"
-            >
-              {{ $t("recorder.editRecord") }}
-            </button>
-          </div>
-          <ManualLogCard
-            v-else-if="row.type === 'manualRecorded' && isEditingManual(row.entry)"
-            :key="'edit-night-' + row.entry.id"
-            :players="players"
-            :script-roles="scriptRoles"
-            :linked-mode="linkedMode"
-            :edit-entry-id="row.entry.id"
-            :initial-tokens="manualEditTokens(row.entry)"
-            :initial-use-result-line="manualEditUseResultLine(row.entry)"
-            @record="onManualRecord"
-            @delete="onDeleteManual"
-            @dismiss="closeManualEdit"
-          />
-          <div
-            v-else-if="row.type === 'optionalRole'"
+            v-for="card in dayOptionalCards"
+            :key="'day-opt-' + card.roleCardKey"
             class="optional-card-wrap"
           >
-            <div v-if="!row.card.isRecorded" class="optional-card-bar">
+            <div v-if="!card.isRecorded" class="optional-card-bar">
               <span class="optional-card-tag">{{
                 $t("recorder.optionalTitle")
               }}</span>
               <button
                 type="button"
                 class="optional-dismiss"
-                @click="dismissOptionalDraft"
+                @click="dismissOptionalCard(card)"
               >
                 {{ $t("recorder.optionalDismiss") }}
               </button>
             </div>
             <RoleActionCard
-              :player="row.card.player"
-              :player-index="row.card.playerIndex"
-              :role-card-key="row.card.roleCardKey"
-              :card-key="row.card.cardKey"
-              :reminder="row.card.reminder"
-              :players="players"
-              :role-options="scriptRoles"
-              :is-recorded="row.card.isRecorded"
-              :recorded-entry="row.card.recordedEntry"
-              @record="onOptionalRoleRecord"
-              @delete="onDeleteRoleCard"
-            />
-          </div>
-          <RoleActionCard
-            v-else-if="row.type === 'role'"
-            :player="row.card.player"
-            :player-index="row.card.playerIndex"
-            :role-card-key="row.card.roleCardKey"
-            :reminder="row.card.reminder"
-            :players="players"
-            :role-options="scriptRoles"
-            :is-recorded="row.card.isRecorded"
-            :recorded-entry="row.card.recordedEntry"
-            @record="onRoleRecord"
-            @delete="onDeleteRoleCard"
-          />
-        </div>
-        <p v-if="!nightCards.length && !setupCards.length" class="empty-hint">
-          {{ $t("recorder.noNightActions") }}
-        </p>
-      </template>
-
-      <template v-else>
-        <div
-          v-if="dayAbilityCards.length"
-          class="day-ability-block"
-        >
-          <h4 class="day-ability-title">{{ $t("recorder.dayAbilityTitle") }}</h4>
-          <p class="day-ability-hint">{{ $t("recorder.dayAbilityHint") }}</p>
-          <div
-            v-for="card in dayAbilityCards"
-            :key="'day-ability-' + card.roleCardKey"
-            class="day-ability-card-wrap"
-          >
-            <RoleActionCard
               :player="card.player"
               :player-index="card.playerIndex"
               :role-card-key="card.roleCardKey"
               :card-key="card.cardKey"
-              :day-mode="true"
-              :day-number="dayNumber"
               :reminder="card.reminder"
               :players="players"
               :role-options="scriptRoles"
@@ -390,241 +632,32 @@
               @delete="onDeleteRoleCard"
             />
           </div>
-        </div>
-        <template v-for="entry in phaseDayEntries">
-          <div
-            v-if="!isEditingEntry(entry)"
-            :key="'rec-' + (entry.manualKey || entry.id)"
-            class="manual-recorded-card"
-            :class="{
-              vote: entry.category === 'vote',
-              scaffold: entry.category === 'voteScaffold',
-              execution: entry.category === 'execution' || entry.category === 'noExecution',
-              alive: entry.category === 'alivePlayers',
-              'dead-vote': entry.category === 'deadVote',
-            }"
-          >
-            <button
-              v-if="entry.category === 'manual'"
-              type="button"
-              class="record-delete-btn"
-              :title="$t('recorder.deleteRecord')"
-              @click="confirmDeleteRecord(entry)"
-            >
-              <font-awesome-icon icon="trash-alt" />
-            </button>
-            <div class="manual-label">
-              {{
-                entry.category === "vote"
-                  ? $t("recorder.voteTitle")
-                  : entry.category === "voteScaffold"
-                    ? $t("recorder.voteScaffoldTitle")
-                    : entry.category === "execution"
-                      ? $t("recorder.executionTitle")
-                      : entry.category === "noExecution"
-                        ? $t("recorder.noExecution")
-                        : entry.category === "alivePlayers"
-                          ? $t("recorder.alivePlayersTitle")
-                          : entry.category === "deadVote"
-                            ? $t("recorder.deadVoteTitle")
-                            : $t("recorder.manualTitle")
-              }}
-            </div>
-            <div class="manual-summary">{{ entry.message }}</div>
-            <span class="manual-detail" v-if="entry.detail"
-              >└ {{ entry.detail }}</span
-            >
-            <button
-              type="button"
-              class="btn edit"
-              @click="startEditEntry(entry)"
-            >
-              {{ $t("recorder.editRecord") }}
-            </button>
-          </div>
-          <VoteLogCard
-            v-else-if="entry.category === 'vote'"
-            :key="'edit-vote-' + (entry.manualKey || entry.id)"
-            :players="players"
-            :day-votes="dayVoteSnapshots"
-            :edit-entry-id="entry.id"
-            :initial-snapshot="voteEditSnapshot(entry)"
-            @record="onVoteRecord"
-            @delete="onDeleteManual"
-            @dismiss="closeManualEdit"
-          />
-          <DeadVoteLogCard
-            v-else-if="entry.category === 'deadVote'"
-            :key="'edit-dead-' + (entry.manualKey || entry.id)"
-            :players="players"
-            :edit-entry-id="entry.id"
-            :initial-snapshot="voteEditSnapshot(entry)"
-            @record="onDeadVoteRecord"
-            @delete="onDeleteManual"
-            @dismiss="closeManualEdit"
-          />
           <ManualLogCard
-            v-else
-            :key="'edit-' + (entry.manualKey || entry.id)"
+            v-if="manualFormOpen"
             :players="players"
             :script-roles="scriptRoles"
             :linked-mode="linkedMode"
-            :edit-entry-id="entry.id"
-            :initial-tokens="manualEditTokens(entry)"
-            :initial-use-result-line="manualEditUseResultLine(entry)"
+            :initial-tokens="manualPrefillTokens"
             @record="onManualRecord"
-            @delete="onDeleteManual"
-            @dismiss="closeManualEdit"
+            @dismiss="closeManualForm"
           />
-        </template>
-        <button
-          v-if="isVoting && !voteFormOpen"
-          type="button"
-          class="add-manual-btn add-vote-btn"
-          @click="openVoteForm"
-        >
-          {{ $t("recorder.addVote") }}
-        </button>
-        <VoteLogCard
-          v-else-if="isVoting && voteFormOpen"
-          :players="players"
-          :day-votes="dayVoteSnapshots"
-          @record="onVoteRecord"
-          @dismiss="closeVoteForm"
-        />
-        <button
-          v-if="isVoting && !deadVoteFormOpen"
-          type="button"
-          class="add-manual-btn add-dead-vote-btn"
-          @click="openDeadVoteForm"
-        >
-          {{ $t("recorder.addDeadVote") }}
-        </button>
-        <DeadVoteLogCard
-          v-else-if="isVoting && deadVoteFormOpen"
-          :players="players"
-          :initial-snapshot="deadVotePrefill"
-          @record="onDeadVoteRecord"
-          @dismiss="closeDeadVoteForm"
-        />
-        <button
-          v-if="isDusk && !executionFormOpen"
-          type="button"
-          class="add-manual-btn add-execution-btn"
-          @click="openExecutionForm"
-        >
-          {{ $t("recorder.addExecution") }}
-        </button>
-        <ExecutionLogCard
-          v-else-if="isDusk && executionFormOpen"
-          :players="players"
-          :default-nominee="duskNominee"
-          @record="onExecutionRecord"
-          @dismiss="closeExecutionForm"
-        />
-        <button
-          v-if="!manualFormOpen && !optionalPickerOpen"
-          type="button"
-          class="add-manual-btn"
-          @click="openManualForm"
-        >
-          {{ $t("recorder.addManual") }}
-        </button>
-        <button
-          v-if="!manualFormOpen && !optionalPickerOpen"
-          type="button"
-          class="add-manual-btn add-optional-btn"
-          @click="openOptionalPicker"
-        >
-          {{ $t("recorder.addOptional") }}
-        </button>
-        <div v-if="optionalPickerOpen && !isNight" class="optional-picker">
-          <div class="optional-picker-head">
-            <span>{{ $t("recorder.optionalTitle") }}</span>
-            <button
-              type="button"
-              class="optional-dismiss"
-              @click="closeOptionalPicker"
-            >
-              {{ $t("recorder.optionalDismiss") }}
-            </button>
-          </div>
-          <p class="optional-hint">{{ $t("recorder.optionalPickHint") }}</p>
-          <p v-if="!optionalCandidates.length" class="empty-hint">
-            {{ $t("recorder.optionalEmpty") }}
-          </p>
-          <button
-            v-for="c in optionalCandidates"
-            :key="'day-pick-' + c.playerIndex + '-' + c.role.id"
-            type="button"
-            class="optional-pick-btn"
-            :class="{ disabled: c.onceUsed && !c.recordedThisPhase }"
-            :disabled="c.onceUsed && !c.recordedThisPhase"
-            @click="selectOptionalCandidate(c)"
-          >
-            <span class="optional-pick-label">{{ c.label }}</span>
-            <span v-if="c.onceUsed" class="optional-once-tag">{{
-              $t("recorder.optionalOnceUsed")
-            }}</span>
-          </button>
-        </div>
-        <div
-          v-for="card in dayOptionalCards"
-          :key="'day-opt-' + card.roleCardKey"
-          class="optional-card-wrap"
-        >
-          <div v-if="!card.isRecorded" class="optional-card-bar">
-            <span class="optional-card-tag">{{
-              $t("recorder.optionalTitle")
-            }}</span>
-            <button
-              type="button"
-              class="optional-dismiss"
-              @click="dismissOptionalDraft"
-            >
-              {{ $t("recorder.optionalDismiss") }}
-            </button>
-          </div>
-          <RoleActionCard
-            :player="card.player"
-            :player-index="card.playerIndex"
-            :role-card-key="card.roleCardKey"
-            :card-key="card.cardKey"
-            :reminder="card.reminder"
-            :players="players"
-            :role-options="scriptRoles"
-            :is-recorded="card.isRecorded"
-            :recorded-entry="card.recordedEntry"
-            @record="onOptionalRoleRecord"
-            @delete="onDeleteRoleCard"
-          />
-        </div>
-        <ManualLogCard
-          v-if="manualFormOpen"
-          :players="players"
-          :script-roles="scriptRoles"
-          :linked-mode="linkedMode"
-          :initial-tokens="manualPrefillTokens"
-          @record="onManualRecord"
-          @dismiss="closeManualForm"
-        />
-        <p class="empty-hint">
-          {{
-            isDusk
-              ? $t("recorder.duskHint")
-              : isVoting
+          <p class="empty-hint">
+            {{
+              isDusk
+                ? $t("recorder.duskHint")
+                : isVoting
                 ? $t("recorder.votePhaseHint")
                 : $t("recorder.dayHint")
-          }}
-        </p>
-      </template>
+            }}
+          </p>
+        </template>
 
-      <ul class="mini-timeline" v-if="phaseEntries.length">
-        <li v-for="e in phaseEntries" :key="e.id">
-          {{ e.message }}
-          <span v-if="e.detail" class="detail">└ {{ e.detail }}</span>
-        </li>
-      </ul>
+        <ul class="mini-timeline" v-if="phaseEntries.length">
+          <li v-for="e in phaseEntries" :key="e.id">
+            {{ e.message }}
+            <span v-if="e.detail" class="detail">└ {{ e.detail }}</span>
+          </li>
+        </ul>
       </template>
     </div>
   </div>
@@ -662,7 +695,11 @@ import {
 } from "../store/roleInteractionEngine";
 import { formatLogMessage } from "../store/modules/battleLog";
 import { formatEntryForDisplay } from "../store/battleLogFormat";
-import { pendingLabelKey, FACT_TYPES, resolvePlayerIndex } from "../store/battleLogEffects";
+import {
+  pendingLabelKey,
+  FACT_TYPES,
+  resolvePlayerIndex,
+} from "../store/battleLogEffects";
 
 const SETUP_UNASSIGNED = -1;
 
@@ -702,6 +739,8 @@ export default {
       optionalPickerOpen: false,
       /** @type {{ playerIndex: number, roleId: string } | null} */
       optionalDraft: null,
+      /** roleCardKeys dismissed this phase (unrecorded optional cards) */
+      dismissedOptionalKeys: [],
     };
   },
   watch: {
@@ -715,6 +754,7 @@ export default {
       this.deadVotePrefill = null;
       this.optionalPickerOpen = false;
       this.optionalDraft = null;
+      this.dismissedOptionalKeys = [];
       this.$store.dispatch("battleLog/clearPreviewEffects");
       this.$nextTick(() => {
         this.maybeAutoOpenExecutionForm();
@@ -724,7 +764,12 @@ export default {
   computed: {
     ...mapState(["session", "roles"]),
     ...mapState("players", ["players"]),
-    ...mapState("battleLog", ["entries", "gameMeta", "linkedMode"]),
+    ...mapState("battleLog", [
+      "entries",
+      "gameMeta",
+      "linkedMode",
+      "phaseOrders",
+    ]),
     ...mapState("interactionRules", ["overlay"]),
     ...mapGetters("gamePhase", [
       "displayLabel",
@@ -762,6 +807,7 @@ export default {
             key,
             label: entry.phase.label || key,
             entries: [],
+            phase: entry.phase,
           });
         }
         byPhase.get(key).entries.push(entry);
@@ -769,16 +815,39 @@ export default {
 
       const sections = [...byPhase.values()].filter((s) => s.entries.length);
       sections.forEach((section) => {
-        section.entries.sort(
-          (a, b) =>
-            new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
+        const orderedIds = this.orderedEntryIdsForPhase(
+          section.key,
+          section.entries,
+          section.phase,
         );
+        const byId = new Map(section.entries.map((e) => [e.id, e]));
+        const ordered = [];
+        orderedIds.forEach((id) => {
+          const e = byId.get(id);
+          if (e) {
+            ordered.push(e);
+            byId.delete(id);
+          }
+        });
+        // Append any leftovers not covered by the order list
+        byId.forEach((e) => ordered.push(e));
+        section.entries = ordered;
       });
-      // Phase order follows the earliest event in each section (game timeline)
+      // Phase order follows game phase progression (first appearance in entries)
+      const phaseFirstIndex = new Map();
+      this.entries.forEach((entry, idx) => {
+        if (!entry.phase) return;
+        const key = entry.phase.id || entry.phase.label;
+        if (key && !phaseFirstIndex.has(key)) phaseFirstIndex.set(key, idx);
+      });
       sections.sort((a, b) => {
-        const ta = new Date(a.entries[0].timestamp).getTime();
-        const tb = new Date(b.entries[0].timestamp).getTime();
-        return ta - tb;
+        const ia = phaseFirstIndex.has(a.key)
+          ? phaseFirstIndex.get(a.key)
+          : Number.MAX_SAFE_INTEGER;
+        const ib = phaseFirstIndex.has(b.key)
+          ? phaseFirstIndex.get(b.key)
+          : Number.MAX_SAFE_INTEGER;
+        return ia - ib;
       });
       return sections;
     },
@@ -849,8 +918,7 @@ export default {
         const recordedEntry = this.entryByRoleCardKey(roleCardKey);
         const setupRule = getSetupRule(setupRoleId, this.overlay);
         const placeholderPlayer =
-          player ||
-          this.disguiseSetupPlaceholder(setupRoleId);
+          player || this.disguiseSetupPlaceholder(setupRoleId);
         if (!placeholderPlayer) return;
         cards.push({
           player: placeholderPlayer,
@@ -868,7 +936,12 @@ export default {
 
       const hasRecordedDisguiseSetup = (setupRoleId) =>
         this.entries.some((e) => {
-          if (!e || e.source !== "roleCard" || !e.phase || e.phase.id !== phaseId)
+          if (
+            !e ||
+            e.source !== "roleCard" ||
+            !e.phase ||
+            e.phase.id !== phaseId
+          )
             return false;
           const parsed = parseSetupRoleCardKey(e.roleCardKey);
           if (!parsed || parsed.roleId !== setupRoleId) return false;
@@ -900,8 +973,7 @@ export default {
         if (!isDisguiseRoleInScript(setupRoleId)) return;
         const assignedIdx = this.players.findIndex(
           (p) =>
-            p.role &&
-            String(p.role.id || "").toLowerCase() === setupRoleId,
+            p.role && String(p.role.id || "").toLowerCase() === setupRoleId,
         );
         if (assignedIdx >= 0) {
           pushCard(assignedIdx, setupRoleId);
@@ -941,8 +1013,8 @@ export default {
                 card.setupRoleId === "marionette"
                   ? "提線木偶"
                   : card.setupRoleId === "drunk"
-                    ? "酒鬼"
-                    : card.setupRoleId
+                  ? "酒鬼"
+                  : card.setupRoleId
               }`
             : formatPlayerRoleLabel(card.player, card.playerIndex),
         note: card.reminder,
@@ -996,7 +1068,10 @@ export default {
         const usable = cards.filter((card) => {
           if (this.isNight) return cardAppearsInNightOptional(card);
           // Day picker: event/optional only — auto-listed day abilities excluded
-          if (isDayAbilityCard(card) && ruleAppliesToday(card, this.dayNumber)) {
+          if (
+            isDayAbilityCard(card) &&
+            ruleAppliesToday(card, this.dayNumber)
+          ) {
             return false;
           }
           return cardAppearsInDayOptional(card, this.dayNumber);
@@ -1050,6 +1125,7 @@ export default {
       const dayKeys = new Set(this.dayAbilityCards.map((c) => c.roleCardKey));
       const cards = [];
       const seen = new Set();
+      const dismissed = new Set(this.dismissedOptionalKeys || []);
 
       const pushCard = (playerIndex, roleId, cardKey = "") => {
         const player = this.players[playerIndex];
@@ -1065,6 +1141,7 @@ export default {
           return;
         }
         const recordedEntry = this.entryByRoleCardKey(roleCardKey);
+        if (!recordedEntry && dismissed.has(roleCardKey)) return;
         const rule =
           (cardKey && getCardByKey(id, cardKey, this.overlay)) ||
           (cardKey && getDayRule(id, this.dayNumber, this.overlay)) ||
@@ -1074,13 +1151,18 @@ export default {
           player,
           playerIndex,
           roleCardKey,
-          cardKey:
-            cardKey ||
-            (rule && (rule.cardKey || rule.key)) ||
-            "",
+          cardKey: cardKey || (rule && (rule.cardKey || rule.key)) || "",
           reminder: (rule && rule.notes) || "",
           isRecorded: !!recordedEntry,
           recordedEntry,
+          insertBeforeRoleCardKey:
+            recordedEntry && recordedEntry.insertBeforeRoleCardKey != null
+              ? recordedEntry.insertBeforeRoleCardKey
+              : recordedEntry
+              ? MANUAL_END
+              : this.isNight
+              ? this.insertBeforeRoleCardKey
+              : MANUAL_END,
         });
         seen.add(roleCardKey);
       };
@@ -1093,13 +1175,6 @@ export default {
         );
       }
 
-      // Auto-list seated trigger/optional roles (e.g. 莽夫) so cards appear
-      // without requiring "+可選紀錄" first.
-      (this.optionalCandidates || []).forEach((c) => {
-        if (!c || (c.onceUsed && !c.recordedThisPhase)) return;
-        pushCard(c.playerIndex, c.role && c.role.id, c.cardKey || "");
-      });
-
       this.entries.forEach((e) => {
         if (!e || e.source !== "roleCard" || !e.roleCardKey) return;
         if (!e.phase || e.phase.id !== phaseId) return;
@@ -1111,11 +1186,7 @@ export default {
         // Skip if this is an auto day-ability already listed
         if (
           !this.isNight &&
-          roleHasDayAction(
-            { id: parsed.roleId },
-            this.dayNumber,
-            this.overlay,
-          )
+          roleHasDayAction({ id: parsed.roleId }, this.dayNumber, this.overlay)
         ) {
           return;
         }
@@ -1130,7 +1201,22 @@ export default {
     },
     dayOptionalCards() {
       if (this.isNight) return [];
-      return this.optionalCards;
+      const cards = this.optionalCards;
+      const order = this.phaseOrders && this.phaseOrders[this.currentPhase.id];
+      if (!order || !order.length) return cards;
+      const rank = new Map(order.map((eid, i) => [eid, i]));
+      return cards.slice().sort((a, b) => {
+        const ida = a.recordedEntry && a.recordedEntry.id;
+        const idb = b.recordedEntry && b.recordedEntry.id;
+        const ra =
+          ida && rank.has(ida) ? rank.get(ida) : Number.MAX_SAFE_INTEGER;
+        const rb =
+          idb && rank.has(idb) ? rank.get(idb) : Number.MAX_SAFE_INTEGER;
+        if (ra !== rb) return ra - rb;
+        // Unrecorded drafts stay after recorded
+        if (a.isRecorded !== b.isRecorded) return a.isRecorded ? -1 : 1;
+        return 0;
+      });
     },
     phaseManualEntries() {
       const id = this.currentPhase.id;
@@ -1150,7 +1236,7 @@ export default {
         "noExecution",
         "alivePlayers",
       ];
-      return this.entries.filter(
+      const list = this.entries.filter(
         (e) =>
           e.phase &&
           e.phase.id === id &&
@@ -1163,6 +1249,15 @@ export default {
             (e.source === "system" && e.category === "alivePlayers") ||
             extraCategories.includes(e.category)),
       );
+      const order = this.phaseOrders && this.phaseOrders[id];
+      if (!order || !order.length) return list;
+      const rank = new Map(order.map((eid, i) => [eid, i]));
+      return list.slice().sort((a, b) => {
+        const ra = rank.has(a.id) ? rank.get(a.id) : Number.MAX_SAFE_INTEGER;
+        const rb = rank.has(b.id) ? rank.get(b.id) : Number.MAX_SAFE_INTEGER;
+        if (ra !== rb) return ra - rb;
+        return 0;
+      });
     },
     firstUnrecordedIndex() {
       return this.nightCards.findIndex(
@@ -1177,23 +1272,50 @@ export default {
     nightRows() {
       const rows = [];
       const manuals = this.phaseManualEntries;
-      const used = new Set();
+      const optionals = this.optionalCards || [];
+      const usedManuals = new Set();
+      const usedOptionals = new Set();
+      const customOrder =
+        (this.phaseOrders && this.phaseOrders[this.currentPhase.id]) || null;
+
+      const insertKeyOf = (entry) =>
+        entry.insertBeforeRoleCardKey == null
+          ? MANUAL_END
+          : entry.insertBeforeRoleCardKey;
+
       const pushManualsBefore = (beforeKey) => {
         manuals
-          .filter((m) => {
-            const key =
-              m.insertBeforeRoleCardKey == null
-                ? MANUAL_END
-                : m.insertBeforeRoleCardKey;
-            return key === beforeKey;
-          })
+          .filter((m) => insertKeyOf(m) === beforeKey)
           .forEach((m) => {
             rows.push({
               type: "manualRecorded",
               key: m.manualKey || m.id,
               entry: m,
             });
-            used.add(m.id);
+            usedManuals.add(m.id);
+          });
+      };
+
+      const pushOptionalsBefore = (beforeKey, { recordedOnly } = {}) => {
+        optionals
+          .filter((card) => {
+            if (usedOptionals.has(card.roleCardKey)) return false;
+            if (recordedOnly && !card.isRecorded) return false;
+            if (!recordedOnly && card.isRecorded) return false;
+            const key = card.isRecorded
+              ? card.insertBeforeRoleCardKey == null
+                ? MANUAL_END
+                : card.insertBeforeRoleCardKey
+              : this.insertBeforeRoleCardKey;
+            return key === beforeKey;
+          })
+          .forEach((card) => {
+            rows.push({
+              type: "optionalRole",
+              key: "opt-" + card.roleCardKey,
+              card,
+            });
+            usedOptionals.add(card.roleCardKey);
           });
       };
 
@@ -1202,10 +1324,167 @@ export default {
           ? this.nightCards.length
           : this.firstUnrecordedIndex;
 
-      if (!this.nightCards.length) {
-        pushManualsBefore(MANUAL_END);
+      const pushInsertablesBefore = (beforeKey, includeDrafts) => {
+        pushManualsBefore(beforeKey);
+        pushOptionalsBefore(beforeKey, { recordedOnly: true });
+        if (includeDrafts) {
+          pushOptionalsBefore(beforeKey, { recordedOnly: false });
+        }
+      };
+
+      // When a custom phase order exists, place recorded items in that
+      // sequence while keeping unrecorded night roles in script order.
+      if (customOrder && customOrder.length) {
+        const entryById = new Map(this.entries.map((e) => [e.id, e]));
+        const nightKeySet = new Set(this.nightCards.map((c) => c.roleCardKey));
+        const nightCardByKey = new Map(
+          this.nightCards.map((c) => [c.roleCardKey, c]),
+        );
+        const optionalByKey = new Map(optionals.map((c) => [c.roleCardKey, c]));
+        const shownNight = new Set();
+        let slotPlaced = false;
+
+        const flushUnrecordedBefore = (roleCardKey) => {
+          for (const card of this.nightCards) {
+            if (card.roleCardKey === roleCardKey) break;
+            if (shownNight.has(card.roleCardKey)) continue;
+            if (card.isRecorded) continue;
+            if (
+              !slotPlaced &&
+              card.roleCardKey === this.nightCards[insertAt]?.roleCardKey
+            ) {
+              rows.push({ type: "manualSlot", key: "manual-slot" });
+              optionals
+                .filter(
+                  (c) => !c.isRecorded && !usedOptionals.has(c.roleCardKey),
+                )
+                .forEach((c) => {
+                  rows.push({
+                    type: "optionalRole",
+                    key: "opt-" + c.roleCardKey,
+                    card: c,
+                  });
+                  usedOptionals.add(c.roleCardKey);
+                });
+              slotPlaced = true;
+            }
+            rows.push({ type: "role", key: card.roleCardKey, card });
+            shownNight.add(card.roleCardKey);
+          }
+        };
+
+        customOrder.forEach((id) => {
+          const entry = entryById.get(id);
+          if (!entry) return;
+          if (entry.source === "manual" && entry.category === "manual") {
+            rows.push({
+              type: "manualRecorded",
+              key: entry.manualKey || entry.id,
+              entry,
+            });
+            usedManuals.add(entry.id);
+            return;
+          }
+          if (entry.source === "roleCard" && entry.roleCardKey) {
+            if (nightKeySet.has(entry.roleCardKey)) {
+              flushUnrecordedBefore(entry.roleCardKey);
+              const card = nightCardByKey.get(entry.roleCardKey);
+              if (card && !shownNight.has(entry.roleCardKey)) {
+                if (
+                  !slotPlaced &&
+                  this.nightCards[insertAt] &&
+                  this.nightCards[insertAt].roleCardKey === entry.roleCardKey
+                ) {
+                  rows.push({ type: "manualSlot", key: "manual-slot" });
+                  optionals
+                    .filter(
+                      (c) => !c.isRecorded && !usedOptionals.has(c.roleCardKey),
+                    )
+                    .forEach((c) => {
+                      rows.push({
+                        type: "optionalRole",
+                        key: "opt-" + c.roleCardKey,
+                        card: c,
+                      });
+                      usedOptionals.add(c.roleCardKey);
+                    });
+                  slotPlaced = true;
+                }
+                rows.push({ type: "role", key: card.roleCardKey, card });
+                shownNight.add(card.roleCardKey);
+              }
+              return;
+            }
+            const opt = optionalByKey.get(entry.roleCardKey);
+            if (opt) {
+              rows.push({
+                type: "optionalRole",
+                key: "opt-" + opt.roleCardKey,
+                card: opt,
+              });
+              usedOptionals.add(opt.roleCardKey);
+            }
+          }
+        });
+
+        // Remaining unrecorded night cards + slot + leftovers
+        this.nightCards.forEach((card, idx) => {
+          if (shownNight.has(card.roleCardKey)) return;
+          if (!slotPlaced && idx === insertAt) {
+            rows.push({ type: "manualSlot", key: "manual-slot" });
+            optionals
+              .filter((c) => !c.isRecorded && !usedOptionals.has(c.roleCardKey))
+              .forEach((c) => {
+                rows.push({
+                  type: "optionalRole",
+                  key: "opt-" + c.roleCardKey,
+                  card: c,
+                });
+                usedOptionals.add(c.roleCardKey);
+              });
+            slotPlaced = true;
+          }
+          rows.push({ type: "role", key: card.roleCardKey, card });
+          shownNight.add(card.roleCardKey);
+        });
+        if (!slotPlaced) {
+          rows.push({ type: "manualSlot", key: "manual-slot-end" });
+          optionals
+            .filter((c) => !c.isRecorded && !usedOptionals.has(c.roleCardKey))
+            .forEach((c) => {
+              rows.push({
+                type: "optionalRole",
+                key: "opt-" + c.roleCardKey,
+                card: c,
+              });
+              usedOptionals.add(c.roleCardKey);
+            });
+        }
         manuals
-          .filter((m) => !used.has(m.id))
+          .filter((m) => !usedManuals.has(m.id))
+          .forEach((m) => {
+            rows.push({
+              type: "manualRecorded",
+              key: m.manualKey || m.id,
+              entry: m,
+            });
+          });
+        optionals
+          .filter((c) => c.isRecorded && !usedOptionals.has(c.roleCardKey))
+          .forEach((c) => {
+            rows.push({
+              type: "optionalRole",
+              key: "opt-" + c.roleCardKey,
+              card: c,
+            });
+          });
+        return rows;
+      }
+
+      if (!this.nightCards.length) {
+        pushInsertablesBefore(MANUAL_END, true);
+        manuals
+          .filter((m) => !usedManuals.has(m.id))
           .forEach((m) => {
             rows.push({
               type: "manualRecorded",
@@ -1214,29 +1493,23 @@ export default {
             });
           });
         rows.push({ type: "manualSlot", key: "manual-slot" });
-        this.optionalCards.forEach((card) => {
-          rows.push({
-            type: "optionalRole",
-            key: "opt-" + card.roleCardKey,
-            card,
-          });
-        });
         return rows;
       }
 
       this.nightCards.forEach((card, idx) => {
-        pushManualsBefore(card.roleCardKey);
-        if (idx === insertAt) {
+        const atInsert = idx === insertAt;
+        pushInsertablesBefore(card.roleCardKey, atInsert);
+        if (atInsert) {
           rows.push({ type: "manualSlot", key: "manual-slot" });
         }
         rows.push({ type: "role", key: card.roleCardKey, card });
       });
-      pushManualsBefore(MANUAL_END);
+      pushInsertablesBefore(MANUAL_END, insertAt >= this.nightCards.length);
       if (insertAt >= this.nightCards.length) {
         rows.push({ type: "manualSlot", key: "manual-slot-end" });
       }
       manuals
-        .filter((m) => !used.has(m.id))
+        .filter((m) => !usedManuals.has(m.id))
         .forEach((m) => {
           rows.push({
             type: "manualRecorded",
@@ -1244,14 +1517,15 @@ export default {
             entry: m,
           });
         });
-
-      this.optionalCards.forEach((card) => {
-        rows.push({
-          type: "optionalRole",
-          key: "opt-" + card.roleCardKey,
-          card,
+      optionals
+        .filter((c) => !usedOptionals.has(c.roleCardKey))
+        .forEach((card) => {
+          rows.push({
+            type: "optionalRole",
+            key: "opt-" + card.roleCardKey,
+            card,
+          });
         });
-      });
       return rows;
     },
     phaseEntries() {
@@ -1344,8 +1618,7 @@ export default {
       const reader = new FileReader();
       reader.onload = () => {
         try {
-          const hasEntries =
-            this.entries && this.entries.length > 0;
+          const hasEntries = this.entries && this.entries.length > 0;
           if (
             hasEntries &&
             !window.confirm(this.$t("recorder.confirmImportReplace"))
@@ -1398,9 +1671,9 @@ export default {
         this.voteFormOpen = false;
         this.editingManualId = null;
         this.deadVotePrefill = {
-          players: (rec.prefill && rec.prefill.players) || [
-            fact.playerName,
-          ].filter(Boolean),
+          players:
+            (rec.prefill && rec.prefill.players) ||
+            [fact.playerName].filter(Boolean),
         };
         this.deadVoteFormOpen = true;
         return;
@@ -1419,13 +1692,13 @@ export default {
                   fact.factType === FACT_TYPES.REVIVE
                     ? "復活"
                     : fact.factType === FACT_TYPES.EVENT_POISON
-                      ? "中毒"
-                      : fact.factType === FACT_TYPES.IDENTITY_DRUNK ||
-                          fact.factType === FACT_TYPES.EVENT_DRUNK
-                        ? "醉酒"
-                        : fact.factType === FACT_TYPES.ABILITY_LOST
-                          ? "失去能力"
-                          : "死亡",
+                    ? "中毒"
+                    : fact.factType === FACT_TYPES.IDENTITY_DRUNK ||
+                      fact.factType === FACT_TYPES.EVENT_DRUNK
+                    ? "醉酒"
+                    : fact.factType === FACT_TYPES.ABILITY_LOST
+                    ? "失去能力"
+                    : "死亡",
               },
             ];
       this.manualFormOpen = true;
@@ -1464,6 +1737,29 @@ export default {
       this.optionalPickerOpen = false;
       this.$store.dispatch("battleLog/clearPreviewEffects");
     },
+    dismissOptionalCard(card) {
+      if (!card) {
+        this.dismissOptionalDraft();
+        return;
+      }
+      const key = card.roleCardKey;
+      if (key && !(this.dismissedOptionalKeys || []).includes(key)) {
+        this.dismissedOptionalKeys = this.dismissedOptionalKeys.concat(key);
+      }
+      if (
+        this.optionalDraft &&
+        key &&
+        buildRoleCardKey(
+          this.currentPhase.id,
+          this.optionalDraft.playerIndex,
+          this.optionalDraft.roleId,
+        ) === key
+      ) {
+        this.optionalDraft = null;
+      }
+      this.optionalPickerOpen = false;
+      this.$store.dispatch("battleLog/clearPreviewEffects");
+    },
     isOptionalOnceUsed(playerIndex, roleId) {
       const id = String(roleId || "").toLowerCase();
       return this.entries.some((e) => {
@@ -1482,6 +1778,14 @@ export default {
       if (!candidate) return;
       if (candidate.onceUsed && !candidate.recordedThisPhase) return;
       this.optionalPickerOpen = false;
+      const roleCardKey = buildRoleCardKey(
+        this.currentPhase.id,
+        candidate.playerIndex,
+        candidate.role.id,
+      );
+      this.dismissedOptionalKeys = (this.dismissedOptionalKeys || []).filter(
+        (k) => k !== roleCardKey,
+      );
       this.optionalDraft = {
         playerIndex: candidate.playerIndex,
         roleId: candidate.role.id,
@@ -1497,7 +1801,12 @@ export default {
         const player = this.players[parsed.playerIndex];
         if (player && player.abilityLost) return;
       }
-      this.$store.dispatch("battleLog/recordRoleAction", payload);
+      this.$store.dispatch("battleLog/recordRoleAction", {
+        ...payload,
+        insertBeforeRoleCardKey: this.isNight
+          ? this.insertBeforeRoleCardKey
+          : MANUAL_END,
+      });
       this.optionalDraft = null;
       this.optionalPickerOpen = false;
     },
@@ -1558,8 +1867,7 @@ export default {
       return entry && this.editingManualId === entry.id;
     },
     manualEditTokens(entry) {
-      const tokens =
-        entry && entry.formSnapshot && entry.formSnapshot.tokens;
+      const tokens = entry && entry.formSnapshot && entry.formSnapshot.tokens;
       if (Array.isArray(tokens) && tokens.length) {
         return tokens.map((t) => ({
           type: t.type,
@@ -1601,7 +1909,9 @@ export default {
     },
     onRoleRecord(payload) {
       const idx = payload
-        ? this.nightCards.findIndex((c) => c.roleCardKey === payload.roleCardKey)
+        ? this.nightCards.findIndex(
+            (c) => c.roleCardKey === payload.roleCardKey,
+          )
         : -1;
       const card = idx >= 0 ? this.nightCards[idx] : null;
       if (card && card.player && card.player.abilityLost) return;
@@ -1620,8 +1930,8 @@ export default {
         insertBeforeRoleCardKey: payload.editEntryId
           ? undefined
           : this.isNight
-            ? this.insertBeforeRoleCardKey
-            : MANUAL_END,
+          ? this.insertBeforeRoleCardKey
+          : MANUAL_END,
       });
       this.manualFormOpen = false;
       this.editingManualId = null;
@@ -1669,6 +1979,138 @@ export default {
       return new Date(ts).toLocaleTimeString("zh-TW", {
         hour: "2-digit",
         minute: "2-digit",
+      });
+    },
+    /**
+     * Default card-equivalent order for a phase (matches 階段紀錄 layout).
+     * Custom phaseOrders override when present.
+     */
+    orderedEntryIdsForPhase(phaseId, phaseEntries, phaseMeta) {
+      const stored = this.phaseOrders && this.phaseOrders[phaseId];
+      if (Array.isArray(stored) && stored.length) {
+        return stored.slice();
+      }
+      return this.defaultCardOrderIds(phaseId, phaseEntries, phaseMeta);
+    },
+    defaultCardOrderIds(phaseId, phaseEntries, phaseMeta) {
+      const entries = phaseEntries || [];
+      const isNightPhase =
+        (phaseMeta && phaseMeta.subPhase === "night") ||
+        (phaseMeta && phaseMeta.type === "night") ||
+        (this.currentPhase && this.currentPhase.id === phaseId && this.isNight);
+
+      if (
+        isNightPhase &&
+        this.currentPhase &&
+        this.currentPhase.id === phaseId
+      ) {
+        // Use live nightRows for the current night phase
+        const ids = [];
+        (this.nightRows || []).forEach((row) => {
+          if (row.type === "manualRecorded" && row.entry) {
+            ids.push(row.entry.id);
+          } else if (
+            row.type === "role" &&
+            row.card &&
+            row.card.recordedEntry
+          ) {
+            ids.push(row.card.recordedEntry.id);
+          } else if (
+            row.type === "optionalRole" &&
+            row.card &&
+            row.card.recordedEntry
+          ) {
+            ids.push(row.card.recordedEntry.id);
+          }
+        });
+        // Include other phase entries not represented as cards (e.g. nightDeaths)
+        entries.forEach((e) => {
+          if (!ids.includes(e.id)) ids.push(e.id);
+        });
+        return ids;
+      }
+
+      if (isNightPhase) {
+        // Past night: reconstruct from night order + insertBefore
+        const nightOrderCards = [];
+        this.players.forEach((player, playerIndex) => {
+          const role = player.role;
+          if (
+            !roleHasNightAction(
+              role,
+              phaseMeta && phaseMeta.number === 0,
+              this.overlay,
+            )
+          )
+            return;
+          const roleCardKey = buildRoleCardKey(phaseId, playerIndex, role.id);
+          const order =
+            phaseMeta && phaseMeta.number === 0
+              ? role.firstNight || 0
+              : role.otherNight || 0;
+          nightOrderCards.push({ roleCardKey, order });
+        });
+        nightOrderCards.sort((a, b) => a.order - b.order);
+
+        const manuals = entries.filter(
+          (e) => e.source === "manual" && e.category === "manual",
+        );
+        const roleEntries = entries.filter((e) => e.source === "roleCard");
+        const used = new Set();
+        const ids = [];
+        const pushBefore = (beforeKey) => {
+          manuals
+            .filter((m) => {
+              const key =
+                m.insertBeforeRoleCardKey == null
+                  ? MANUAL_END
+                  : m.insertBeforeRoleCardKey;
+              return key === beforeKey && !used.has(m.id);
+            })
+            .forEach((m) => {
+              ids.push(m.id);
+              used.add(m.id);
+            });
+          roleEntries
+            .filter((e) => {
+              if (used.has(e.id)) return false;
+              // Optional cards carry insertBefore; regular night roles do not
+              if (e.insertBeforeRoleCardKey == null) return false;
+              return e.insertBeforeRoleCardKey === beforeKey;
+            })
+            .forEach((e) => {
+              ids.push(e.id);
+              used.add(e.id);
+            });
+        };
+        nightOrderCards.forEach((card) => {
+          pushBefore(card.roleCardKey);
+          const rec = roleEntries.find(
+            (e) => e.roleCardKey === card.roleCardKey && !used.has(e.id),
+          );
+          if (rec) {
+            ids.push(rec.id);
+            used.add(rec.id);
+          }
+        });
+        pushBefore(MANUAL_END);
+        entries.forEach((e) => {
+          if (!used.has(e.id)) ids.push(e.id);
+        });
+        return ids;
+      }
+
+      // Day / dusk / voting: entries array order (insertion), which matches cards
+      return entries.map((e) => e.id);
+    },
+    movePreviewEntry(section, entry, direction) {
+      if (!section || !entry) return;
+      const fallbackOrder = section.entries.map((e) => e.id);
+      this.$store.dispatch("battleLog/movePhaseEntry", {
+        phaseId: section.key,
+        entryId: entry.id,
+        direction,
+        fallbackOrder,
       });
     },
     entryMessage(entry) {
@@ -1965,11 +2407,44 @@ export default {
   padding: 0;
   margin: 0;
   font-size: 0.72rem;
-  li {
+  li.preview-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
     padding: 4px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     word-break: break-word;
   }
+}
+
+.preview-sort {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: 0;
+  margin-top: 1px;
+}
+
+.sort-btn {
+  border: none;
+  background: transparent;
+  color: rgba(255, 214, 153, 0.75);
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+  font-size: 0.65rem;
+  &:disabled {
+    opacity: 0.25;
+    cursor: default;
+  }
+  &:not(:disabled):hover {
+    color: #ffd699;
+  }
+}
+
+.preview-body {
+  flex: 1;
+  min-width: 0;
 }
 
 .preview-time {

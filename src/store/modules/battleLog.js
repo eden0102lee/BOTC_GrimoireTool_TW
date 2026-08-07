@@ -35,8 +35,12 @@ import {
 const newId = () =>
   Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
 
+const MANUAL_END_KEY = "__end__";
+
 const state = () => ({
   entries: [],
+  /** @type {Record<string, string[]>} phaseId → entry ids in display order */
+  phaseOrders: {},
   filterType: null,
   filterNumber: null,
   filterSubPhase: null,
@@ -70,11 +74,19 @@ function resolveRuleForRoleCard(formSnapshot, overlay, roleCardKey) {
     return getSetupRule(formSnapshot.ruleId, overlay);
   }
   if (formSnapshot.cardKey) {
-    const byKey = getCardByKey(formSnapshot.ruleId, formSnapshot.cardKey, overlay);
+    const byKey = getCardByKey(
+      formSnapshot.ruleId,
+      formSnapshot.cardKey,
+      overlay,
+    );
     if (byKey) return byKey;
   }
   if (formSnapshot.dayMode) {
-    const dayRule = getDayRule(formSnapshot.ruleId, formSnapshot.dayNumber || 1, overlay);
+    const dayRule = getDayRule(
+      formSnapshot.ruleId,
+      formSnapshot.dayNumber || 1,
+      overlay,
+    );
     if (dayRule) return dayRule;
   }
   return getRule(formSnapshot.ruleId, overlay);
@@ -223,8 +235,7 @@ function rebuildPhaseScaffolds({ commit, state, rootState, phase }) {
 
   state.entries
     .filter(
-      (e) =>
-        e.category === "voteScaffold" && e.phase && e.phase.id === phaseId,
+      (e) => e.category === "voteScaffold" && e.phase && e.phase.id === phaseId,
     )
     .map((e) => e.id)
     .forEach((id) => commit("removeEntry", id));
@@ -270,9 +281,7 @@ function rebuildPhaseScaffolds({ commit, state, rootState, phase }) {
         afterVoteId: vote.id,
       },
       phase,
-      timestamp: new Date(
-        new Date(vote.timestamp).getTime() + 1,
-      ).toISOString(),
+      timestamp: new Date(new Date(vote.timestamp).getTime() + 1).toISOString(),
       insertAfterEntryId: insertAfterVoteBlock(state, vote.id),
     });
   });
@@ -382,8 +391,7 @@ function applyEffectToBoard(ctx, effect) {
           if (idx === effect.playerIndex) return;
           if (!hasReminder(p.reminders, reminder)) return;
           const value = (p.reminders || []).filter(
-            (r) =>
-              !(r.role === reminder.role && r.name === reminder.name),
+            (r) => !(r.role === reminder.role && r.name === reminder.name),
           );
           ctx.commit(
             "players/update",
@@ -404,9 +412,7 @@ function applyEffectToBoard(ctx, effect) {
     case "removeReminder": {
       const value = (player.reminders || []).filter(
         (r) =>
-          !(
-            r.role === effect.reminder.role && r.name === effect.reminder.name
-          ),
+          !(r.role === effect.reminder.role && r.name === effect.reminder.name),
       );
       ctx.commit(
         "players/update",
@@ -481,7 +487,9 @@ const getters = {
     state.entries.forEach((entry) => {
       const key =
         entry.phase.id ||
-        `${entry.phase.type}-${entry.phase.number}-${entry.phase.subPhase || ""}`;
+        `${entry.phase.type}-${entry.phase.number}-${
+          entry.phase.subPhase || ""
+        }`;
       if (!seen.has(key)) {
         seen.set(key, entry.phase);
       }
@@ -551,10 +559,11 @@ const mutations = {
       ...state.entries[idx],
       ...patch,
       id: state.entries[idx].id,
-      phase: patch.phase
-        ? { ...patch.phase }
-        : state.entries[idx].phase,
-      timestamp: new Date().toISOString(),
+      phase: patch.phase ? { ...patch.phase } : state.entries[idx].phase,
+      timestamp:
+        patch.timestamp !== undefined
+          ? patch.timestamp
+          : new Date().toISOString(),
     };
     if (!patch.message && (patch.actor || patch.action || patch.target)) {
       next.message = formatLogMessage(next);
@@ -568,9 +577,30 @@ const mutations = {
   removeEntry(state, id) {
     const idx = state.entries.findIndex((e) => e.id === id);
     if (idx >= 0) state.entries.splice(idx, 1);
+    Object.keys(state.phaseOrders || {}).forEach((phaseId) => {
+      const order = state.phaseOrders[phaseId];
+      if (!Array.isArray(order)) return;
+      const next = order.filter((eid) => eid !== id);
+      if (next.length !== order.length) {
+        state.phaseOrders = { ...state.phaseOrders, [phaseId]: next };
+      }
+    });
   },
   removeByRoleCardKey(state, roleCardKey) {
+    const removedIds = state.entries
+      .filter((e) => e.roleCardKey === roleCardKey)
+      .map((e) => e.id);
     state.entries = state.entries.filter((e) => e.roleCardKey !== roleCardKey);
+    if (!removedIds.length) return;
+    const removed = new Set(removedIds);
+    Object.keys(state.phaseOrders || {}).forEach((phaseId) => {
+      const order = state.phaseOrders[phaseId];
+      if (!Array.isArray(order)) return;
+      const next = order.filter((eid) => !removed.has(eid));
+      if (next.length !== order.length) {
+        state.phaseOrders = { ...state.phaseOrders, [phaseId]: next };
+      }
+    });
   },
   setFilter(state, { type = null, number = null, subPhase = null } = {}) {
     state.filterType = type;
@@ -579,6 +609,7 @@ const mutations = {
   },
   clearLog(state) {
     state.entries = [];
+    state.phaseOrders = {};
     state.filterType = null;
     state.filterNumber = null;
     state.filterSubPhase = null;
@@ -588,15 +619,40 @@ const mutations = {
   loadEntries(state, entries) {
     state.entries = entries || [];
   },
+  loadPhaseOrders(state, phaseOrders) {
+    state.phaseOrders =
+      phaseOrders && typeof phaseOrders === "object" ? { ...phaseOrders } : {};
+  },
+  setPhaseOrder(state, { phaseId, order }) {
+    if (!phaseId) return;
+    state.phaseOrders = {
+      ...state.phaseOrders,
+      [phaseId]: Array.isArray(order) ? order.slice() : [],
+    };
+  },
+  appendPhaseOrderId(state, { phaseId, entryId }) {
+    if (!phaseId || !entryId) return;
+    const existing = state.phaseOrders[phaseId];
+    if (!Array.isArray(existing)) return;
+    if (existing.includes(entryId)) return;
+    state.phaseOrders = {
+      ...state.phaseOrders,
+      [phaseId]: existing.concat(entryId),
+    };
+  },
   setGameMeta(state, meta = {}) {
     state.gameMeta = {
       gameName: meta.gameName != null ? meta.gameName : state.gameMeta.gameName,
       scriptName:
         meta.scriptName != null ? meta.scriptName : state.gameMeta.scriptName,
       playerCount:
-        meta.playerCount != null ? meta.playerCount : state.gameMeta.playerCount,
+        meta.playerCount != null
+          ? meta.playerCount
+          : state.gameMeta.playerCount,
       storyteller:
-        meta.storyteller != null ? meta.storyteller : state.gameMeta.storyteller,
+        meta.storyteller != null
+          ? meta.storyteller
+          : state.gameMeta.storyteller,
     };
   },
   loadGameMeta(state, meta) {
@@ -698,7 +754,10 @@ const actions = {
   setHideTimestamp({ commit }, value) {
     commit("setHideTimestamp", value);
   },
-  appendDawnNightDeathReport({ commit, state, rootState, rootGetters }, { nightPhaseId }) {
+  appendDawnNightDeathReport(
+    { commit, state, rootState, rootGetters },
+    { nightPhaseId },
+  ) {
     if (!nightPhaseId) return;
     const players = rootState.players.players;
     const message = buildNightDeathMessage(
@@ -748,6 +807,9 @@ const actions = {
     }
     commit("clearLog");
     commit("loadEntries", data.entries);
+    if (data.phaseOrders) {
+      commit("loadPhaseOrders", data.phaseOrders);
+    }
     if (data.gameMeta) {
       commit("loadGameMeta", data.gameMeta);
     } else {
@@ -799,7 +861,10 @@ const actions = {
     fact.recommend = recommendForPending(fact, players, rootState);
     commit("upsertPendingFact", fact);
   },
-  handleBoardUpdate({ commit, dispatch, state, rootState }, { player, property, value, oldValue }) {
+  handleBoardUpdate(
+    { commit, dispatch, state, rootState },
+    { player, property, value, oldValue },
+  ) {
     if (!state.linkedMode || state.applyingFromLog) return;
     const players = rootState.players.players;
     const playerIndex = players.indexOf(player);
@@ -921,6 +986,7 @@ const actions = {
       message,
       effects,
       roleId,
+      insertBeforeRoleCardKey,
     },
   ) {
     const phase = rootGetters["gamePhase/currentPhase"];
@@ -962,8 +1028,7 @@ const actions = {
     }
     const correlationId = newId();
     const existing = state.entries.find((e) => e.roleCardKey === roleCardKey);
-    const isSetupCard =
-      roleCardKey && String(roleCardKey).startsWith("setup|");
+    const isSetupCard = roleCardKey && String(roleCardKey).startsWith("setup|");
     const applyBoardEffects = state.linkedMode || isSetupCard;
     const fields = {
       source: "roleCard",
@@ -978,9 +1043,13 @@ const actions = {
       message: resolvedMessage || null,
       effects: resolvedEffects || null,
       roleId: roleId || (formSnapshot && formSnapshot.ruleId) || null,
-      correlationId:
-        (existing && existing.correlationId) || correlationId,
+      correlationId: (existing && existing.correlationId) || correlationId,
     };
+    if (insertBeforeRoleCardKey !== undefined) {
+      fields.insertBeforeRoleCardKey = insertBeforeRoleCardKey;
+    } else if (existing && existing.insertBeforeRoleCardKey != null) {
+      fields.insertBeforeRoleCardKey = existing.insertBeforeRoleCardKey;
+    }
 
     if (existing) {
       if (applyBoardEffects) {
@@ -990,7 +1059,10 @@ const actions = {
       commit("updateEntry", { id: existing.id, patch: fields });
       if (applyBoardEffects) {
         if (resolvedEffects && resolvedEffects.length) {
-          dispatch("applyEntryEffects", { entry: fields, effects: resolvedEffects });
+          dispatch("applyEntryEffects", {
+            entry: fields,
+            effects: resolvedEffects,
+          });
         }
         if (state.linkedMode) {
           dispatch("afterEntryWritten", {
@@ -1003,9 +1075,15 @@ const actions = {
     } else {
       commit("addEntry", { ...fields, phase });
       const entryId = state.entries[state.entries.length - 1]?.id;
+      if (entryId && phase && phase.id) {
+        commit("appendPhaseOrderId", { phaseId: phase.id, entryId });
+      }
       if (applyBoardEffects) {
         if (resolvedEffects && resolvedEffects.length) {
-          dispatch("applyEntryEffects", { entry: fields, effects: resolvedEffects });
+          dispatch("applyEntryEffects", {
+            entry: fields,
+            effects: resolvedEffects,
+          });
         }
         if (state.linkedMode) {
           dispatch("afterEntryWritten", {
@@ -1016,6 +1094,64 @@ const actions = {
         }
       }
     }
+  },
+  movePhaseEntry(
+    { commit, state },
+    { phaseId, entryId, direction, fallbackOrder },
+  ) {
+    if (!phaseId || !entryId) return;
+    const stored = state.phaseOrders[phaseId];
+    const base =
+      Array.isArray(stored) && stored.length
+        ? stored.slice()
+        : Array.isArray(fallbackOrder)
+        ? fallbackOrder.slice()
+        : state.entries
+            .filter((e) => e.phase && e.phase.id === phaseId)
+            .map((e) => e.id);
+    const idx = base.indexOf(entryId);
+    if (idx < 0) return;
+    const targetIdx = direction < 0 ? idx - 1 : idx + 1;
+    if (targetIdx < 0 || targetIdx >= base.length) return;
+    const next = base.slice();
+    const tmp = next[idx];
+    next[idx] = next[targetIdx];
+    next[targetIdx] = tmp;
+    commit("setPhaseOrder", { phaseId, order: next });
+
+    // Keep insertBefore anchors in sync for manuals / optional role cards
+    // so 階段紀錄 cards follow the same order as 戰報總覽.
+    next.forEach((id, i) => {
+      const e = state.entries.find((x) => x.id === id);
+      if (!e) return;
+      const isManual = e.source === "manual" && e.category === "manual";
+      const isOptionalRole =
+        e.source === "roleCard" && e.insertBeforeRoleCardKey != null;
+      if (!isManual && !isOptionalRole) return;
+      let insertBefore = MANUAL_END_KEY;
+      for (let j = i + 1; j < next.length; j++) {
+        const later = state.entries.find((x) => x.id === next[j]);
+        if (
+          later &&
+          later.source === "roleCard" &&
+          later.roleCardKey &&
+          later.insertBeforeRoleCardKey == null
+        ) {
+          insertBefore = later.roleCardKey;
+          break;
+        }
+      }
+      if (e.insertBeforeRoleCardKey !== insertBefore) {
+        commit("updateEntry", {
+          id: e.id,
+          patch: {
+            insertBeforeRoleCardKey: insertBefore,
+            timestamp: e.timestamp,
+            message: e.message,
+          },
+        });
+      }
+    });
   },
   recordManualCard(
     { commit, state, rootGetters, dispatch, rootState },
@@ -1085,18 +1221,19 @@ const actions = {
       phase,
     };
 
-    const manualKey = `manual|${phase.id}|${Date.now().toString(36)}${Math.random()
-      .toString(36)
-      .substr(2, 5)}`;
+    const manualKey = `manual|${phase.id}|${Date.now().toString(
+      36,
+    )}${Math.random().toString(36).substr(2, 5)}`;
     commit("addEntry", {
       ...fields,
       manualKey,
       insertBeforeRoleCardKey:
-        insertBeforeRoleCardKey === undefined
-          ? null
-          : insertBeforeRoleCardKey,
+        insertBeforeRoleCardKey === undefined ? null : insertBeforeRoleCardKey,
     });
     const entryId = state.entries[state.entries.length - 1]?.id;
+    if (entryId && phase && phase.id) {
+      commit("appendPhaseOrderId", { phaseId: phase.id, entryId });
+    }
     if (state.linkedMode) {
       if (effects.length) {
         dispatch("applyEntryEffects", { entry: fields, effects });
@@ -1176,8 +1313,7 @@ const actions = {
     },
   ) {
     const phase = rootGetters["gamePhase/currentPhase"];
-    const voterList =
-      (formSnapshot && formSnapshot.voters) || voters || [];
+    const voterList = (formSnapshot && formSnapshot.voters) || voters || [];
     const fields = {
       source: "vote",
       category: "vote",
@@ -1207,9 +1343,9 @@ const actions = {
       rebuildPhaseScaffolds({ commit, state, rootState, phase });
       return;
     }
-    const manualKey = `vote|${phase.id}|${Date.now().toString(36)}${Math.random()
-      .toString(36)
-      .substr(2, 5)}`;
+    const manualKey = `vote|${phase.id}|${Date.now().toString(
+      36,
+    )}${Math.random().toString(36).substr(2, 5)}`;
     commit("addEntry", {
       ...fields,
       manualKey,
@@ -1342,9 +1478,9 @@ const actions = {
       }
       return;
     }
-    const manualKey = `deadVote|${phase.id}|${Date.now().toString(36)}${Math.random()
-      .toString(36)
-      .substr(2, 5)}`;
+    const manualKey = `deadVote|${phase.id}|${Date.now().toString(
+      36,
+    )}${Math.random().toString(36).substr(2, 5)}`;
     commit("addEntry", {
       ...fields,
       manualKey,
@@ -1365,8 +1501,7 @@ const actions = {
   cancelRoleCard({ commit, state, dispatch, rootState }, roleCardKey) {
     const entry = state.entries.find((e) => e.roleCardKey === roleCardKey);
     if (!entry) return;
-    const isSetupCard =
-      roleCardKey && String(roleCardKey).startsWith("setup|");
+    const isSetupCard = roleCardKey && String(roleCardKey).startsWith("setup|");
     const shouldUndo = state.linkedMode || isSetupCard;
     if (shouldUndo) {
       const effects = effectsFromEntry(entry, rootState.players.players);
@@ -1391,7 +1526,7 @@ const actions = {
   },
   exportJson({ state, rootState, rootGetters }) {
     const gamePhase = rootGetters["gamePhase/currentPhase"];
-    const phaseSections = buildPhaseSections(state.entries);
+    const phaseSections = buildPhaseSections(state.entries, state.phaseOrders);
     const resolved = resolveGameMeta(state, rootState);
     return JSON.stringify(
       {
@@ -1410,6 +1545,7 @@ const actions = {
         })),
         phaseSections,
         entries: state.entries,
+        phaseOrders: state.phaseOrders,
         pendingFacts: state.pendingFacts,
       },
       null,
@@ -1433,7 +1569,7 @@ const actions = {
       }${p.isDead ? "（死亡）" : ""}\n`;
     });
 
-    const sections = buildPhaseSections(state.entries);
+    const sections = buildPhaseSections(state.entries, state.phaseOrders);
     const hideTime = !!state.hideTimestamp;
     md += `\n## 階段戰報\n\n`;
     sections.forEach((section) => {
@@ -1444,7 +1580,9 @@ const actions = {
           minute: "2-digit",
         });
         const msg = formatLogMessage(entry) || "";
-        const msgLines = String(msg).split("\n").filter((l) => l.length);
+        const msgLines = String(msg)
+          .split("\n")
+          .filter((l) => l.length);
         const timePrefix = hideTime ? "" : `**${time}** `;
         if (!msgLines.length) {
           md += hideTime ? `- \n` : `- **${time}**\n`;
@@ -1484,13 +1622,15 @@ const actions = {
       resolved.storyteller || ""
     }\n對局狀態：中途紀錄\n-----------------------------------\n\n`;
 
-    const sections = buildPhaseSections(state.entries);
+    const sections = buildPhaseSections(state.entries, state.phaseOrders);
     const content = sections
       .map((section) => {
         const events = section.entries
           .map((e) => {
             if (e.category === "phase" && e.snapshot) {
-              return `\n【當前玩家狀態】\n${formatSnapshotPlayers(e.snapshot)}\n`;
+              return `\n【當前玩家狀態】\n${formatSnapshotPlayers(
+                e.snapshot,
+              )}\n`;
             }
             if (e.category === "phase") {
               return `  ${e.message}`;
@@ -1533,7 +1673,7 @@ function formatSnapshotPlayers(snapshot) {
     .join("\n");
 }
 
-function buildPhaseSections(entries) {
+function buildPhaseSections(entries, phaseOrders = {}) {
   const sections = [];
   let current = null;
   entries.forEach((entry) => {
@@ -1543,6 +1683,21 @@ function buildPhaseSections(entries) {
       sections.push(current);
     }
     current.entries.push(entry);
+  });
+  sections.forEach((section) => {
+    const order = phaseOrders && phaseOrders[section.key];
+    if (!Array.isArray(order) || !order.length) return;
+    const byId = new Map(section.entries.map((e) => [e.id, e]));
+    const ordered = [];
+    order.forEach((id) => {
+      const e = byId.get(id);
+      if (e) {
+        ordered.push(e);
+        byId.delete(id);
+      }
+    });
+    byId.forEach((e) => ordered.push(e));
+    section.entries = ordered;
   });
   return sections;
 }

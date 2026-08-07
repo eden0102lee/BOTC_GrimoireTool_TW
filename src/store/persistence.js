@@ -9,6 +9,7 @@ export default (store) => {
       "battleLog",
       JSON.stringify({
         entries: state.battleLog.entries,
+        phaseOrders: state.battleLog.phaseOrders,
         gameMeta: state.battleLog.gameMeta,
         gamePhase: state.gamePhase,
         linkedMode: state.battleLog.linkedMode,
@@ -98,6 +99,9 @@ export default (store) => {
     try {
       const saved = JSON.parse(localStorage.getItem("battleLog"));
       store.commit("battleLog/loadEntries", saved.entries || []);
+      if (saved.phaseOrders) {
+        store.commit("battleLog/loadPhaseOrders", saved.phaseOrders);
+      }
       if (saved.gameMeta) {
         store.commit("battleLog/loadGameMeta", saved.gameMeta);
       }
@@ -260,6 +264,9 @@ export default (store) => {
       case "battleLog/removeByRoleCardKey":
       case "battleLog/clearLog":
       case "battleLog/loadEntries":
+      case "battleLog/setPhaseOrder":
+      case "battleLog/appendPhaseOrderId":
+      case "battleLog/loadPhaseOrders":
       case "battleLog/setGameMeta":
       case "battleLog/loadGameMeta":
       case "battleLog/setLinkedMode":
