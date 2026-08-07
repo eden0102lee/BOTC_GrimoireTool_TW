@@ -63,6 +63,7 @@ import Modal from "./Modal";
 import gameJSON from "./../../game";
 import Token from "./../Token";
 import { mapGetters, mapMutations, mapState } from "vuex";
+import { defaultAlignmentForTeam } from "../../store/teamTerms";
 
 const randomElement = arr => arr[Math.floor(Math.random() * arr.length)];
 
@@ -140,6 +141,11 @@ export default {
               player,
               property: "role",
               value
+            });
+            this.$store.commit("players/update", {
+              player,
+              property: "alignment",
+              value: value && value.team ? defaultAlignmentForTeam(value.team) : null
             });
           }
         });

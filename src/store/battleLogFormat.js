@@ -452,7 +452,7 @@ export function buildNaturalRoleMessage(rule, { players, actorIndex, formData, e
     template.includes("始終將")
   ) {
     const p1 = labelForKey(players, fd, "p1");
-    main = `${actor}始終將 ${p1} 視為惡魔`;
+    main = `${actor}始終將 ${p1 || "—"} 視為惡魔`;
   } else if (
     (action === "得知" || template.includes("死亡後")) &&
     template.includes("死亡後") &&

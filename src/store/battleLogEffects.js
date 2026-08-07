@@ -568,9 +568,26 @@ export function invertEffect(effect) {
           playerIndex: effect.playerIndex,
           role: { ...effect.previousRole },
           previousRole: effect.role ? { ...effect.role } : null,
+          alignment: effect.previousAlignment || null,
+          previousAlignment: effect.alignment || null,
         };
       }
       return null;
+    case "setAlignment":
+      if (effect.previousAlignment === "good" || effect.previousAlignment === "evil") {
+        return {
+          type: "setAlignment",
+          playerIndex: effect.playerIndex,
+          alignment: effect.previousAlignment,
+          previousAlignment: effect.alignment || null,
+        };
+      }
+      return {
+        type: "setAlignment",
+        playerIndex: effect.playerIndex,
+        alignment: null,
+        previousAlignment: effect.alignment || null,
+      };
     case "setDisguiseRole":
       return {
         type: "setDisguiseRole",

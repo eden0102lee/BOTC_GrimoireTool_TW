@@ -258,11 +258,11 @@ function getRoleInputConfig(role) {
   }
 
   if (isRole(role, ["poisoner"], ["投毒者"])) {
-    return [{ key: "target", type: "alivePlayer", label: "目標對象" }];
+    return [{ key: "target", type: "player", label: "目標對象" }];
   }
 
   if (isRole(role, ["imp"], ["小惡魔"])) {
-    return [{ key: "target", type: "alivePlayer", label: "目標對象" }];
+    return [{ key: "target", type: "player", label: "目標對象" }];
   }
 
   return [{ key: "target", type: "player", label: "目標對象" }];

@@ -14,6 +14,7 @@
     "normalize:team-terms": "node scripts/normalize-team-terms.js",
     "generate:interaction-rules": "node scripts/generate-role-interaction-rules.js",
     "apply:skill-cards": "node scripts/apply-skill-cards-to-rules.js",
+    "apply:target-types": "node scripts/apply-target-input-types.js",
     "export:skill-cards": "node scripts/export-official-skill-cards.js",
     "audit:reminder-coverage": "node scripts/audit-reminder-coverage.js",
     "sync:characters": "node scripts/sync-characters-from-csv.js",
@@ -60,6 +61,6 @@
   "license": "GPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bra1n/townsquare.git"
+    "url": "https://github.com/eden0102lee/BOTC_GrimoireTool_TW.git"
   }
 }

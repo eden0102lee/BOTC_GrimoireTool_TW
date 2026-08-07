@@ -29,7 +29,7 @@ The frontend connects to `hostname:8081` unless `VUE_APP_WS_URL` is set at build
 
 ### Cloud setup (Render)
 
-See [`docs/online-hosting.md`](../docs/online-hosting.md) and root [`render.yaml`](../render.yaml).
+See root [`render.yaml`](../render.yaml).
 
 Required env:
 

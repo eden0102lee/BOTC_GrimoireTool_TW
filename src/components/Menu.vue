@@ -307,11 +307,11 @@
             <em><font-awesome-icon icon="file-code"/></em>
           </li>
           <li>
-            <a href="https://github.com/bra1n/townsquare" target="_blank">
+            <a href="https://github.com/eden0102lee/BOTC_GrimoireTool_TW" target="_blank">
               {{ $t("menu.sourceCode") }}
             </a>
             <em>
-              <a href="https://github.com/bra1n/townsquare" target="_blank">
+              <a href="https://github.com/eden0102lee/BOTC_GrimoireTool_TW" target="_blank">
                 <font-awesome-icon :icon="['fab', 'github']" />
               </a>
             </em>

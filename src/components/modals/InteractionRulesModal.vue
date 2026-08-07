@@ -51,19 +51,165 @@
             }"
             @click="selectRole(item.role)"
           >
-            <span class="name">{{ item.role.name || item.role.id }}</span>
-            <span class="badge">{{ statusLabel(item.status) }}</span>
+            <div class="role-row">
+              <span class="name">{{ item.role.name || item.role.id }}</span>
+              <span class="badge">{{ statusLabel(item.status) }}</span>
+            </div>
+            <div v-if="item.cardLabels && item.cardLabels.length" class="card-chips">
+              <span
+                v-for="lab in item.cardLabels"
+                :key="lab"
+                class="card-chip"
+              >{{ lab }}</span>
+            </div>
           </li>
         </ul>
       </aside>
 
-      <section class="rule-editor" v-if="editRule">
+      <section class="rule-editor" v-if="editDoc && editRule">
         <div class="editor-head">
-          <h4>{{ editRule.name || editRule.id }}</h4>
-          <label class="enabled-toggle">
-            <input type="checkbox" v-model="editRule.enabled" />
+          <h4>{{ editDoc.name || editDoc.id }}</h4>
+          <button
+            type="button"
+            class="toggle-chip"
+            :class="{ on: !!editDoc.enabled }"
+            :aria-pressed="editDoc.enabled ? 'true' : 'false'"
+            @click="editDoc.enabled = !editDoc.enabled"
+          >
             {{ $t("interactionRules.enabled") }}
-          </label>
+          </button>
+        </div>
+
+        <div class="card-label-bar" v-if="editDoc.cards && editDoc.cards.length">
+          <div class="card-label-tabs" role="tablist">
+            <button
+              v-for="card in editDoc.cards"
+              :key="card.key"
+              type="button"
+              class="card-label-tab"
+              role="tab"
+              :class="{ active: activeCardKey === card.key }"
+              :aria-selected="activeCardKey === card.key"
+              @click="selectCard(card.key)"
+            >
+              {{ card.label || card.key }}
+            </button>
+          </div>
+          <div class="card-label-actions">
+            <button
+              type="button"
+              class="mini-btn"
+              :title="$t('interactionRules.addCard')"
+              @click="addCard"
+            >
+              +
+            </button>
+            <button
+              type="button"
+              class="mini-btn danger"
+              :disabled="editDoc.cards.length <= 1"
+              :title="$t('interactionRules.removeCard')"
+              @click="removeActiveCard"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+
+        <div class="section card-label-edit" v-if="editRule">
+          <div class="field-grid">
+            <label class="field">
+              <span class="field-label">{{ $t("interactionRules.cardLabel") }}</span>
+              <select v-model="editRule.label" @change="onCardLabelChange">
+                <option
+                  v-for="lab in cardLabelOptions"
+                  :key="lab"
+                  :value="lab"
+                >
+                  {{ lab }}
+                </option>
+              </select>
+            </label>
+            <div class="field">
+              <span class="field-label">{{ $t("interactionRules.once") }}</span>
+              <div class="toggle-chip-row">
+                <button
+                  type="button"
+                  class="toggle-chip"
+                  :class="{ on: !!editRule.once }"
+                  :aria-pressed="editRule.once ? 'true' : 'false'"
+                  @click="$set(editRule, 'once', !editRule.once)"
+                >
+                  {{ $t("interactionRules.once") }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p v-if="selectedRoleAbility" class="role-ability">{{ selectedRoleAbility }}</p>
+
+        <div class="section meta-section" v-if="editRule">
+          <div class="section-head">
+            <span>{{ $t("interactionRules.roleSettings") }}</span>
+          </div>
+          <div class="field-grid meta-fields">
+            <label class="field">
+              <span class="field-label">{{ $t("interactionRules.activation") }}</span>
+              <select v-model="editRule.activation" @change="onActivationChange">
+                <option value="">{{ $t("interactionRules.activationNight") }}</option>
+                <option value="optional">{{ $t("interactionRules.activationOptional") }}</option>
+                <option value="setup">{{ $t("interactionRules.activationSetup") }}</option>
+                <option value="trigger">{{ $t("interactionRules.activationTrigger") }}</option>
+              </select>
+            </label>
+            <div class="field field-toggles">
+              <span class="field-label">{{ $t("interactionRules.whenNights") }}</span>
+              <div class="toggle-chip-row">
+                <button
+                  type="button"
+                  class="toggle-chip"
+                  :class="{ on: hasNight('first') }"
+                  :aria-pressed="hasNight('first') ? 'true' : 'false'"
+                  @click="toggleNight('first')"
+                >
+                  {{ $t("interactionRules.nightFirst") }}
+                </button>
+                <button
+                  type="button"
+                  class="toggle-chip"
+                  :class="{ on: hasNight('other') }"
+                  :aria-pressed="hasNight('other') ? 'true' : 'false'"
+                  @click="toggleNight('other')"
+                >
+                  {{ $t("interactionRules.nightOther") }}
+                </button>
+              </div>
+            </div>
+            <div class="field field-toggles">
+              <span class="field-label">{{ $t("interactionRules.whenDays") }}</span>
+              <div class="toggle-chip-row">
+                <button
+                  type="button"
+                  class="toggle-chip"
+                  :class="{ on: hasDay('first') }"
+                  :aria-pressed="hasDay('first') ? 'true' : 'false'"
+                  @click="toggleDay('first')"
+                >
+                  {{ $t("interactionRules.dayFirst") }}
+                </button>
+                <button
+                  type="button"
+                  class="toggle-chip"
+                  :class="{ on: hasDay('other') }"
+                  :aria-pressed="hasDay('other') ? 'true' : 'false'"
+                  @click="toggleDay('other')"
+                >
+                  {{ $t("interactionRules.dayOther") }}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="section">
@@ -97,12 +243,76 @@
                 <span class="field-label">{{ $t("interactionRules.label") }}</span>
                 <input v-model="input.label" :placeholder="$t('interactionRules.label')" />
               </label>
+              <label v-if="input.type === 'select'" class="field field-wide">
+                <span class="field-label">{{ $t("interactionRules.selectOptions") }}</span>
+                <input
+                  :value="(input.options || []).join(', ')"
+                  :placeholder="$t('interactionRules.selectOptionsHint')"
+                  @input="setSelectOptions(input, $event.target.value)"
+                />
+              </label>
+              <template v-if="isPlayerInputType(input.type) || input.type === 'role'">
+                <label
+                  v-if="isPlayerInputType(input.type)"
+                  class="field"
+                >
+                  <span class="field-label">{{ $t("interactionRules.filterAlignment") }}</span>
+                  <select
+                    :value="input.alignment || ''"
+                    @change="setInputAlignment(input, $event.target.value)"
+                  >
+                    <option value="">{{ $t("interactionRules.filterAny") }}</option>
+                    <option
+                      v-for="(lab, key) in alignmentLabels"
+                      :key="key"
+                      :value="key"
+                    >
+                      {{ lab }}
+                    </option>
+                  </select>
+                </label>
+                <div class="field field-toggles field-wide">
+                  <span class="field-label">{{ $t("interactionRules.filterTeams") }}</span>
+                  <div class="toggle-chip-row">
+                    <button
+                      v-for="(lab, key) in teamLabels"
+                      :key="key"
+                      type="button"
+                      class="toggle-chip"
+                      :class="{ on: hasInputTeam(input, key) }"
+                      :aria-pressed="hasInputTeam(input, key) ? 'true' : 'false'"
+                      @click="toggleInputTeam(input, key)"
+                    >
+                      {{ lab }}
+                    </button>
+                  </div>
+                </div>
+                <div v-if="input.type === 'role'" class="field field-toggles">
+                  <span class="field-label">{{ $t("interactionRules.filterInPlay") }}</span>
+                  <div class="toggle-chip-row">
+                    <button
+                      type="button"
+                      class="toggle-chip"
+                      :class="{ on: !!input.inPlay }"
+                      :aria-pressed="input.inPlay ? 'true' : 'false'"
+                      @click="$set(input, 'inPlay', !input.inPlay)"
+                    >
+                      {{ $t("interactionRules.filterInPlay") }}
+                    </button>
+                  </div>
+                </div>
+              </template>
             </div>
             <div class="input-row-actions">
-              <label class="inline-check">
-                <input type="checkbox" v-model="input.required" />
+              <button
+                type="button"
+                class="toggle-chip"
+                :class="{ on: !!input.required }"
+                :aria-pressed="input.required ? 'true' : 'false'"
+                @click="$set(input, 'required', !input.required)"
+              >
                 {{ $t("interactionRules.required") }}
-              </label>
+              </button>
               <button type="button" class="mini-btn danger" @click="removeInput(idx)">×</button>
             </div>
           </div>
@@ -145,6 +355,7 @@
                 <span class="field-label">{{ $t("interactionRules.pickTarget") }}</span>
                 <select v-model="effect.targetFrom">
                   <option value="">{{ $t("interactionRules.pickTarget") }}</option>
+                  <option value="actor">{{ $t("interactionRules.targetActor") }}</option>
                   <option
                     v-for="input in playerInputsForEffects"
                     :key="input.key"
@@ -154,6 +365,38 @@
                   </option>
                 </select>
               </label>
+              <template v-if="effect.type === 'setAlignment'">
+                <label class="field">
+                  <span class="field-label">{{ $t("interactionRules.alignmentFixed") }}</span>
+                  <select
+                    :value="effect.alignment || ''"
+                    @change="onEffectAlignmentChange(effect, $event.target.value)"
+                  >
+                    <option value="">{{ $t("interactionRules.alignmentFromPlayer") }}</option>
+                    <option
+                      v-for="(lab, key) in alignmentLabels"
+                      :key="key"
+                      :value="key"
+                    >
+                      {{ lab }}
+                    </option>
+                  </select>
+                </label>
+                <label v-if="!effect.alignment" class="field">
+                  <span class="field-label">{{ $t("interactionRules.alignmentFrom") }}</span>
+                  <select v-model="effect.alignmentFrom">
+                    <option value="">—</option>
+                    <option value="actor">{{ $t("interactionRules.targetActor") }}</option>
+                    <option
+                      v-for="input in playerInputsForEffects"
+                      :key="'af-' + input.key"
+                      :value="input.key"
+                    >
+                      {{ input.label || input.key }}
+                    </option>
+                  </select>
+                </label>
+              </template>
               <template v-if="effectNeedsReminder(effect.type)">
                 <label class="field">
                   <span class="field-label">{{ $t("interactionRules.reminderRole") }}</span>
@@ -161,8 +404,8 @@
                     v-model="effect.reminderRole"
                     @change="onReminderRoleChange(effect)"
                   >
-                    <option :value="editRule.id">
-                      {{ editRule.name || editRule.id }}（{{ $t("interactionRules.thisRole") }}）
+                    <option :value="editDoc.id">
+                      {{ editDoc.name || editDoc.id }}（{{ $t("interactionRules.thisRole") }}）
                     </option>
                     <optgroup :label="$t('interactionRules.otherRoleTokens')">
                       <option
@@ -219,15 +462,28 @@
                   </option>
                 </select>
               </label>
-              <div class="field field-toggles">
-                <label class="inline-check" v-if="!effect.bindTo">
-                  <input type="checkbox" v-model="effect.optional" />
-                  {{ $t("interactionRules.optionalToggle") }}
-                </label>
-                <label class="inline-check" v-if="effect.optional && !effect.bindTo">
-                  <input type="checkbox" v-model="effect.defaultOn" />
-                  {{ $t("interactionRules.defaultOn") }}
-                </label>
+              <div class="field field-toggles" v-if="!effect.bindTo">
+                <div class="toggle-chip-row">
+                  <button
+                    type="button"
+                    class="toggle-chip"
+                    :class="{ on: !!effect.optional }"
+                    :aria-pressed="effect.optional ? 'true' : 'false'"
+                    @click="$set(effect, 'optional', !effect.optional)"
+                  >
+                    {{ $t("interactionRules.optionalToggle") }}
+                  </button>
+                  <button
+                    v-if="effect.optional"
+                    type="button"
+                    class="toggle-chip"
+                    :class="{ on: effect.defaultOn !== false }"
+                    :aria-pressed="effect.defaultOn !== false ? 'true' : 'false'"
+                    @click="$set(effect, 'defaultOn', effect.defaultOn === false)"
+                  >
+                    {{ $t("interactionRules.defaultOn") }}
+                  </button>
+                </div>
               </div>
             </div>
             <div class="effect-row-actions">
@@ -282,6 +538,9 @@
       <aside class="preview-panel">
         <h4>{{ $t("interactionRules.preview") }}</h4>
         <div v-if="editRule" class="preview-form">
+          <div v-if="editRule.label" class="preview-card-label">
+            LABEL · {{ editRule.label }}
+          </div>
           <label
             v-for="input in editRule.inputs"
             :key="'pv-' + input.key"
@@ -307,7 +566,7 @@
             >
               <option value="">—</option>
               <option
-                v-for="r in scriptRoles"
+                v-for="r in previewRolesForInput(input)"
                 :key="r.id"
                 :value="r.name || r.id"
               >
@@ -328,17 +587,20 @@
 
           <div v-if="editRule.effects && editRule.effects.length" class="effect-toggles">
             <p class="preview-label">{{ $t("interactionRules.grimoireEffects") }}</p>
-            <label
-              v-for="item in previewVisibleEffects"
-              :key="'pt-' + item.idx"
-              class="preview-field"
-            >
-              <span>{{ item.label }}</span>
-              <input
-                type="checkbox"
-                v-model="previewToggles[item.key]"
-              />
-            </label>
+            <div class="toggle-chip-row">
+              <button
+                v-for="item in previewVisibleEffects"
+                :key="'pt-' + item.idx"
+                type="button"
+                class="toggle-chip"
+                :class="{ on: !!previewToggles[item.key] }"
+                :aria-pressed="previewToggles[item.key] ? 'true' : 'false'"
+                :title="item.label"
+                @click="$set(previewToggles, item.key, !previewToggles[item.key])"
+              >
+                {{ item.label }}
+              </button>
+            </div>
           </div>
 
           <div class="preview-sentence">
@@ -370,6 +632,14 @@ import {
   describeEffects,
   coverageStatus,
   normalizeRule,
+  normalizeCard,
+  getRoleDocument,
+  slugifyCardKey,
+  inferCardLabel,
+  normalizeCardLabel,
+  listRoleCards,
+  CARD_LABELS,
+  activationForLabel,
 } from "../../store/roleInteractionEngine";
 import {
   getRoleInputConfig,
@@ -390,6 +660,9 @@ import {
   grimoireActionNeedsReminder,
   formatGrimoireEffectSpec,
   filterPlayersForInput,
+  filterRolesForInput,
+  TEAM_LABELS,
+  ALIGNMENT_LABELS,
 } from "../../store/roleInteractionTypes";
 
 export default {
@@ -399,12 +672,15 @@ export default {
     return {
       search: "",
       selectedRoleId: null,
-      editRule: null,
+      editDoc: null,
+      activeCardKey: null,
       previewForm: {},
       previewToggles: {},
       grimoireActionTypes: GRIMOIRE_ACTION_TYPES,
       reminderSheetUrl: COMMUNITY_TRANSLATIONS_SHEET_URL,
       genericReminderRole: GENERIC_REMINDER_ROLE,
+      teamLabels: TEAM_LABELS,
+      alignmentLabels: ALIGNMENT_LABELS,
     };
   },
   computed: {
@@ -412,14 +688,34 @@ export default {
     ...mapState("interactionRules", ["overlay", "editorDirty"]),
     ...mapState("players", { boardPlayers: "players" }),
     ...mapGetters("interactionRules", ["ruleById"]),
+    editRule() {
+      if (!this.editDoc || !this.editDoc.cards || !this.activeCardKey) return null;
+      return (
+        this.editDoc.cards.find((c) => c.key === this.activeCardKey) || null
+      );
+    },
     scriptRoles() {
       return [...this.roles.values()];
     },
     roleItems() {
-      return this.scriptRoles.map((role) => ({
-        role,
-        status: coverageStatus(role, this.overlay, getRoleInputConfig),
-      }));
+      return this.scriptRoles.map((role) => {
+        const cards = listRoleCards(role.id, this.overlay);
+        const labels = cards.map((c) => c.cardLabel).filter(Boolean);
+        const showChips =
+          labels.length > 1 ||
+          labels.some((lab) => normalizeCardLabel(lab) === "setup");
+        return {
+          role,
+          status: coverageStatus(role, this.overlay, getRoleInputConfig),
+          cardLabels: showChips ? labels : [],
+        };
+      });
+    },
+    cardLabelOptions() {
+      const current = this.editRule && this.editRule.label;
+      const list = CARD_LABELS.slice();
+      if (current && !list.includes(current)) list.unshift(current);
+      return list;
     },
     filteredRoles() {
       const q = this.search.trim().toLowerCase();
@@ -443,6 +739,10 @@ export default {
       if (!this.selectedRole) return "fallback";
       return coverageStatus(this.selectedRole, this.overlay, getRoleInputConfig);
     },
+    selectedRoleAbility() {
+      if (!this.selectedRole) return "";
+      return this.selectedRole.ability || "";
+    },
     previewPlayers() {
       if (this.boardPlayers && this.boardPlayers.length) {
         return this.boardPlayers;
@@ -462,17 +762,35 @@ export default {
       );
       return idx >= 0 ? idx : -1;
     },
+    previewRunnableRule() {
+      if (!this.editDoc || !this.editRule) return null;
+      return {
+        id: this.editDoc.id,
+        name: this.editDoc.name,
+        enabled: this.editDoc.enabled !== false && this.editRule.enabled !== false,
+        cardKey: this.editRule.key,
+        cardLabel: this.editRule.label,
+        activation: this.editRule.activation || null,
+        once: !!this.editRule.once,
+        when: this.editRule.when,
+        inputs: this.editRule.inputs,
+        sentence: this.editRule.sentence,
+        effects: this.editRule.effects,
+        notes: this.editRule.notes,
+      };
+    },
     previewSentence() {
-      if (!this.editRule) return "";
+      const rule = this.previewRunnableRule;
+      if (!rule) return "";
       const effects = effectsFromRule(
-        this.editRule,
+        rule,
         this.previewForm,
         this.previewPlayers,
         this.previewToggles,
         this.roles,
         this.previewActorIndex,
       );
-      return buildNaturalRoleMessage(this.editRule, {
+      return buildNaturalRoleMessage(rule, {
         players: this.previewPlayers,
         actorIndex: this.previewActorIndex,
         formData: this.previewForm,
@@ -480,9 +798,10 @@ export default {
       });
     },
     previewEffectLines() {
-      if (!this.editRule) return [];
+      const rule = this.previewRunnableRule;
+      if (!rule) return [];
       const effects = effectsFromRule(
-        this.editRule,
+        rule,
         this.previewForm,
         this.previewPlayers,
         this.previewToggles,
@@ -497,7 +816,7 @@ export default {
     },
     roleReminderNames() {
       return reminderNamesForRole(
-        this.editRule ? this.editRule.id : null,
+        this.editDoc ? this.editDoc.id : null,
         this.roles,
         { includeGeneric: true },
       );
@@ -506,9 +825,9 @@ export default {
       return rolesWithReminders(this.roles);
     },
     otherScriptRolesWithReminders() {
-      if (!this.editRule) return this.scriptRolesWithReminders;
+      if (!this.editDoc) return this.scriptRolesWithReminders;
       return this.scriptRolesWithReminders.filter(
-        (r) => r.id !== this.editRule.id,
+        (r) => r.id !== this.editDoc.id,
       );
     },
     previewVisibleEffects() {
@@ -550,6 +869,55 @@ export default {
         formatGrimoireEffectSpec(effect, this.editRule.inputs)
       );
     },
+    hasNight(night) {
+      if (!this.editRule || !this.editRule.when || !this.editRule.when.nights) {
+        return false;
+      }
+      return this.editRule.when.nights.includes(night);
+    },
+    toggleNight(night) {
+      this.ensureWhen();
+      const nights = this.editRule.when.nights.slice();
+      const idx = nights.indexOf(night);
+      if (idx < 0) nights.push(night);
+      else nights.splice(idx, 1);
+      this.$set(this.editRule.when, "nights", nights);
+    },
+    hasDay(day) {
+      if (!this.editRule || !this.editRule.when || !this.editRule.when.days) {
+        return false;
+      }
+      return this.editRule.when.days.includes(day);
+    },
+    toggleDay(day) {
+      this.ensureWhen();
+      if (!Array.isArray(this.editRule.when.days)) {
+        this.$set(this.editRule.when, "days", []);
+      }
+      const days = this.editRule.when.days.slice();
+      const idx = days.indexOf(day);
+      if (idx < 0) days.push(day);
+      else days.splice(idx, 1);
+      this.$set(this.editRule.when, "days", days);
+    },
+    ensureWhen() {
+      if (!this.editRule.when || typeof this.editRule.when !== "object") {
+        this.$set(this.editRule, "when", { nights: [], days: [] });
+      }
+      if (!Array.isArray(this.editRule.when.nights)) {
+        this.$set(this.editRule.when, "nights", []);
+      }
+      if (!Array.isArray(this.editRule.when.days)) {
+        this.$set(this.editRule.when, "days", []);
+      }
+    },
+    setSelectOptions(input, raw) {
+      const options = String(raw || "")
+        .split(/[,，]/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+      this.$set(input, "options", options);
+    },
     bindToOptions(currentIdx) {
       if (!this.editRule || !this.editRule.effects) return [];
       return this.editRule.effects
@@ -579,7 +947,7 @@ export default {
       this.refreshEffectLabel(effect);
     },
     reminderOptionsForEffect(effect) {
-      const roleId = effect.reminderRole || (this.editRule && this.editRule.id);
+      const roleId = effect.reminderRole || (this.editDoc && this.editDoc.id);
       return reminderNamesForRole(roleId, this.roles, {
         includeGeneric: roleId === GENERIC_REMINDER_ROLE,
       });
@@ -593,10 +961,18 @@ export default {
       if (this.effectNeedsReminder(effect.type)) {
         if (!effect.reminderName) effect.reminderName = "";
         if (!effect.reminderRole) {
-          effect.reminderRole = this.editRule ? this.editRule.id : GENERIC_REMINDER_ROLE;
+          effect.reminderRole = this.editDoc
+            ? this.editDoc.id
+            : GENERIC_REMINDER_ROLE;
         }
       } else {
         effect.reminderName = "";
+      }
+      if (effect.type !== "setAlignment") {
+        this.$delete(effect, "alignment");
+        this.$delete(effect, "alignmentFrom");
+      } else if (!effect.alignment && !effect.alignmentFrom) {
+        this.$set(effect, "alignmentFrom", "target");
       }
       if (!effect.label) {
         effect.label = formatGrimoireEffectSpec(
@@ -613,10 +989,45 @@ export default {
     previewPlayersForInput(input) {
       return filterPlayersForInput(
         this.previewPlayers,
-        input.type,
+        input,
         this.previewActorIndex,
         this.playerLabel,
       );
+    },
+    previewRolesForInput(input) {
+      return filterRolesForInput(this.scriptRoles, this.previewPlayers, input);
+    },
+    setInputAlignment(input, value) {
+      if (!value) {
+        this.$delete(input, "alignment");
+      } else {
+        this.$set(input, "alignment", value);
+      }
+    },
+    hasInputTeam(input, team) {
+      return Array.isArray(input.teams) && input.teams.includes(team);
+    },
+    toggleInputTeam(input, team) {
+      const cur = Array.isArray(input.teams) ? input.teams.slice() : [];
+      const i = cur.indexOf(team);
+      if (i >= 0) cur.splice(i, 1);
+      else cur.push(team);
+      if (cur.length) this.$set(input, "teams", cur);
+      else this.$delete(input, "teams");
+    },
+    onEffectAlignmentChange(effect, value) {
+      if (!value) {
+        this.$delete(effect, "alignment");
+      } else {
+        this.$set(effect, "alignment", value);
+        this.$delete(effect, "alignmentFrom");
+      }
+      if (!effect.label || String(effect.label).includes("陣營")) {
+        effect.label = formatGrimoireEffectSpec(
+          effect,
+          this.editRule ? this.editRule.inputs : [],
+        );
+      }
     },
     playerLabel(p, i) {
       return formatPlayerRoleLabel(p, i);
@@ -631,24 +1042,138 @@ export default {
       this.selectedRoleId = role.id;
       this.loadRuleForSelected();
     },
+    selectCard(key) {
+      this.activeCardKey = key;
+      if (this.editRule) this.syncPreviewForm(this.editRule);
+    },
+    onCardLabelChange() {
+      if (!this.editRule) return;
+      const label = normalizeCardLabel(inferCardLabel(this.editRule));
+      this.editRule.label = label;
+      this.ensureWhen();
+      this.editRule.activation = activationForLabel(label);
+      if (label === "firstDay") {
+        this.$set(this.editRule.when, "days", ["first"]);
+        this.$set(this.editRule.when, "nights", []);
+      }
+      if (label === "everyDay") {
+        this.$set(this.editRule.when, "days", ["first", "other"]);
+        this.$set(this.editRule.when, "nights", []);
+      }
+      if (label === "firstNight") {
+        this.$set(this.editRule.when, "nights", ["first"]);
+        this.$set(this.editRule.when, "days", []);
+      }
+      if (label === "otherNight") {
+        this.$set(this.editRule.when, "nights", ["other"]);
+        this.$set(this.editRule.when, "days", []);
+      }
+      if (label === "everyNight") {
+        this.$set(this.editRule.when, "nights", ["first", "other"]);
+        this.$set(this.editRule.when, "days", []);
+      }
+      if (
+        label === "setup" ||
+        label === "optional" ||
+        label === "trigger" ||
+        label === "nominate" ||
+        label === "death" ||
+        label === "passive"
+      ) {
+        this.$set(this.editRule.when, "nights", []);
+        this.$set(this.editRule.when, "days", []);
+      }
+      const nextKey = slugifyCardKey(
+        label,
+        this.editDoc.cards.indexOf(this.editRule),
+      );
+      const clash = this.editDoc.cards.some(
+        (c) => c !== this.editRule && c.key === nextKey,
+      );
+      if (!clash) {
+        this.editRule.key = nextKey;
+        this.activeCardKey = nextKey;
+      }
+    },
+    onActivationChange() {
+      if (!this.editRule) return;
+      // Prefer LABEL as source of truth; activation edits remapped via label when empty.
+      if (!this.editRule.label) {
+        this.editRule.label = inferCardLabel(this.editRule);
+        this.onCardLabelChange();
+      }
+    },
+    addCard() {
+      if (!this.editDoc) return;
+      const n = this.editDoc.cards.length + 1;
+      const label = `card${n}`;
+      const card = normalizeCard(
+        {
+          key: slugifyCardKey(label, n),
+          label,
+          enabled: true,
+          activation: "",
+          once: false,
+          when: { nights: ["first", "other"], days: [] },
+          inputs: [{ key: "target", type: "player", label: "目標對象" }],
+          sentence: {
+            action: "選擇",
+            template: "{actor} → {action} → 選擇 {target}",
+          },
+          effects: [],
+          notes: "",
+        },
+        n,
+      );
+      if (card.activation == null) card.activation = "";
+      this.editDoc.cards.push(card);
+      this.activeCardKey = card.key;
+    },
+    removeActiveCard() {
+      if (!this.editDoc || !this.editDoc.cards || this.editDoc.cards.length <= 1) {
+        return;
+      }
+      const idx = this.editDoc.cards.findIndex((c) => c.key === this.activeCardKey);
+      if (idx < 0) return;
+      this.editDoc.cards.splice(idx, 1);
+      const next = this.editDoc.cards[Math.max(0, idx - 1)];
+      this.activeCardKey = next ? next.key : null;
+    },
+    prepareCardForEdit(card) {
+      if (!card) return;
+      if (card.activation == null) card.activation = "";
+      if (card.once == null) card.once = false;
+      if (!card.when) card.when = { nights: [], days: [] };
+      if (!Array.isArray(card.when.nights)) card.when.nights = [];
+      if (!Array.isArray(card.when.days)) card.when.days = [];
+      if (!card.sentence) {
+        card.sentence = { action: "選擇", template: "{actor} → {action}" };
+      }
+      if (card.label) card.label = normalizeCardLabel(card.label) || card.label;
+    },
     loadRuleForSelected() {
       const role = this.selectedRole;
       if (!role) {
-        this.editRule = null;
+        this.editDoc = null;
+        this.activeCardKey = null;
         return;
       }
-      const existing = this.ruleById(role.id);
+      const existing =
+        getRoleDocument(role.id, this.overlay) || this.ruleById(role.id);
       if (existing) {
-        this.editRule = JSON.parse(JSON.stringify(existing));
+        this.editDoc = JSON.parse(JSON.stringify(normalizeRule(existing)));
       } else {
-        this.editRule = null;
+        this.editDoc = null;
+        this.activeCardKey = null;
+        return;
       }
-      if (this.editRule) {
-        if (!this.editRule.sentence) {
-          this.editRule.sentence = { action: "選擇", template: "{actor} → {action}" };
-        }
-        this.syncPreviewForm(this.editRule);
-      }
+      (this.editDoc.cards || []).forEach((card) => this.prepareCardForEdit(card));
+      const preferred =
+        (this.editDoc.cards || []).find((c) => c.key === this.activeCardKey) ||
+        (this.editDoc.cards || []).find((c) => c.activation !== "setup") ||
+        (this.editDoc.cards || [])[0];
+      this.activeCardKey = preferred ? preferred.key : null;
+      if (this.editRule) this.syncPreviewForm(this.editRule);
     },
     syncPreviewForm(rule) {
       const next = {};
@@ -670,18 +1195,26 @@ export default {
     createBlankRule() {
       const role = this.selectedRole;
       if (!role) return;
-      this.editRule = normalizeRule({
+      this.editDoc = normalizeRule({
         id: role.id,
         name: role.name || role.id,
         enabled: true,
-        inputs: [{ key: "target", type: "player", label: "目標對象" }],
-        sentence: {
-          action: "選擇",
-          template: "{actor} → {action} → 選擇 {target}",
-        },
-        effects: [],
-        notes: "",
+        cards: [
+          {
+            key: "default",
+            label: "default",
+            inputs: [{ key: "target", type: "player", label: "目標對象" }],
+            sentence: {
+              action: "選擇",
+              template: "{actor} → {action} → 選擇 {target}",
+            },
+            effects: [],
+            notes: "",
+          },
+        ],
       });
+      this.prepareCardForEdit(this.editDoc.cards[0]);
+      this.activeCardKey = this.editDoc.cards[0].key;
     },
     async createDraft() {
       const role = this.selectedRole;
@@ -691,7 +1224,9 @@ export default {
         role,
       );
       if (draft) {
-        this.editRule = JSON.parse(JSON.stringify(draft));
+        this.editDoc = JSON.parse(JSON.stringify(normalizeRule(draft)));
+        (this.editDoc.cards || []).forEach((card) => this.prepareCardForEdit(card));
+        this.activeCardKey = this.editDoc.cards[0] ? this.editDoc.cards[0].key : null;
       }
     },
     addInput() {
@@ -707,7 +1242,7 @@ export default {
       this.editRule.inputs.splice(idx, 1);
     },
     addEffect() {
-      if (!this.editRule) return;
+      if (!this.editRule || !this.editDoc) return;
       const firstTarget =
         this.playerInputsForEffects[0] &&
         this.playerInputsForEffects[0].key;
@@ -715,7 +1250,7 @@ export default {
         type: "addReminder",
         targetFrom: firstTarget || "target",
         reminderName: "",
-        reminderRole: this.editRule.id,
+        reminderRole: this.editDoc.id,
         optional: false,
         defaultOn: true,
         label: "",
@@ -727,9 +1262,14 @@ export default {
       this.editRule.effects.splice(idx, 1);
     },
     applyEdit() {
-      if (!this.editRule) return;
-      this.$store.commit("interactionRules/upsertRule", this.editRule);
+      if (!this.editDoc) return;
+      const payload = JSON.parse(JSON.stringify(this.editDoc));
+      (payload.cards || []).forEach((card) => {
+        if (!card.activation) card.activation = null;
+      });
+      this.$store.commit("interactionRules/upsertRule", payload);
       this.$store.dispatch("interactionRules/saveOverlay");
+      this.loadRuleForSelected();
     },
     saveOverlay() {
       this.$store.dispatch("interactionRules/saveOverlay");
@@ -864,12 +1404,12 @@ export default {
     flex: 0 0 auto;
     width: 100%;
     box-sizing: border-box;
-    padding: 8px 10px;
+    padding: 5px 8px;
     cursor: pointer;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
 
     &:hover,
     &.active {
@@ -891,16 +1431,44 @@ export default {
     }
   }
 
+  .role-row {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 6px;
+  }
+
   .name {
-    font-size: 0.88rem;
-    line-height: 1.3;
+    font-size: 0.84rem;
+    line-height: 1.25;
     word-break: break-word;
+    min-width: 0;
+    flex: 1 1 auto;
   }
 
   .badge {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     opacity: 0.85;
-    line-height: 1.3;
+    line-height: 1.2;
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .card-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+  }
+
+  .card-chip {
+    font-size: 0.62rem;
+    line-height: 1.2;
+    padding: 1px 6px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 214, 153, 0.35);
+    color: #ffd699;
+    opacity: 0.9;
   }
 }
 
@@ -927,7 +1495,7 @@ export default {
   justify-content: space-between;
   align-items: flex-start;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   flex-wrap: wrap;
 
   h4 {
@@ -938,21 +1506,78 @@ export default {
   }
 }
 
-.enabled-toggle {
-  font-size: 0.85rem;
+.card-label-bar {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.card-label-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.card-label-tab {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(0, 0, 0, 0.35);
+  color: rgba(255, 255, 255, 0.82);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 0.72rem;
+  line-height: 1.3;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+
+  &.active {
+    background: rgba(255, 214, 153, 0.18);
+    border-color: rgba(255, 214, 153, 0.55);
+    color: #ffd699;
+  }
+}
+
+.card-label-actions {
+  display: flex;
+  gap: 4px;
   flex-shrink: 0;
 }
 
+.card-label-edit {
+  margin-bottom: 8px;
+
+  .field {
+    margin: 0;
+  }
+}
+
+.preview-card-label {
+  font-size: 0.72rem;
+  color: #ffd699;
+  margin-bottom: 6px;
+  letter-spacing: 0.03em;
+}
+
+.role-ability {
+  margin: 0 0 10px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 0.76rem;
+  line-height: 1.4;
+  opacity: 0.88;
+}
+
 .section {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 
   > label {
     display: block;
     font-size: 0.8rem;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
     opacity: 0.85;
   }
 
@@ -960,8 +1585,8 @@ export default {
   select,
   textarea {
     width: 100%;
-    margin-bottom: 8px;
-    padding: 7px 8px;
+    margin-bottom: 6px;
+    padding: 6px 8px;
     border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.25);
     background: rgba(0, 0, 0, 0.45);
@@ -973,7 +1598,7 @@ export default {
 
   textarea {
     resize: vertical;
-    min-height: 64px;
+    min-height: 52px;
   }
 }
 
@@ -983,15 +1608,15 @@ export default {
   align-items: center;
   font-size: 0.88rem;
   font-weight: bold;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   gap: 8px;
 }
 
 .section-hint {
-  margin: 0 0 10px;
-  font-size: 0.78rem;
+  margin: 0 0 8px;
+  font-size: 0.74rem;
   opacity: 0.75;
-  line-height: 1.5;
+  line-height: 1.4;
 
   .sheet-link {
     color: #8fd4ff;
@@ -1003,13 +1628,13 @@ export default {
 .field-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px 12px;
+  gap: 8px 10px;
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   min-width: 0;
 
   &.field-wide {
@@ -1018,17 +1643,13 @@ export default {
 
   &.field-toggles {
     grid-column: 1 / -1;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 12px 16px;
-    align-items: center;
   }
 
   input,
   select {
     width: 100%;
     margin-bottom: 0;
-    padding: 7px 8px;
+    padding: 6px 8px;
     border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.25);
     background: rgba(0, 0, 0, 0.45);
@@ -1038,17 +1659,21 @@ export default {
   }
 }
 
+.meta-fields .field-toggles .field-label {
+  margin-bottom: 2px;
+}
+
 .field-label {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   opacity: 0.72;
-  line-height: 1.3;
+  line-height: 1.25;
 }
 
 .input-row,
 .grimoire-effect-row {
-  margin-bottom: 12px;
-  padding: 10px;
-  border-radius: 8px;
+  margin-bottom: 8px;
+  padding: 8px;
+  border-radius: 6px;
   background: rgba(0, 0, 0, 0.22);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -1059,8 +1684,8 @@ export default {
   justify-content: flex-end;
   align-items: center;
   gap: 10px;
-  margin-top: 10px;
-  padding-top: 8px;
+  margin-top: 6px;
+  padding-top: 6px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -1069,10 +1694,10 @@ export default {
 }
 
 .effect-summary {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: #ffd699;
-  margin-bottom: 10px;
-  line-height: 1.45;
+  margin-bottom: 6px;
+  line-height: 1.35;
   word-break: break-word;
 }
 
@@ -1080,22 +1705,14 @@ export default {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.inline-check {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.8rem;
-  line-height: 1.3;
-}
-
 .mini-btn {
-  padding: 4px 10px;
+  padding: 3px 8px;
   border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.3);
   background: rgba(0, 0, 0, 0.4);
   color: white;
   cursor: pointer;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   flex-shrink: 0;
 
   &.danger {
@@ -1104,17 +1721,17 @@ export default {
 }
 
 .hint {
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   opacity: 0.7;
   margin: 0;
-  line-height: 1.45;
+  line-height: 1.4;
 }
 
 .editor-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 12px;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .preview-panel {
@@ -1167,6 +1784,34 @@ export default {
   margin-top: 4px;
 }
 
+.toggle-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.toggle-chip {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.78);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  line-height: 1.25;
+  cursor: pointer;
+  user-select: none;
+  max-width: 100%;
+  text-align: left;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+
+  &.on {
+    background: rgba(70, 213, 255, 0.22);
+    border-color: rgba(70, 213, 255, 0.75);
+    color: #e8fbff;
+  }
+}
+
 .preview-label {
   display: block;
   font-size: 0.76rem;
@@ -1214,26 +1859,121 @@ export default {
 
   .preview-panel {
     grid-column: 1 / -1;
-    max-height: 280px;
+    max-height: 240px;
   }
 }
 
 @media (max-width: 760px) {
+  .interaction-rules-body {
+    max-height: calc(100dvh - 52px);
+  }
+
+  .subtitle {
+    display: none;
+  }
+
+  .toolbar {
+    gap: 4px;
+    margin-bottom: 8px;
+
+    .button {
+      font-size: 0.72rem;
+      padding: 4px 7px;
+    }
+  }
+
   .editor-layout {
     grid-template-columns: 1fr;
+    gap: 8px;
   }
 
   .field-grid,
   .effect-fields {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 8px;
   }
 
   .role-list {
-    max-height: 220px;
+    max-height: min(38dvh, 320px);
+    border-radius: 6px;
+
+    .search {
+      padding: 6px 8px;
+      font-size: 0.8rem;
+    }
+
+    li {
+      padding: 4px 8px;
+    }
+
+    .name {
+      font-size: 0.8rem;
+    }
+
+    .badge {
+      font-size: 0.64rem;
+    }
+  }
+
+  .rule-editor {
+    padding: 8px;
+    border-radius: 6px;
+  }
+
+  .editor-head {
+    margin-bottom: 6px;
+    gap: 6px;
+
+    h4 {
+      font-size: 0.95rem;
+    }
+  }
+
+  .card-label-bar {
+    margin-bottom: 6px;
+    gap: 6px;
+  }
+
+  .card-label-tab {
+    padding: 2px 8px;
+    font-size: 0.68rem;
+  }
+
+  .role-ability {
+    margin-bottom: 8px;
+    padding: 5px 6px;
+    font-size: 0.7rem;
+    max-height: 4.2em;
+    overflow: auto;
+  }
+
+  .section {
+    margin-bottom: 8px;
+  }
+
+  .section-hint {
+    display: none;
+  }
+
+  .input-row,
+  .grimoire-effect-row {
+    margin-bottom: 6px;
+    padding: 6px;
   }
 
   .preview-panel {
-    max-height: none;
+    max-height: min(28dvh, 220px);
+    padding: 8px;
+    border-radius: 6px;
+
+    h4 {
+      margin-bottom: 6px;
+      font-size: 0.88rem;
+    }
+  }
+
+  .preview-field {
+    margin-bottom: 5px;
   }
 }
 </style>
@@ -1275,6 +2015,24 @@ export default {
 
     .interaction-rules-body {
       max-height: calc(100dvh - 60px);
+    }
+  }
+
+  @media (max-width: 760px) {
+    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    height: 100%;
+    border-radius: 0;
+    padding: 8px 10px 10px;
+
+    .interaction-rules-body {
+      max-height: calc(100dvh - 40px);
+    }
+
+    > .top-right-buttons {
+      top: 6px;
+      right: 8px;
     }
   }
 }

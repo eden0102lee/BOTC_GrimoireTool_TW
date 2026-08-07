@@ -14,10 +14,9 @@
 - **戰報／復盤**：依日／夜瀏覽、自動與手動紀錄、JSON／Markdown 匯出
 - **本機 LAN 開服**：雙擊 `啟動伺服器.bat` 或 `npm start`
 
-功能對照集石魔典見 [`docs/parity-checklist.md`](docs/parity-checklist.md)。  
-LAN 遊玩步驟見 [`docs/local-play.md`](docs/local-play.md)。  
-跨網路公開網址（Render + GitHub Pages）見 [`docs/online-hosting.md`](docs/online-hosting.md)。  
-**GitHub Pages 第一次啟用**（找不到部署時必看）→ [`docs/github-pages-setup.md`](docs/github-pages-setup.md)。
+戰報技能卡對照見 [`docs/official-skill-cards-tb.md`](docs/official-skill-cards-tb.md)／[`bmr`](docs/official-skill-cards-bmr.md)／[`snv`](docs/official-skill-cards-snv.md)。  
+互動規則盤點見 [`docs/interaction-rules-inventory.md`](docs/interaction-rules-inventory.md)。  
+雲端 WS 部署見根目錄 [`render.yaml`](render.yaml) 與 [`server/README.md`](server/README.md)。
 
 ## 快速開始
 
@@ -46,7 +45,7 @@ npm run serve:ws
 - WebSocket：`ws://localhost:8081/`（未設定 `VUE_APP_WS_URL` 時連「目前頁面 host」的 `:8081`）
 - 健康檢查：`http://localhost:8080/api/health`
 
-線上局：部署 Render WS 後，於 GitHub Actions secret 設定 `VUE_APP_WS_URL=wss://….onrender.com/`，詳見 [`docs/online-hosting.md`](docs/online-hosting.md)。
+線上局：部署 Render WS 後，於 GitHub Actions secret 設定 `VUE_APP_WS_URL=wss://….onrender.com/`（見 [`render.yaml`](render.yaml)、[`server/README.md`](server/README.md)）。
 
 ## 繁中角色 CSV 同步
 
@@ -88,8 +87,6 @@ npm run sync:characters
 | `reminders` | `reminders` | 以 `\|` 分隔，或 JSON 陣列字串 |
 | `remindersGlobal` | `remindersGlobal` | 同上 |
 
-詳見 [`docs/character-sources.md`](docs/character-sources.md)。
-
 ## 戰報／復盤
 
 說書人選單 **Help → 戰報／復盤**（或 Live Session 內／快捷鍵 `[B]`）：
@@ -111,6 +108,8 @@ npm run sync:characters
 | `npm run sync:characters` | CSV → roles JSON |
 | `npm run sync:official` | 自 botc-release 同步角色／傳奇／奇遇／jinxes（需網路） |
 | `npm run sync:script-tool` | 自 [官方劇本工具](https://script.bloodontheclocktower.com/) 更新圖示、簡中→繁中說明與相剋（可用 `--force-icons` / `--overwrite-text`） |
+| `npm run export:skill-cards` | 自角色規則匯出技能卡 markdown |
+| `npm run apply:skill-cards` | 將 `docs/official-skill-cards-*.md` 套回互動規則 |
 | `npm run build` | 正式建置到 `dist/` |
 | `npm run lint` | ESLint |
 

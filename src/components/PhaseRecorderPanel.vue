@@ -333,6 +333,7 @@
               :player="row.card.player"
               :player-index="row.card.playerIndex"
               :role-card-key="row.card.roleCardKey"
+              :card-key="row.card.cardKey"
               :reminder="row.card.reminder"
               :players="players"
               :role-options="scriptRoles"
@@ -362,6 +363,34 @@
       </template>
 
       <template v-else>
+        <div
+          v-if="dayAbilityCards.length"
+          class="day-ability-block"
+        >
+          <h4 class="day-ability-title">{{ $t("recorder.dayAbilityTitle") }}</h4>
+          <p class="day-ability-hint">{{ $t("recorder.dayAbilityHint") }}</p>
+          <div
+            v-for="card in dayAbilityCards"
+            :key="'day-ability-' + card.roleCardKey"
+            class="day-ability-card-wrap"
+          >
+            <RoleActionCard
+              :player="card.player"
+              :player-index="card.playerIndex"
+              :role-card-key="card.roleCardKey"
+              :card-key="card.cardKey"
+              :day-mode="true"
+              :day-number="dayNumber"
+              :reminder="card.reminder"
+              :players="players"
+              :role-options="scriptRoles"
+              :is-recorded="card.isRecorded"
+              :recorded-entry="card.recordedEntry"
+              @record="onOptionalRoleRecord"
+              @delete="onDeleteRoleCard"
+            />
+          </div>
+        </div>
         <template v-for="entry in phaseDayEntries">
           <div
             v-if="!isEditingEntry(entry)"
@@ -560,12 +589,14 @@
             :player="card.player"
             :player-index="card.playerIndex"
             :role-card-key="card.roleCardKey"
+            :card-key="card.cardKey"
             :reminder="card.reminder"
             :players="players"
             :role-options="scriptRoles"
             :is-recorded="card.isRecorded"
             :recorded-entry="card.recordedEntry"
             @record="onOptionalRoleRecord"
+            @delete="onDeleteRoleCard"
           />
         </div>
         <ManualLogCard
@@ -613,13 +644,21 @@ import {
 } from "../store/roleInputConfig";
 import {
   getRule,
+  getDayRule,
+  getCardByKey,
   roleHasOptionalAction,
   roleHasSetupAction,
+  roleHasDayAction,
   getSetupRule,
   buildSetupRoleCardKey,
   setupTaskNote,
   parseSetupRoleCardKey,
   shouldShowMarkOnlyDisguiseSetup,
+  listRoleCards,
+  isDayAbilityCard,
+  cardAppearsInNightOptional,
+  cardAppearsInDayOptional,
+  ruleAppliesToday,
 } from "../store/roleInteractionEngine";
 import { formatLogMessage } from "../store/modules/battleLog";
 import { formatEntryForDisplay } from "../store/battleLogFormat";
@@ -691,6 +730,7 @@ export default {
       "displayLabel",
       "currentPhase",
       "nightNumber",
+      "dayNumber",
       "subPhase",
     ]),
     ...mapGetters("battleLog", [
@@ -951,16 +991,29 @@ export default {
       const list = [];
       this.players.forEach((player, playerIndex) => {
         const role = player.role;
-        if (!roleHasOptionalAction(role, this.overlay)) return;
-        const rule = getRule(role.id, this.overlay);
-        const onceUsed = !!(rule && rule.once && this.isOptionalOnceUsed(playerIndex, role.id));
+        if (!role || !role.id) return;
+        const cards = listRoleCards(role.id, this.overlay);
+        const usable = cards.filter((card) => {
+          if (this.isNight) return cardAppearsInNightOptional(card);
+          // Day picker: event/optional only — auto-listed day abilities excluded
+          if (isDayAbilityCard(card) && ruleAppliesToday(card, this.dayNumber)) {
+            return false;
+          }
+          return cardAppearsInDayOptional(card, this.dayNumber);
+        });
+        if (!usable.length) return;
+        const primary = usable[0];
+        const onceUsed = !!(
+          primary.once && this.isOptionalOnceUsed(playerIndex, role.id)
+        );
         const roleCardKey = buildRoleCardKey(phaseId, playerIndex, role.id);
         const recordedThisPhase = !!this.entryByRoleCardKey(roleCardKey);
         list.push({
           player,
           playerIndex,
           role,
-          rule,
+          rule: primary,
+          cardKey: primary.cardKey,
           onceUsed,
           recordedThisPhase,
           label: formatPlayerRoleLabel(player, playerIndex),
@@ -968,25 +1021,63 @@ export default {
       });
       return list;
     },
+    dayAbilityCards() {
+      if (this.isNight) return [];
+      const phaseId = this.currentPhase.id;
+      const cards = [];
+      this.players.forEach((player, playerIndex) => {
+        const role = player.role;
+        if (!roleHasDayAction(role, this.dayNumber, this.overlay)) return;
+        const dayRule = getDayRule(role.id, this.dayNumber, this.overlay);
+        if (!dayRule) return;
+        const roleCardKey = buildRoleCardKey(phaseId, playerIndex, role.id);
+        const recordedEntry = this.entryByRoleCardKey(roleCardKey);
+        cards.push({
+          player,
+          playerIndex,
+          roleCardKey,
+          cardKey: dayRule.cardKey,
+          reminder: dayRule.notes || "",
+          isRecorded: !!recordedEntry,
+          recordedEntry,
+        });
+      });
+      return cards;
+    },
     optionalCards() {
       const phaseId = this.currentPhase.id;
       const nightKeys = new Set(this.nightCards.map((c) => c.roleCardKey));
+      const dayKeys = new Set(this.dayAbilityCards.map((c) => c.roleCardKey));
       const cards = [];
       const seen = new Set();
 
-      const pushCard = (playerIndex, roleId) => {
+      const pushCard = (playerIndex, roleId, cardKey = "") => {
         const player = this.players[playerIndex];
         if (!player || !player.role) return;
         const id = roleId || (player.role && player.role.id);
         if (!id) return;
         const roleCardKey = buildRoleCardKey(phaseId, playerIndex, id);
-        if (seen.has(roleCardKey) || nightKeys.has(roleCardKey)) return;
+        if (
+          seen.has(roleCardKey) ||
+          nightKeys.has(roleCardKey) ||
+          dayKeys.has(roleCardKey)
+        ) {
+          return;
+        }
         const recordedEntry = this.entryByRoleCardKey(roleCardKey);
-        const rule = getRule(id, this.overlay);
+        const rule =
+          (cardKey && getCardByKey(id, cardKey, this.overlay)) ||
+          (cardKey && getDayRule(id, this.dayNumber, this.overlay)) ||
+          getRule(id, this.overlay) ||
+          getCardByKey(id, cardKey, this.overlay);
         cards.push({
           player,
           playerIndex,
           roleCardKey,
+          cardKey:
+            cardKey ||
+            (rule && (rule.cardKey || rule.key)) ||
+            "",
           reminder: (rule && rule.notes) || "",
           isRecorded: !!recordedEntry,
           recordedEntry,
@@ -995,19 +1086,44 @@ export default {
       };
 
       if (this.optionalDraft) {
-        pushCard(this.optionalDraft.playerIndex, this.optionalDraft.roleId);
+        pushCard(
+          this.optionalDraft.playerIndex,
+          this.optionalDraft.roleId,
+          this.optionalDraft.cardKey || "",
+        );
       }
+
+      // Auto-list seated trigger/optional roles (e.g. 莽夫) so cards appear
+      // without requiring "+可選紀錄" first.
+      (this.optionalCandidates || []).forEach((c) => {
+        if (!c || (c.onceUsed && !c.recordedThisPhase)) return;
+        pushCard(c.playerIndex, c.role && c.role.id, c.cardKey || "");
+      });
 
       this.entries.forEach((e) => {
         if (!e || e.source !== "roleCard" || !e.roleCardKey) return;
         if (!e.phase || e.phase.id !== phaseId) return;
         const parsed = parseRoleCardKey(e.roleCardKey);
         if (!parsed) return;
-        const rule = getRule(parsed.roleId, this.overlay);
-        if (!rule || !roleHasOptionalAction({ id: parsed.roleId }, this.overlay)) {
+        if (!roleHasOptionalAction({ id: parsed.roleId }, this.overlay)) {
           return;
         }
-        pushCard(parsed.playerIndex, parsed.roleId);
+        // Skip if this is an auto day-ability already listed
+        if (
+          !this.isNight &&
+          roleHasDayAction(
+            { id: parsed.roleId },
+            this.dayNumber,
+            this.overlay,
+          )
+        ) {
+          return;
+        }
+        const snapKey =
+          e.formSnapshot && e.formSnapshot.cardKey
+            ? e.formSnapshot.cardKey
+            : "";
+        pushCard(parsed.playerIndex, parsed.roleId, snapKey);
       });
 
       return cards;
@@ -1369,6 +1485,7 @@ export default {
       this.optionalDraft = {
         playerIndex: candidate.playerIndex,
         roleId: candidate.role.id,
+        cardKey: candidate.cardKey || "",
       };
     },
     onOptionalRoleRecord(payload) {
@@ -2000,6 +2117,31 @@ export default {
 }
 
 .setup-card-wrap {
+  margin-top: 6px;
+}
+
+.day-ability-block {
+  margin-bottom: 12px;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(140, 190, 255, 0.35);
+  background: rgba(20, 30, 50, 0.45);
+}
+
+.day-ability-title {
+  margin: 0 0 4px;
+  font-size: 0.82rem;
+  color: #a8cfff;
+}
+
+.day-ability-hint {
+  margin: 0 0 8px;
+  font-size: 0.7rem;
+  opacity: 0.7;
+  line-height: 1.4;
+}
+
+.day-ability-card-wrap {
   margin-top: 6px;
 }
 

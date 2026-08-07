@@ -9,6 +9,43 @@ export const TEAM_LABELS = {
 
 export const TEAM_CATEGORY_OPTIONS = ["爪牙", "外來者", "惡魔", "旅行者", "鎮民"];
 
+/** Player alignment — independent from role.team (evil townsfolk / good demon). */
+export const ALIGNMENT_LABELS = {
+  good: "善良",
+  evil: "邪惡",
+};
+
+/** Default alignment when a role of this team is assigned (initial only). */
+export function defaultAlignmentForTeam(team) {
+  const t = String(team || "").toLowerCase();
+  if (t === "townsfolk" || t === "outsider") return "good";
+  if (t === "minion" || t === "demon") return "evil";
+  return null;
+}
+
+export function normalizeAlignment(value) {
+  if (value === "good" || value === "evil") return value;
+  if (value === "善良" || value === "Good" || value === "good (Good)") return "good";
+  if (value === "邪惡" || value === "Evil" || value === "evil (Evil)") return "evil";
+  const raw = String(value || "").trim().toLowerCase();
+  if (raw === "good" || raw.startsWith("善良")) return "good";
+  if (raw === "evil" || raw.startsWith("邪惡") || raw.startsWith("邪恶")) return "evil";
+  return null;
+}
+
+/** Current alignment for filtering; falls back to role.team default if unset. */
+export function resolvePlayerAlignment(player) {
+  if (!player) return null;
+  const explicit = normalizeAlignment(player.alignment);
+  if (explicit) return explicit;
+  return defaultAlignmentForTeam(player.role && player.role.team);
+}
+
+export function alignmentLabel(alignment) {
+  const a = normalizeAlignment(alignment);
+  return a ? ALIGNMENT_LABELS[a] : "";
+}
+
 const TEAM_TERM_REPLACEMENTS = [
   ["非僕從", "非爪牙"],
   ["非城外人", "非外來者"],

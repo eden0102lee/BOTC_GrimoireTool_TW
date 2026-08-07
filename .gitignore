@@ -3,3 +3,18 @@ node_modules
 dist
 *.pem
 .cursor/
+
+# one-off investigation dumps (keep tracked overlays like _community_translations_gviz.csv)
+data/raw/_*_sample.*
+data/raw/_*_404.*
+data/raw/_investigation_*
+data/raw/_coverage_*
+data/raw/_analyze_*.py
+data/raw/_write_*.py
+data/raw/_grimoire_*
+data/raw/_sample_utf8.txt
+data/raw/limpy-extract.json
+data/raw/_official_roles*.json
+data/raw/_bra1n_*
+data/raw/_user_sheet_*
+data/raw/_community_translations_sample.*

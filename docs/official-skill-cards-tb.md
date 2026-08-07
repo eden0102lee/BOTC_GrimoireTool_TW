@@ -466,7 +466,7 @@
 - 對象: other
 - 觸發: (無)
 - 動詞: 投毒
-- 輸入: alivePlayer:target(目標對象)
+- 輸入: player:target(目標對象)
 - effects: 目標對象 中毒
 - template: `{actor} → {action} → 選擇 {target} → {target} 中毒`
 - 例句:
@@ -531,7 +531,7 @@
 - 對象: both
 - 觸發: 每晚選擇；若自殺則爪牙變小惡魔（另記）
 - 動詞: 殺害
-- 輸入: alivePlayer:target(目標對象)
+- 輸入: player:target(目標對象)
 - effects: 目標死亡、目標掛死亡標記
 - template: `{actor} → {action} → 選擇 {target} → {target} 死亡`
 - 例句:
