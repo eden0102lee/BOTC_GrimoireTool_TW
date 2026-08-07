@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985",
-  "generatedAt": "2026-08-06T15:13:24.608Z",
+  "generatedAt": "2026-08-07T14:26:45.525Z",
   "rules": [
     {
       "id": "ojo",
@@ -235,10 +235,41 @@
       "id": "chef",
       "name": "廚師",
       "enabled": true,
+      "cards": [
+        {
+          "key": "first-night",
+          "label": "firstNight",
+          "enabled": true,
+          "activation": null,
+          "once": true,
+          "when": {
+            "nights": [
+              "first"
+            ],
+            "days": []
+          },
+          "inputs": [
+            {
+              "key": "num",
+              "type": "number",
+              "label": "得知數字"
+            }
+          ],
+          "sentence": {
+            "action": "得知",
+            "template": "{actor} → {action} → {num}"
+          },
+          "effects": [],
+          "notes": "僅首夜資訊"
+        }
+      ],
+      "activation": null,
+      "once": true,
       "when": {
         "nights": [
           "first"
-        ]
+        ],
+        "days": []
       },
       "inputs": [
         {
@@ -419,10 +450,75 @@
       "id": "investigator",
       "name": "調查員",
       "enabled": true,
+      "cards": [
+        {
+          "key": "first-night",
+          "label": "firstNight",
+          "enabled": true,
+          "activation": null,
+          "once": false,
+          "when": {
+            "nights": [
+              "first"
+            ],
+            "days": []
+          },
+          "inputs": [
+            {
+              "key": "p1",
+              "type": "player",
+              "label": "玩家 1"
+            },
+            {
+              "key": "p2",
+              "type": "player",
+              "label": "玩家 2",
+              "required": false
+            },
+            {
+              "key": "r1",
+              "type": "role",
+              "label": "對應角色",
+              "teams": [
+                "minion"
+              ],
+              "required": false
+            }
+          ],
+          "sentence": {
+            "action": "得知",
+            "template": "{actor} → {action} → {p1} & {p2} 其中一位是 {r1}"
+          },
+          "effects": [
+            {
+              "type": "addReminder",
+              "targetFrom": "p1",
+              "reminderName": "爪牙",
+              "reminderRole": "investigator",
+              "optional": false,
+              "defaultOn": true,
+              "label": "玩家 1 爪牙"
+            },
+            {
+              "type": "addReminder",
+              "targetFrom": "p2",
+              "reminderName": "非爪牙",
+              "reminderRole": "investigator",
+              "optional": false,
+              "defaultOn": true,
+              "label": "玩家 2 非爪牙"
+            }
+          ],
+          "notes": ""
+        }
+      ],
+      "activation": null,
+      "once": false,
       "when": {
         "nights": [
           "first"
-        ]
+        ],
+        "days": []
       },
       "inputs": [
         {
@@ -433,12 +529,17 @@
         {
           "key": "p2",
           "type": "player",
-          "label": "玩家 2"
+          "label": "玩家 2",
+          "required": false
         },
         {
           "key": "r1",
           "type": "role",
-          "label": "對應角色"
+          "label": "對應角色",
+          "teams": [
+            "minion"
+          ],
+          "required": false
         }
       ],
       "sentence": {
@@ -989,14 +1090,59 @@
       "id": "scarletwoman",
       "name": "紅唇女郎",
       "enabled": true,
+      "cards": [
+        {
+          "key": "trigger",
+          "label": "trigger",
+          "enabled": true,
+          "activation": "optional",
+          "once": false,
+          "when": {
+            "nights": [],
+            "days": []
+          },
+          "inputs": [
+            {
+              "key": "r1",
+              "type": "role",
+              "label": "惡魔角色",
+              "teams": [
+                "demon"
+              ]
+            }
+          ],
+          "sentence": {
+            "action": "成為",
+            "template": "{actor}成為[{r1}]"
+          },
+          "effects": [
+            {
+              "type": "addReminder",
+              "targetFrom": "actor",
+              "reminderName": "是惡魔",
+              "reminderRole": "scarletwoman",
+              "optional": true,
+              "defaultOn": true,
+              "label": "自身 是惡魔"
+            }
+          ],
+          "notes": "觸發：≥5 名玩家存活（不含旅行者）時惡魔死亡；非夜選擇；可選紀錄"
+        }
+      ],
+      "activation": "optional",
+      "once": false,
       "when": {
-        "nights": []
+        "nights": [],
+        "days": []
       },
       "inputs": [
         {
           "key": "r1",
           "type": "role",
-          "label": "惡魔角色"
+          "label": "惡魔角色",
+          "teams": [
+            "demon"
+          ]
         }
       ],
       "sentence": {
@@ -1014,9 +1160,7 @@
           "label": "自身 是惡魔"
         }
       ],
-      "notes": "觸發：≥5 名玩家存活（不含旅行者）時惡魔死亡；非夜選擇；可選紀錄",
-      "activation": "optional",
-      "once": false
+      "notes": "觸發：≥5 名玩家存活（不含旅行者）時惡魔死亡；非夜選擇；可選紀錄"
     },
     {
       "id": "bonecollector",
@@ -1350,19 +1494,80 @@
       "id": "drunk",
       "name": "酒鬼",
       "enabled": true,
+      "cards": [
+        {
+          "key": "setup",
+          "label": "setup",
+          "enabled": true,
+          "activation": "setup",
+          "once": true,
+          "when": {
+            "nights": [],
+            "days": []
+          },
+          "inputs": [
+            {
+              "key": "p1",
+              "type": "player",
+              "label": "酒鬼玩家",
+              "teams": [
+                "townsfolk"
+              ]
+            },
+            {
+              "key": "r1",
+              "type": "role",
+              "label": "善良角色",
+              "teams": [
+                "townsfolk"
+              ]
+            }
+          ],
+          "sentence": {
+            "action": "是",
+            "template": "{p1}是[酒鬼]"
+          },
+          "effects": [
+            {
+              "type": "setRole",
+              "targetFrom": "p1",
+              "roleFrom": "r1"
+            },
+            {
+              "type": "addReminder",
+              "targetFrom": "p1",
+              "reminderName": "是酒鬼",
+              "reminderRole": "drunk",
+              "optional": true,
+              "defaultOn": true,
+              "label": "掛 是酒鬼 標記"
+            }
+          ],
+          "notes": "設置 A：已指派酒鬼時，將角色改為所选善良角色並掛「是酒鬼」；B：未指派且無標記時選善良玩家僅掛標記"
+        }
+      ],
+      "activation": "setup",
+      "once": true,
       "when": {
-        "nights": []
+        "nights": [],
+        "days": []
       },
       "inputs": [
         {
           "key": "p1",
           "type": "player",
-          "label": "酒鬼玩家"
+          "label": "酒鬼玩家",
+          "teams": [
+            "townsfolk"
+          ]
         },
         {
           "key": "r1",
           "type": "role",
-          "label": "善良角色"
+          "label": "善良角色",
+          "teams": [
+            "townsfolk"
+          ]
         }
       ],
       "sentence": {
@@ -1385,9 +1590,7 @@
           "label": "掛 是酒鬼 標記"
         }
       ],
-      "notes": "設置 A：已指派酒鬼時，將角色改為所选善良角色並掛「是酒鬼」；B：未指派且無標記時選善良玩家僅掛標記",
-      "activation": "setup",
-      "once": true
+      "notes": "設置 A：已指派酒鬼時，將角色改為所选善良角色並掛「是酒鬼」；B：未指派且無標記時選善良玩家僅掛標記"
     },
     {
       "id": "baron",
@@ -3098,16 +3301,49 @@
       "id": "undertaker",
       "name": "送葬者",
       "enabled": true,
+      "cards": [
+        {
+          "key": "other-night",
+          "label": "otherNight",
+          "enabled": true,
+          "activation": null,
+          "once": false,
+          "when": {
+            "nights": [
+              "other"
+            ],
+            "days": []
+          },
+          "inputs": [
+            {
+              "key": "r1",
+              "type": "role",
+              "label": "處決角色",
+              "inPlay": false
+            }
+          ],
+          "sentence": {
+            "action": "得知",
+            "template": "{actor} → {action} → 今日處決 {r1}"
+          },
+          "effects": [],
+          "notes": "次夜起；當天有人死於處決才有資訊"
+        }
+      ],
+      "activation": null,
+      "once": false,
       "when": {
         "nights": [
           "other"
-        ]
+        ],
+        "days": []
       },
       "inputs": [
         {
           "key": "r1",
           "type": "role",
-          "label": "處決角色"
+          "label": "處決角色",
+          "inPlay": false
         }
       ],
       "sentence": {
@@ -3115,7 +3351,7 @@
         "template": "{actor} → {action} → 今日處決 {r1}"
       },
       "effects": [],
-      "notes": "次夜起；當天有人死於處決才有資訊；勿 └ 自身處決"
+      "notes": "次夜起；當天有人死於處決才有資訊"
     },
     {
       "id": "marionette",
@@ -3522,10 +3758,73 @@
       "id": "washerwoman",
       "name": "洗衣婦",
       "enabled": true,
+      "cards": [
+        {
+          "key": "first-night",
+          "label": "firstNight",
+          "enabled": true,
+          "activation": null,
+          "once": false,
+          "when": {
+            "nights": [
+              "first"
+            ],
+            "days": []
+          },
+          "inputs": [
+            {
+              "key": "p1",
+              "type": "player",
+              "label": "玩家 1"
+            },
+            {
+              "key": "p2",
+              "type": "player",
+              "label": "玩家 2"
+            },
+            {
+              "key": "r1",
+              "type": "role",
+              "label": "對應角色",
+              "teams": [
+                "townsfolk"
+              ]
+            }
+          ],
+          "sentence": {
+            "action": "得知",
+            "template": "{actor} → {action} → {p1} & {p2} 其中一位是 {r1}"
+          },
+          "effects": [
+            {
+              "type": "addReminder",
+              "targetFrom": "p1",
+              "reminderName": "鎮民",
+              "reminderRole": "washerwoman",
+              "optional": false,
+              "defaultOn": true,
+              "label": "玩家 1 鎮民"
+            },
+            {
+              "type": "addReminder",
+              "targetFrom": "p2",
+              "reminderName": "非鎮民",
+              "reminderRole": "washerwoman",
+              "optional": false,
+              "defaultOn": true,
+              "label": "玩家 2 非鎮民"
+            }
+          ],
+          "notes": ""
+        }
+      ],
+      "activation": null,
+      "once": false,
       "when": {
         "nights": [
           "first"
-        ]
+        ],
+        "days": []
       },
       "inputs": [
         {
@@ -3541,7 +3840,10 @@
         {
           "key": "r1",
           "type": "role",
-          "label": "對應角色"
+          "label": "對應角色",
+          "teams": [
+            "townsfolk"
+          ]
         }
       ],
       "sentence": {
@@ -4356,11 +4658,93 @@
       "id": "fortuneteller",
       "name": "占卜師",
       "enabled": true,
+      "cards": [
+        {
+          "key": "setup",
+          "label": "setup",
+          "enabled": true,
+          "activation": "setup",
+          "once": true,
+          "when": {
+            "nights": [],
+            "days": []
+          },
+          "inputs": [
+            {
+              "key": "p1",
+              "type": "otherPlayer",
+              "alignment": "good",
+              "label": "視為惡魔（善良玩家）"
+            }
+          ],
+          "sentence": {
+            "action": "始終將",
+            "template": "{actor}始終將 {p1} 視為惡魔"
+          },
+          "effects": [
+            {
+              "type": "addReminder",
+              "targetFrom": "p1",
+              "reminderName": "視為惡魔",
+              "reminderRole": "fortuneteller",
+              "unique": true,
+              "optional": true,
+              "defaultOn": true,
+              "label": "掛「視為惡魔」標記"
+            }
+          ],
+          "notes": "開局選定一名善良玩家「視為惡魔」（整局）"
+        },
+        {
+          "key": "every-night",
+          "label": "everyNight",
+          "enabled": true,
+          "activation": null,
+          "once": false,
+          "when": {
+            "nights": [
+              "first",
+              "other"
+            ],
+            "days": []
+          },
+          "inputs": [
+            {
+              "key": "p1",
+              "type": "player",
+              "label": "玩家 1"
+            },
+            {
+              "key": "p2",
+              "type": "player",
+              "label": "玩家 2"
+            },
+            {
+              "key": "res",
+              "type": "select",
+              "label": "結果判斷",
+              "options": [
+                "是",
+                "否"
+              ]
+            }
+          ],
+          "sentence": {
+            "action": "得知",
+            "template": "{actor} → 查驗 {p1} & {p2} → {res}"
+          },
+          "effects": [],
+          "notes": "res 用 是/否；「始終將…視為惡魔」見 SETUP 卡"
+        }
+      ],
+      "activation": null,
+      "once": false,
       "when": {
         "nights": [
           "first",
           "other"
-        ]
+        ],
+        "days": []
       },
       "inputs": [
         {
@@ -4388,7 +4772,7 @@
         "template": "{actor} → 查驗 {p1} & {p2} → {res}"
       },
       "effects": [],
-      "notes": "res 用 是/否；「始終將…視為惡魔」僅開局一次（另記／可選紀錄），勿每夜掛標記"
+      "notes": "res 用 是/否；「始終將…視為惡魔」見 SETUP 卡"
     },
     {
       "id": "summoner",
@@ -4634,10 +5018,61 @@
       "id": "slayer",
       "name": "獵手",
       "enabled": true,
-      "activation": "optional",
+      "cards": [
+        {
+          "key": "every-day",
+          "label": "everyDay",
+          "enabled": true,
+          "activation": null,
+          "once": true,
+          "when": {
+            "nights": [],
+            "days": [
+              "first",
+              "other"
+            ]
+          },
+          "inputs": [
+            {
+              "key": "target",
+              "type": "alivePlayer",
+              "label": "目標對象"
+            }
+          ],
+          "sentence": {
+            "action": "獵殺",
+            "template": "{actor} → {action} → {target}"
+          },
+          "effects": [
+            {
+              "id": "kill",
+              "type": "setDead",
+              "targetFrom": "target",
+              "value": true,
+              "optional": true,
+              "defaultOn": true,
+              "label": "目標死亡"
+            },
+            {
+              "type": "addReminder",
+              "targetFrom": "actor",
+              "reminderName": "無能力",
+              "reminderRole": "slayer",
+              "bindTo": "",
+              "label": "失去能力"
+            }
+          ],
+          "notes": "白天公開使用，每局一次；目標為惡魔才死亡"
+        }
+      ],
+      "activation": null,
       "once": true,
       "when": {
-        "nights": []
+        "nights": [],
+        "days": [
+          "first",
+          "other"
+        ]
       },
       "inputs": [
         {
@@ -4662,14 +5097,14 @@
         },
         {
           "type": "addReminder",
-          "targetFrom": "target",
-          "reminderName": "死亡",
+          "targetFrom": "actor",
+          "reminderName": "無能力",
           "reminderRole": "slayer",
-          "bindTo": "kill",
-          "label": "目標掛死亡標記"
+          "bindTo": "",
+          "label": "失去能力"
         }
       ],
-      "notes": "白天公開使用，每局一次；目標為惡魔才死亡；可選紀錄"
+      "notes": "白天公開使用，每局一次；目標為惡魔才死亡"
     },
     {
       "id": "gunslinger",
@@ -5067,5 +5502,5 @@
       "notes": "白天可換至多三對座位；不可離座密談"
     }
   ],
-  "sourceNote": "Skill-card patches applied via scripts/apply-skill-cards-to-rules.js (docs/official-skill-cards-*.md)"
+  "sourceNote": "Skill-card patches applied via scripts/apply-skill-cards-to-rules.js (docs/official-skill-cards-*.md); Merged overlay from role-interaction-rules (2).json at 2026-08-07T14:19:27.036Z"
 }

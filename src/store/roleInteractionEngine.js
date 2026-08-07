@@ -27,7 +27,7 @@ export function getBuiltinRulesMap() {
 
 export function normalizeRule(rule) {
   if (!rule) return null;
-  return {
+  const normalized = {
     id: rule.id,
     name: rule.name || rule.id,
     enabled: rule.enabled !== false,
@@ -39,6 +39,11 @@ export function normalizeRule(rule) {
     effects: Array.isArray(rule.effects) ? rule.effects.slice() : [],
     notes: rule.notes || "",
   };
+  // Multi-card role specs (setup + night/day) — preserve when present
+  if (Array.isArray(rule.cards) && rule.cards.length) {
+    normalized.cards = rule.cards.map((c) => ({ ...c }));
+  }
+  return normalized;
 }
 
 export function loadOverlayFromStorage() {
