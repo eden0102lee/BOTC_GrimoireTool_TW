@@ -47,7 +47,7 @@ if not exist "node_modules\" (
   echo.
 )
 
-echo [INFO] Starting HTTP :8080 and WebSocket :8081 ...
+echo [INFO] Force rebuilding frontend, then starting HTTP :8080 and WebSocket :8081 ...
 echo [INFO] Browser will open when ready.
 echo [INFO] In this window: restart / rebuild / help / quit
 echo [INFO] Close this window or press Ctrl+C to stop.
