@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /**
  * Local LAN play server: static frontend + WebSocket on separate ports.
- * Usage: npm run play  |  npm start  |  啟動伺服器.bat
+ * Usage: npm run play  |  npm start  |  start-server.bat
  *
+ * Startup always force-rebuilds the frontend so local git updates are served.
  * While running, type a command and press Enter:
  *   restart / r  — rebuild frontend if needed, restart WebSocket
  *   rebuild      — force rebuild frontend, then restart WebSocket
@@ -446,7 +447,8 @@ async function main() {
     );
   }
 
-  ensureDist();
+  // Always rebuild on start so pull/sync updates are not served from stale dist/.
+  ensureDist(true);
   startWsServer();
 
   process.on("SIGINT", shutdown);

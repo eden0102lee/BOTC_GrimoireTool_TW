@@ -12,7 +12,7 @@
 - **繁中角色 CSV 同步**（不連 Google Sheets API）
 - **官方角色／奇遇同步**（`npm run sync:official`，對齊 botc-release）
 - **戰報／復盤**：依日／夜瀏覽、自動與手動紀錄、JSON／Markdown 匯出
-- **本機 LAN 開服**：雙擊 `啟動伺服器.bat` 或 `npm start`
+- **本機 LAN 開服**：雙擊 `start-server.bat` 或 `npm start`（啟動時強制 rebuild）
 
 戰報技能卡對照見 [`docs/official-skill-cards-tb.md`](docs/official-skill-cards-tb.md)／[`bmr`](docs/official-skill-cards-bmr.md)／[`snv`](docs/official-skill-cards-snv.md)。  
 互動規則盤點見 [`docs/interaction-rules-inventory.md`](docs/interaction-rules-inventory.md)。  
@@ -20,14 +20,14 @@
 
 ## 快速開始
 
-**一鍵開服（推薦）**：雙擊專案根目錄的 `啟動伺服器.bat`（或 `start-server.bat`）。
+**一鍵開服（推薦）**：雙擊專案根目錄的 `start-server.bat`。
 
-會自動檢查 Node／依賴、啟動 HTTP + WebSocket，並開啟瀏覽器。關閉該視窗即可停服。
+會自動檢查 Node／依賴、**強制重建前端**、啟動 HTTP + WebSocket，並開啟瀏覽器。關閉該視窗即可停服。
 
 ```bash
 npm install
 
-# 一鍵本機 LAN（等同雙擊 .bat：build 如需 + 靜態站 + WS + 開瀏覽器）
+# 一鍵本機 LAN（等同雙擊 start-server.bat：強制 rebuild + 靜態站 + WS + 開瀏覽器）
 npm start
 # 或
 npm run play
@@ -100,7 +100,7 @@ npm run sync:characters
 
 | 指令 | 說明 |
 | --- | --- |
-| `npm start` / `npm run play` | 一鍵 LAN：建置（如需）＋靜態＋WS，並開瀏覽器；執行中可輸入 `restart` / `rebuild` / `quit` |
+| `npm start` / `npm run play` / `start-server.bat` | 一鍵 LAN：**每次啟動強制 rebuild** ＋靜態＋WS，並開瀏覽器；執行中可輸入 `restart` / `rebuild` / `quit` |
 | `npm run serve` | Vue 開發伺服器 |
 | `npm run serve:ws` | 本機 WebSocket（development） |
 | `npm run start:ws` | 啟動 WS（Render／雲端用；設 `CLOUD=1`） |
