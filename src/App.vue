@@ -95,6 +95,7 @@ export default {
   },
   mounted() {
     this._unbindViewport = bindViewportUnitSync(this.$store);
+    this.openModalFromQuery();
   },
   beforeDestroy() {
     if (this._unbindViewport) {
@@ -103,6 +104,31 @@ export default {
     }
   },
   methods: {
+    openModalFromQuery() {
+      try {
+        const params = new URLSearchParams(window.location.search || "");
+        const open = params.get("open");
+        if (!open) return;
+        const allowed = {
+          interactionRules: true,
+          battleLog: true,
+          gameState: true,
+          reference: true,
+          nightOrder: true,
+          edition: true,
+          roles: true,
+          voteHistory: true,
+        };
+        if (!allowed[open]) return;
+        this.$nextTick(() => {
+          if (!this.$store.state.modals[open]) {
+            this.$store.commit("toggleModal", open);
+          }
+        });
+      } catch (e) {
+        /* ignore */
+      }
+    },
     keyup(event) {
       const { key, ctrlKey, metaKey, target } = event;
       if (ctrlKey || metaKey) return;

@@ -17,6 +17,8 @@ import {
 import {
   getRule,
   getSetupRule,
+  getCardByKey,
+  getDayRule,
   effectsFromRule,
   buildSentence,
   inputsFromRule,
@@ -66,6 +68,14 @@ function resolveRuleForRoleCard(formSnapshot, overlay, roleCardKey) {
     (roleCardKey && String(roleCardKey).startsWith("setup|"))
   ) {
     return getSetupRule(formSnapshot.ruleId, overlay);
+  }
+  if (formSnapshot.cardKey) {
+    const byKey = getCardByKey(formSnapshot.ruleId, formSnapshot.cardKey, overlay);
+    if (byKey) return byKey;
+  }
+  if (formSnapshot.dayMode) {
+    const dayRule = getDayRule(formSnapshot.ruleId, formSnapshot.dayNumber || 1, overlay);
+    if (dayRule) return dayRule;
   }
   return getRule(formSnapshot.ruleId, overlay);
 }

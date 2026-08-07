@@ -28,14 +28,15 @@
       </div>
     </div>
 
-    <label class="ability-lost-toggle">
-      <input
-        type="checkbox"
-        :checked="abilityLost"
-        @change="onAbilityLostChange"
-      />
-      <span>{{ $t("recorder.abilityLost") }}</span>
-    </label>
+    <button
+      type="button"
+      class="toggle-chip ability-lost-chip"
+      :class="{ on: abilityLost }"
+      :aria-pressed="abilityLost ? 'true' : 'false'"
+      @click="onAbilityLostChipClick"
+    >
+      {{ $t("recorder.abilityLost") }}
+    </button>
 
     <p class="reminder" v-if="reminder && !abilityLost">{{ reminder }}</p>
 
@@ -88,14 +89,20 @@
 
         <template v-if="interactionRule && visibleEffectToggles.length">
           <div class="grimoire-effects-head">{{ $t("interactionRules.grimoireEffects") }}</div>
-          <label
-            v-for="item in visibleEffectToggles"
-            :key="item.key"
-            class="field effect-toggle full"
-          >
-            <span>{{ item.label }}</span>
-            <input type="checkbox" v-model="effectToggles[item.key]" />
-          </label>
+          <div class="toggle-chip-row">
+            <button
+              v-for="item in visibleEffectToggles"
+              :key="item.key"
+              type="button"
+              class="toggle-chip effect-chip"
+              :class="{ on: !!effectToggles[item.key] }"
+              :aria-pressed="effectToggles[item.key] ? 'true' : 'false'"
+              :title="item.label"
+              @click="toggleEffectChip(item.key)"
+            >
+              {{ item.label }}
+            </button>
+          </div>
         </template>
 
         <label class="field full">
@@ -146,6 +153,8 @@ import {
 import {
   getRule,
   getSetupRule,
+  getDayRule,
+  getCardByKey,
   inputsFromRule,
   effectsFromRule,
   parseSetupRoleCardKey,
@@ -174,6 +183,12 @@ export default {
     recordedEntry: { type: Object, default: null },
     /** When true, use setup rule (開局設置) instead of night/optional rule. */
     setupMode: { type: Boolean, default: false },
+    /** When true, resolve daytime ability card for current day. */
+    dayMode: { type: Boolean, default: false },
+    /** Current day number (1-based) for dayMode. */
+    dayNumber: { type: Number, default: 1 },
+    /** Prefer a specific card key within the role document. */
+    cardKey: { type: String, default: "" },
     /** Original setup role id (e.g. drunk) when surface role was replaced. */
     setupRoleId: { type: String, default: "" },
     /** Optional prefill for form fields (e.g. soldier target = self). */
@@ -249,6 +264,14 @@ export default {
         const setupId = this.setupRoleId || role.id;
         const setupRule = getSetupRule(setupId, this.overlay);
         return setupRule && setupRule.enabled ? setupRule : null;
+      }
+      if (this.cardKey) {
+        const byKey = getCardByKey(role.id, this.cardKey, this.overlay);
+        if (byKey && byKey.enabled) return byKey;
+      }
+      if (this.dayMode) {
+        const dayRule = getDayRule(role.id, this.dayNumber, this.overlay);
+        return dayRule && dayRule.enabled ? dayRule : null;
       }
       const rule = getRule(role.id, this.overlay);
       return rule && rule.enabled ? rule : null;
@@ -441,6 +464,18 @@ export default {
           return team === "townsfolk" || team === "outsider";
         });
       }
+      // 占卜師 setup：僅可選其他善良玩家作為「視為惡魔」
+      const setupId = String(this.setupRoleId || "").toLowerCase();
+      if (
+        this.setupMode &&
+        setupId === "fortuneteller" &&
+        field.key === "p1"
+      ) {
+        return list.filter(({ player }) => {
+          const team = player && player.role && player.role.team;
+          return team === "townsfolk" || team === "outsider";
+        });
+      }
       return list;
     },
     effectToggleKey(effect, idx) {
@@ -463,8 +498,8 @@ export default {
       });
       this.effectToggles = toggles;
     },
-    onAbilityLostChange(event) {
-      const value = !!event.target.checked;
+    onAbilityLostChipClick() {
+      const value = !this.abilityLost;
       this.$store.commit("players/update", {
         player: this.player,
         property: "abilityLost",
@@ -474,6 +509,9 @@ export default {
         this.editing = false;
         this.$store.dispatch("battleLog/cancelRoleCard", this.roleCardKey);
       }
+    },
+    toggleEffectChip(key) {
+      this.$set(this.effectToggles, key, !this.effectToggles[key]);
     },
     startEdit() {
       const snap =
@@ -600,6 +638,16 @@ export default {
             ? this.setupRoleId || this.player.role.id
             : null,
           setup: !!this.setupMode,
+          dayMode: !!this.dayMode,
+          dayNumber: this.dayMode ? this.dayNumber : null,
+          cardKey:
+            this.cardKey ||
+            (this.interactionRule && this.interactionRule.cardKey) ||
+            null,
+          cardLabel:
+            (this.interactionRule &&
+              (this.interactionRule.cardLabel || this.interactionRule.label)) ||
+            null,
           setupVariant: this.disguiseSetupVariant || null,
           formData: { ...this.formData },
           detailNote: this.detailNote,
@@ -674,18 +722,42 @@ export default {
   opacity: 0.75;
 }
 
-.ability-lost-toggle {
+.toggle-chip-row {
+  grid-column: 1 / -1;
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
   gap: 6px;
-  margin: 6px 0;
-  font-size: 0.72rem;
+  margin: 2px 0 4px;
+}
+
+.toggle-chip {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.78);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.7rem;
+  line-height: 1.25;
   cursor: pointer;
   user-select: none;
+  max-width: 100%;
+  text-align: left;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 
-  input {
-    margin: 0;
-    cursor: pointer;
+  &.on {
+    background: rgba(70, 213, 255, 0.22);
+    border-color: rgba(70, 213, 255, 0.75);
+    color: #e8fbff;
+  }
+
+  &.ability-lost-chip {
+    margin: 6px 0;
+    &.on {
+      background: rgba(255, 120, 100, 0.22);
+      border-color: rgba(255, 140, 120, 0.8);
+      color: #ffe8e4;
+    }
   }
 }
 
@@ -720,31 +792,11 @@ export default {
   &.full {
     grid-column: 1 / -1;
   }
-  &.effect-toggle {
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 8px;
-
-    span {
-      flex: 1 1 auto;
-      min-width: 0;
-      line-height: 1.35;
-      word-break: normal;
-      overflow-wrap: anywhere;
-    }
-
-    input[type="checkbox"] {
-      width: auto;
-      flex-shrink: 0;
-      margin: 2px 0 0;
-      accent-color: #46d5ff;
-    }
-  }
   span {
     opacity: 0.7;
   }
   select,
-  input:not([type="checkbox"]) {
+  input {
     width: 100%;
     padding: 3px 4px;
     border-radius: 4px;
