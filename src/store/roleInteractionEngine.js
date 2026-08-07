@@ -10,9 +10,14 @@ import { formatPlayerRoleLabel } from "./roleInputConfig";
 import {
   isPlayerInputType,
   resolveEffectEnabled,
-  formatGrimoireEffectSpec,
 } from "./roleInteractionTypes";
 import { makeRoleReminder } from "./roleReminderCatalog";
+import {
+  alignmentLabel,
+  defaultAlignmentForTeam,
+  normalizeAlignment,
+  resolvePlayerAlignment,
+} from "./teamTerms";
 
 const STORAGE_KEY = "roleInteractionRulesOverlay";
 
@@ -49,7 +54,8 @@ const LABEL_ALIASES = {
   nominate: "nominate",
   death: "death",
   passive: "passive",
-  default: "default",
+  // legacy → canonical
+  default: "everyNight",
 };
 
 /** @returns {Map<string, object>} */
@@ -72,11 +78,13 @@ export function normalizeCardLabel(label) {
 
 export function inferCardLabel(card) {
   if (card && card.label && String(card.label).trim()) {
-    return normalizeCardLabel(card.label) || String(card.label).trim();
+    const normalized = normalizeCardLabel(card.label);
+    if (normalized && CARD_LABELS.includes(normalized)) return normalized;
+    if (normalized) return normalized;
   }
   if (card && card.activation === "setup") return "setup";
-  if (card && card.activation === "optional") return "optional";
   if (card && card.activation === "trigger") return "trigger";
+  if (card && card.activation === "optional") return "optional";
 
   const days = card && card.when && card.when.days;
   if (Array.isArray(days) && days.length) {
@@ -98,7 +106,18 @@ export function inferCardLabel(card) {
   if (Array.isArray(nights) && nights.length === 1 && nights[0] === "other") {
     return "otherNight";
   }
-  return "default";
+  // Never emit non-canonical "default" — night-order fallback.
+  return "everyNight";
+}
+
+/** Derive activation from canonical LABEL (LABEL is source of truth for pool). */
+export function activationForLabel(label) {
+  const l = normalizeCardLabel(label);
+  if (l === "setup") return "setup";
+  if (l === "optional") return "optional";
+  if (l === "trigger") return "trigger";
+  if (l === "nominate" || l === "death" || l === "passive") return "optional";
+  return null;
 }
 
 export function slugifyCardKey(label, index = 0) {
@@ -174,11 +193,17 @@ export function normalizeCard(card, index = 0) {
   if (label === "everyNight" && !when.nights.length) {
     when.nights = ["first", "other"];
   }
+  const activation =
+    card.activation !== undefined &&
+    card.activation !== null &&
+    card.activation !== ""
+      ? card.activation
+      : activationForLabel(label);
   return {
     key: card.key || slugifyCardKey(label, index),
     label,
     enabled: card.enabled !== false,
-    activation: card.activation || null,
+    activation,
     once: !!card.once,
     when,
     inputs: Array.isArray(card.inputs) ? card.inputs.slice() : [],
@@ -766,11 +791,17 @@ export function effectsFromRule(
         ) {
           break;
         }
+        const previousAlignment =
+          players[pi] && players[pi].alignment != null
+            ? normalizeAlignment(players[pi].alignment)
+            : resolvePlayerAlignment(players[pi]);
         effects.push({
           type: "setRole",
           playerIndex: pi,
           role: { ...roleObj },
           previousRole,
+          alignment: defaultAlignmentForTeam(roleObj.team),
+          previousAlignment,
         });
         break;
       }
@@ -793,6 +824,46 @@ export function effectsFromRule(
           playerIndex: pi,
           role: { ...roleObj },
           previousRole: previousDisguise,
+        });
+        break;
+      }
+      case "setAlignment": {
+        const pi = resolveEffectTargetIndex(
+          spec.targetFrom || "actor",
+          formData,
+          players,
+          actorIndex,
+        );
+        if (pi < 0) break;
+        let nextAlign = normalizeAlignment(spec.alignment);
+        if (!nextAlign && spec.alignmentFrom) {
+          if (
+            spec.alignmentFrom === "actor" ||
+            spec.alignmentFrom === "__actor__"
+          ) {
+            nextAlign = resolvePlayerAlignment(players[actorIndex]);
+          } else {
+            const fromIdx = resolveEffectTargetIndex(
+              spec.alignmentFrom,
+              formData,
+              players,
+              actorIndex,
+            );
+            if (fromIdx >= 0) {
+              nextAlign = resolvePlayerAlignment(players[fromIdx]);
+            }
+          }
+        }
+        if (!nextAlign) break;
+        const prev =
+          players[pi] && players[pi].alignment != null
+            ? normalizeAlignment(players[pi].alignment)
+            : resolvePlayerAlignment(players[pi]);
+        effects.push({
+          type: "setAlignment",
+          playerIndex: pi,
+          alignment: nextAlign,
+          previousAlignment: prev,
         });
         break;
       }
@@ -857,6 +928,8 @@ export function describeEffects(effects, players) {
         return `${label} 角色改為「${(e.role && e.role.name) || "?"}」`;
       case "setDisguiseRole":
         return `${label} 表面角色改為「${(e.role && e.role.name) || "?"}」`;
+      case "setAlignment":
+        return `${label} 陣營轉變為 [${alignmentLabel(e.alignment) || e.alignment || "?"}]`;
       case "removeReminder":
         return `${label} 移除「${(e.reminder && e.reminder.name) || "提醒"}」`;
       default:

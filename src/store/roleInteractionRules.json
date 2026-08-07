@@ -66,7 +66,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -163,7 +163,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -397,7 +397,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -502,7 +502,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -615,7 +615,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             },
             {
@@ -691,7 +691,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -951,7 +951,7 @@
           "inputs": [
             {
               "key": "p1",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標玩家"
             },
             {
@@ -1009,7 +1009,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "otherPlayer",
               "label": "目標對象"
             }
           ],
@@ -1053,7 +1053,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "otherPlayer",
               "label": "目標對象"
             }
           ],
@@ -1150,7 +1150,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -1183,17 +1183,17 @@
           "inputs": [
             {
               "key": "p1",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "玩家 1"
             },
             {
               "key": "p2",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "玩家 2"
             },
             {
               "key": "p3",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "玩家 3"
             }
           ],
@@ -1438,7 +1438,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -1554,7 +1554,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -1821,7 +1821,10 @@
             {
               "key": "r1",
               "type": "role",
-              "label": "善良角色"
+              "label": "善良角色",
+              "teams": [
+                "townsfolk"
+              ]
             }
           ],
           "sentence": {
@@ -1893,7 +1896,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -2008,7 +2011,7 @@
           "inputs": [
             {
               "key": "p1",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標玩家"
             },
             {
@@ -2271,7 +2274,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -2418,7 +2421,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -2575,7 +2578,7 @@
           "inputs": [
             {
               "key": "p1",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標玩家"
             },
             {
@@ -2668,7 +2671,7 @@
           "key": "trigger",
           "label": "trigger",
           "enabled": true,
-          "activation": "optional",
+          "activation": "trigger",
           "once": false,
           "when": {
             "nights": [],
@@ -2694,9 +2697,17 @@
               "optional": true,
               "defaultOn": true,
               "label": "選中者 醉酒"
+            },
+            {
+              "type": "setAlignment",
+              "targetFrom": "actor",
+              "alignmentFrom": "target",
+              "optional": true,
+              "defaultOn": true,
+              "label": "自身 轉為選中者陣營"
             }
           ],
-          "notes": "被動；選中者醉酒，莽夫轉為其陣營"
+          "notes": "被動；選中者醉酒，莽夫轉為其陣營（陣營≠角色類型）"
         }
       ]
     },
@@ -2764,7 +2775,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -2840,7 +2851,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -2874,12 +2885,12 @@
           "inputs": [
             {
               "key": "p1",
-              "type": "player",
+              "type": "otherPlayer",
               "label": "玩家 1"
             },
             {
               "key": "p2",
-              "type": "player",
+              "type": "otherPlayer",
               "label": "玩家 2"
             },
             {
@@ -2956,7 +2967,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -3017,7 +3028,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -3079,7 +3090,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -3140,7 +3151,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -3341,7 +3352,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "otherPlayer",
               "label": "目標對象"
             }
           ],
@@ -3460,7 +3471,7 @@
           "inputs": [
             {
               "key": "p1",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "玩家 1"
             },
             {
@@ -3636,7 +3647,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "otherPlayer",
               "label": "目標對象"
             }
           ],
@@ -3837,12 +3848,12 @@
           "inputs": [
             {
               "key": "p1",
-              "type": "player",
+              "type": "otherPlayer",
               "label": "玩家 1"
             },
             {
               "key": "p2",
-              "type": "player",
+              "type": "otherPlayer",
               "label": "玩家 2"
             },
             {
@@ -3990,7 +4001,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -4070,7 +4081,10 @@
             {
               "key": "r1",
               "type": "role",
-              "label": "善良角色"
+              "label": "善良角色",
+              "teams": [
+                "townsfolk"
+              ]
             }
           ],
           "sentence": {
@@ -4118,7 +4132,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "alivePlayer",
+              "type": "player",
               "label": "目標對象"
             }
           ],
@@ -4242,7 +4256,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -4415,7 +4429,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -4519,7 +4533,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -4780,7 +4794,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "alivePlayer",
+              "type": "player",
               "label": "目標對象"
             }
           ],
@@ -4851,7 +4865,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -5174,7 +5188,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -5252,7 +5266,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -5283,7 +5297,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "otherPlayer",
               "label": "目標對象"
             }
           ],
@@ -5488,7 +5502,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -5531,7 +5545,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -5678,7 +5692,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "目標對象"
             }
           ],
@@ -5720,7 +5734,8 @@
             {
               "key": "p1",
               "type": "otherPlayer",
-              "label": "視為惡魔"
+              "alignment": "good",
+              "label": "視為惡魔（善良玩家）"
             }
           ],
           "sentence": {
@@ -6263,7 +6278,7 @@
           "inputs": [
             {
               "key": "nominator",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "提名者"
             }
           ],
@@ -6365,7 +6380,7 @@
             },
             {
               "key": "target",
-              "type": "player",
+              "type": "otherPlayer",
               "label": "代替死亡玩家"
             }
           ],
@@ -6619,7 +6634,7 @@
           "inputs": [
             {
               "key": "target",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "選擇的存活玩家"
             },
             {

@@ -66,7 +66,11 @@
             v-model="formData[field.key]"
           >
             <option value="">—</option>
-            <option v-for="r in displayRoleOptions" :key="r.id" :value="r.name">
+            <option
+              v-for="r in rolesForField(field)"
+              :key="r.id"
+              :value="r.name"
+            >
               {{ r.name }}
             </option>
           </select>
@@ -166,9 +170,11 @@ import { resolvePlayerIndex } from "../store/battleLogEffects";
 import {
   isPlayerInputType,
   filterPlayersForInput,
+  filterRolesForInput,
   isEffectToggleVisible,
   formatGrimoireEffectSpec,
 } from "../store/roleInteractionTypes";
+import { resolvePlayerAlignment } from "../store/teamTerms";
 
 export default {
   name: "RoleActionCard",
@@ -209,7 +215,11 @@ export default {
         if (this.editing) return;
         const next = {};
         (configs || []).forEach((c) => {
-          next[c.key] = "";
+          const prev =
+            this.formData && Object.prototype.hasOwnProperty.call(this.formData, c.key)
+              ? this.formData[c.key]
+              : "";
+          next[c.key] = prev != null ? prev : "";
         });
         const prefill = this.initialFormData || {};
         Object.keys(prefill).forEach((key) => {
@@ -278,18 +288,6 @@ export default {
     },
     displayRoleOptions() {
       if (this.disguiseSetupVariant === "markOnly") return [];
-      const ruleId =
-        this.setupRoleId ||
-        (this.interactionRule && this.interactionRule.id) ||
-        (this.player.role && this.player.role.id);
-      const id = String(ruleId || "").toLowerCase();
-      if (this.setupMode && (id === "drunk" || id === "marionette")) {
-        return (this.roleOptions || []).filter(
-          (r) =>
-            r.team === "townsfolk" &&
-            String(r.id || "").toLowerCase() !== id,
-        );
-      }
       return this.roleOptions || [];
     },
     disguiseSetupVariant() {
@@ -451,32 +449,40 @@ export default {
     playersForField(field) {
       const list = filterPlayersForInput(
         this.players,
-        field.type,
+        field,
         this.playerIndex,
         this.playerOption,
       );
-      if (
-        this.disguiseSetupVariant === "markOnly" &&
-        field.key === "p1"
-      ) {
+      // Drunk/marionette markOnly: prefer alignment; allow unassigned seats.
+      if (this.disguiseSetupVariant === "markOnly" && field.key === "p1") {
+        if (field.alignment) return list;
         return list.filter(({ player }) => {
-          const team = player && player.role && player.role.team;
-          return team === "townsfolk" || team === "outsider";
-        });
-      }
-      // 占卜師 setup：僅可選其他善良玩家作為「視為惡魔」
-      const setupId = String(this.setupRoleId || "").toLowerCase();
-      if (
-        this.setupMode &&
-        setupId === "fortuneteller" &&
-        field.key === "p1"
-      ) {
-        return list.filter(({ player }) => {
-          const team = player && player.role && player.role.team;
-          return team === "townsfolk" || team === "outsider";
+          if (!player || !player.role || !player.role.team) return true;
+          return resolvePlayerAlignment(player) === "good";
         });
       }
       return list;
+    },
+    rolesForField(field) {
+      let base = this.displayRoleOptions || [];
+      const ruleId =
+        this.setupRoleId ||
+        (this.interactionRule && this.interactionRule.id) ||
+        (this.player.role && this.player.role.id);
+      const id = String(ruleId || "").toLowerCase();
+      // Legacy: drunk/marionette disguise picks townsfolk only when rule has no teams.
+      if (
+        this.setupMode &&
+        (id === "drunk" || id === "marionette") &&
+        !(field.teams && field.teams.length)
+      ) {
+        base = (this.roleOptions || []).filter(
+          (r) =>
+            r.team === "townsfolk" &&
+            String(r.id || "").toLowerCase() !== id,
+        );
+      }
+      return filterRolesForInput(base, this.players, field);
     },
     effectToggleKey(effect, idx) {
       return effect.id || `effect-${idx}`;
@@ -564,6 +570,13 @@ export default {
       }
       if (
         this.setupMode &&
+        String(this.setupRoleId || "").toLowerCase() === "fortuneteller" &&
+        (!this.formData.p1 || !String(this.formData.p1).trim())
+      ) {
+        return;
+      }
+      if (
+        this.setupMode &&
         this.disguiseSetupVariant === "disguise" &&
         (!this.formData.r1 || !String(this.formData.r1).trim())
       ) {
@@ -612,7 +625,13 @@ export default {
         : null;
 
       let roleCardKey = this.roleCardKey;
-      if (this.setupMode && this.formData.p1) {
+      // Only drunk/marionette remaps the setup card onto the chosen player seat.
+      const setupId = String(this.setupRoleId || "").toLowerCase();
+      if (
+        this.setupMode &&
+        this.formData.p1 &&
+        (setupId === "drunk" || setupId === "marionette")
+      ) {
         const parsed = parseSetupRoleCardKey(this.roleCardKey);
         const p1Idx = resolvePlayerIndex(this.players, this.formData.p1);
         if (parsed && p1Idx >= 0) {

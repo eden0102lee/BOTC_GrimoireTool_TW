@@ -338,6 +338,32 @@ function applyEffectToBoard(ctx, effect) {
             { root: true },
           );
         }
+        if (Object.prototype.hasOwnProperty.call(effect, "alignment")) {
+          const next =
+            effect.alignment === "good" || effect.alignment === "evil"
+              ? effect.alignment
+              : null;
+          ctx.commit(
+            "players/update",
+            { player, property: "alignment", value: next },
+            { root: true },
+          );
+        }
+      }
+      break;
+    case "setAlignment":
+      if (effect.alignment === "good" || effect.alignment === "evil") {
+        ctx.commit(
+          "players/update",
+          { player, property: "alignment", value: effect.alignment },
+          { root: true },
+        );
+      } else if (effect.alignment == null) {
+        ctx.commit(
+          "players/update",
+          { player, property: "alignment", value: null },
+          { root: true },
+        );
       }
       break;
     case "setDisguiseRole":

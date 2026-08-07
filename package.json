@@ -14,6 +14,7 @@
     "normalize:team-terms": "node scripts/normalize-team-terms.js",
     "generate:interaction-rules": "node scripts/generate-role-interaction-rules.js",
     "apply:skill-cards": "node scripts/apply-skill-cards-to-rules.js",
+    "apply:target-types": "node scripts/apply-target-input-types.js",
     "export:skill-cards": "node scripts/export-official-skill-cards.js",
     "audit:reminder-coverage": "node scripts/audit-reminder-coverage.js",
     "sync:characters": "node scripts/sync-characters-from-csv.js",

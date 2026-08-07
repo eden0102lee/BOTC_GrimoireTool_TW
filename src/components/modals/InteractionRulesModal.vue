@@ -251,6 +251,57 @@
                   @input="setSelectOptions(input, $event.target.value)"
                 />
               </label>
+              <template v-if="isPlayerInputType(input.type) || input.type === 'role'">
+                <label
+                  v-if="isPlayerInputType(input.type)"
+                  class="field"
+                >
+                  <span class="field-label">{{ $t("interactionRules.filterAlignment") }}</span>
+                  <select
+                    :value="input.alignment || ''"
+                    @change="setInputAlignment(input, $event.target.value)"
+                  >
+                    <option value="">{{ $t("interactionRules.filterAny") }}</option>
+                    <option
+                      v-for="(lab, key) in alignmentLabels"
+                      :key="key"
+                      :value="key"
+                    >
+                      {{ lab }}
+                    </option>
+                  </select>
+                </label>
+                <div class="field field-toggles field-wide">
+                  <span class="field-label">{{ $t("interactionRules.filterTeams") }}</span>
+                  <div class="toggle-chip-row">
+                    <button
+                      v-for="(lab, key) in teamLabels"
+                      :key="key"
+                      type="button"
+                      class="toggle-chip"
+                      :class="{ on: hasInputTeam(input, key) }"
+                      :aria-pressed="hasInputTeam(input, key) ? 'true' : 'false'"
+                      @click="toggleInputTeam(input, key)"
+                    >
+                      {{ lab }}
+                    </button>
+                  </div>
+                </div>
+                <div v-if="input.type === 'role'" class="field field-toggles">
+                  <span class="field-label">{{ $t("interactionRules.filterInPlay") }}</span>
+                  <div class="toggle-chip-row">
+                    <button
+                      type="button"
+                      class="toggle-chip"
+                      :class="{ on: !!input.inPlay }"
+                      :aria-pressed="input.inPlay ? 'true' : 'false'"
+                      @click="$set(input, 'inPlay', !input.inPlay)"
+                    >
+                      {{ $t("interactionRules.filterInPlay") }}
+                    </button>
+                  </div>
+                </div>
+              </template>
             </div>
             <div class="input-row-actions">
               <button
@@ -304,6 +355,7 @@
                 <span class="field-label">{{ $t("interactionRules.pickTarget") }}</span>
                 <select v-model="effect.targetFrom">
                   <option value="">{{ $t("interactionRules.pickTarget") }}</option>
+                  <option value="actor">{{ $t("interactionRules.targetActor") }}</option>
                   <option
                     v-for="input in playerInputsForEffects"
                     :key="input.key"
@@ -313,6 +365,38 @@
                   </option>
                 </select>
               </label>
+              <template v-if="effect.type === 'setAlignment'">
+                <label class="field">
+                  <span class="field-label">{{ $t("interactionRules.alignmentFixed") }}</span>
+                  <select
+                    :value="effect.alignment || ''"
+                    @change="onEffectAlignmentChange(effect, $event.target.value)"
+                  >
+                    <option value="">{{ $t("interactionRules.alignmentFromPlayer") }}</option>
+                    <option
+                      v-for="(lab, key) in alignmentLabels"
+                      :key="key"
+                      :value="key"
+                    >
+                      {{ lab }}
+                    </option>
+                  </select>
+                </label>
+                <label v-if="!effect.alignment" class="field">
+                  <span class="field-label">{{ $t("interactionRules.alignmentFrom") }}</span>
+                  <select v-model="effect.alignmentFrom">
+                    <option value="">—</option>
+                    <option value="actor">{{ $t("interactionRules.targetActor") }}</option>
+                    <option
+                      v-for="input in playerInputsForEffects"
+                      :key="'af-' + input.key"
+                      :value="input.key"
+                    >
+                      {{ input.label || input.key }}
+                    </option>
+                  </select>
+                </label>
+              </template>
               <template v-if="effectNeedsReminder(effect.type)">
                 <label class="field">
                   <span class="field-label">{{ $t("interactionRules.reminderRole") }}</span>
@@ -482,7 +566,7 @@
             >
               <option value="">—</option>
               <option
-                v-for="r in scriptRoles"
+                v-for="r in previewRolesForInput(input)"
                 :key="r.id"
                 :value="r.name || r.id"
               >
@@ -555,6 +639,7 @@ import {
   normalizeCardLabel,
   listRoleCards,
   CARD_LABELS,
+  activationForLabel,
 } from "../../store/roleInteractionEngine";
 import {
   getRoleInputConfig,
@@ -575,6 +660,9 @@ import {
   grimoireActionNeedsReminder,
   formatGrimoireEffectSpec,
   filterPlayersForInput,
+  filterRolesForInput,
+  TEAM_LABELS,
+  ALIGNMENT_LABELS,
 } from "../../store/roleInteractionTypes";
 
 export default {
@@ -591,6 +679,8 @@ export default {
       grimoireActionTypes: GRIMOIRE_ACTION_TYPES,
       reminderSheetUrl: COMMUNITY_TRANSLATIONS_SHEET_URL,
       genericReminderRole: GENERIC_REMINDER_ROLE,
+      teamLabels: TEAM_LABELS,
+      alignmentLabels: ALIGNMENT_LABELS,
     };
   },
   computed: {
@@ -878,6 +968,12 @@ export default {
       } else {
         effect.reminderName = "";
       }
+      if (effect.type !== "setAlignment") {
+        this.$delete(effect, "alignment");
+        this.$delete(effect, "alignmentFrom");
+      } else if (!effect.alignment && !effect.alignmentFrom) {
+        this.$set(effect, "alignmentFrom", "target");
+      }
       if (!effect.label) {
         effect.label = formatGrimoireEffectSpec(
           effect,
@@ -893,10 +989,45 @@ export default {
     previewPlayersForInput(input) {
       return filterPlayersForInput(
         this.previewPlayers,
-        input.type,
+        input,
         this.previewActorIndex,
         this.playerLabel,
       );
+    },
+    previewRolesForInput(input) {
+      return filterRolesForInput(this.scriptRoles, this.previewPlayers, input);
+    },
+    setInputAlignment(input, value) {
+      if (!value) {
+        this.$delete(input, "alignment");
+      } else {
+        this.$set(input, "alignment", value);
+      }
+    },
+    hasInputTeam(input, team) {
+      return Array.isArray(input.teams) && input.teams.includes(team);
+    },
+    toggleInputTeam(input, team) {
+      const cur = Array.isArray(input.teams) ? input.teams.slice() : [];
+      const i = cur.indexOf(team);
+      if (i >= 0) cur.splice(i, 1);
+      else cur.push(team);
+      if (cur.length) this.$set(input, "teams", cur);
+      else this.$delete(input, "teams");
+    },
+    onEffectAlignmentChange(effect, value) {
+      if (!value) {
+        this.$delete(effect, "alignment");
+      } else {
+        this.$set(effect, "alignment", value);
+        this.$delete(effect, "alignmentFrom");
+      }
+      if (!effect.label || String(effect.label).includes("陣營")) {
+        effect.label = formatGrimoireEffectSpec(
+          effect,
+          this.editRule ? this.editRule.inputs : [],
+        );
+      }
     },
     playerLabel(p, i) {
       return formatPlayerRoleLabel(p, i);
@@ -920,21 +1051,37 @@ export default {
       const label = normalizeCardLabel(inferCardLabel(this.editRule));
       this.editRule.label = label;
       this.ensureWhen();
-      if (label === "firstDay") this.$set(this.editRule.when, "days", ["first"]);
+      this.editRule.activation = activationForLabel(label);
+      if (label === "firstDay") {
+        this.$set(this.editRule.when, "days", ["first"]);
+        this.$set(this.editRule.when, "nights", []);
+      }
       if (label === "everyDay") {
         this.$set(this.editRule.when, "days", ["first", "other"]);
+        this.$set(this.editRule.when, "nights", []);
       }
       if (label === "firstNight") {
         this.$set(this.editRule.when, "nights", ["first"]);
+        this.$set(this.editRule.when, "days", []);
       }
       if (label === "otherNight") {
         this.$set(this.editRule.when, "nights", ["other"]);
+        this.$set(this.editRule.when, "days", []);
       }
       if (label === "everyNight") {
         this.$set(this.editRule.when, "nights", ["first", "other"]);
+        this.$set(this.editRule.when, "days", []);
       }
-      if (label === "setup") {
-        this.editRule.activation = "setup";
+      if (
+        label === "setup" ||
+        label === "optional" ||
+        label === "trigger" ||
+        label === "nominate" ||
+        label === "death" ||
+        label === "passive"
+      ) {
+        this.$set(this.editRule.when, "nights", []);
+        this.$set(this.editRule.when, "days", []);
       }
       const nextKey = slugifyCardKey(
         label,
@@ -950,7 +1097,8 @@ export default {
     },
     onActivationChange() {
       if (!this.editRule) return;
-      if (!this.editRule.label || this.editRule.label === "default") {
+      // Prefer LABEL as source of truth; activation edits remapped via label when empty.
+      if (!this.editRule.label) {
         this.editRule.label = inferCardLabel(this.editRule);
         this.onCardLabelChange();
       }

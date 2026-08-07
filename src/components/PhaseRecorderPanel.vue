@@ -645,6 +645,7 @@ import {
 import {
   getRule,
   getDayRule,
+  getCardByKey,
   roleHasOptionalAction,
   roleHasSetupAction,
   roleHasDayAction,
@@ -1065,13 +1066,18 @@ export default {
         }
         const recordedEntry = this.entryByRoleCardKey(roleCardKey);
         const rule =
+          (cardKey && getCardByKey(id, cardKey, this.overlay)) ||
           (cardKey && getDayRule(id, this.dayNumber, this.overlay)) ||
-          getRule(id, this.overlay);
+          getRule(id, this.overlay) ||
+          getCardByKey(id, cardKey, this.overlay);
         cards.push({
           player,
           playerIndex,
           roleCardKey,
-          cardKey: cardKey || (rule && rule.cardKey) || "",
+          cardKey:
+            cardKey ||
+            (rule && (rule.cardKey || rule.key)) ||
+            "",
           reminder: (rule && rule.notes) || "",
           isRecorded: !!recordedEntry,
           recordedEntry,
@@ -1086,6 +1092,13 @@ export default {
           this.optionalDraft.cardKey || "",
         );
       }
+
+      // Auto-list seated trigger/optional roles (e.g. 莽夫) so cards appear
+      // without requiring "+可選紀錄" first.
+      (this.optionalCandidates || []).forEach((c) => {
+        if (!c || (c.onceUsed && !c.recordedThisPhase)) return;
+        pushCard(c.playerIndex, c.role && c.role.id, c.cardKey || "");
+      });
 
       this.entries.forEach((e) => {
         if (!e || e.source !== "roleCard" || !e.roleCardKey) return;

@@ -508,4 +508,12 @@ export default {
   "interactionRules.inputType.player": "全部玩家",
   "interactionRules.inputType.alivePlayer": "存活玩家",
   "interactionRules.inputType.otherPlayer": "其他玩家",
+  "interactionRules.filterAlignment": "陣營篩選",
+  "interactionRules.filterTeams": "角色類型篩選",
+  "interactionRules.filterInPlay": "僅在場角色",
+  "interactionRules.filterAny": "不限",
+  "interactionRules.targetActor": "自身（行動者）",
+  "interactionRules.alignmentFixed": "固定陣營",
+  "interactionRules.alignmentFromPlayer": "從玩家複製",
+  "interactionRules.alignmentFrom": "陣營來源",
 };

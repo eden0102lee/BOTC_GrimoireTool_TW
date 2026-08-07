@@ -9,7 +9,9 @@ const NEWPLAYER = {
   reminders: [],
   isVoteless: false,
   isDead: false,
-  abilityLost: false
+  abilityLost: false,
+  /** "good" | "evil" | null — independent from role.team */
+  alignment: null,
 };
 
 export function nextDefaultPlayerName(players) {

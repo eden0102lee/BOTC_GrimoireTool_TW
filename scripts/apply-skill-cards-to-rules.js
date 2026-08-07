@@ -81,7 +81,10 @@ function kill(roleId, targetFrom = "target", opts = {}) {
   ];
 }
 
-/** Structured patches keyed by role id (overrides MD parse for effects/inputs). */
+/** Structured patches keyed by role id (overrides MD parse for effects/inputs).
+ * Player input types (player/alivePlayer/otherPlayer) are owned by
+ * scripts/apply-target-input-types.js — keep STRUCTURAL in sync when listing inputs.
+ */
 const STRUCTURAL = {
   assassin: {
     once: true,
@@ -93,7 +96,7 @@ const STRUCTURAL = {
   },
   gambler: {
     inputs: [
-      { key: "target", type: "player", label: "目標對象" },
+      { key: "target", type: "alivePlayer", label: "目標對象" },
       { key: "r1", type: "role", label: "猜測角色" },
     ],
     sentence: {
@@ -157,8 +160,8 @@ const STRUCTURAL = {
   },
   chambermaid: {
     inputs: [
-      { key: "p1", type: "player", label: "玩家 1" },
-      { key: "p2", type: "player", label: "玩家 2" },
+      { key: "p1", type: "otherPlayer", label: "玩家 1" },
+      { key: "p2", type: "otherPlayer", label: "玩家 2" },
       { key: "num", type: "number", label: "醒來人數 0/1/2" },
     ],
     sentence: {
@@ -552,16 +555,19 @@ const STRUCTURAL = {
       "res 用 是/否；「始終將…視為惡魔」僅開局一次（另記／可選紀錄），勿每夜掛標記",
   },
   imp: {
+    inputs: [{ key: "target", type: "player", label: "目標對象" }],
     notes:
       "主線：殺害目標。自殺轉生（爪牙成為小惡魔）另條／可選紀錄；可選 effect 關閉時無 └",
   },
   poisoner: {
+    inputs: [{ key: "target", type: "player", label: "目標對象" }],
     sentence: {
       action: "投毒",
       template: "{actor} → {action} → 選擇 {target} → {target} 中毒",
     },
   },
   monk: {
+    inputs: [{ key: "target", type: "otherPlayer", label: "目標對象" }],
     sentence: {
       action: "保護",
       template: "{actor} → {action} → 選擇 {target}",
@@ -684,7 +690,7 @@ const NEW_RULES = [
     activation: "optional",
     when: { nights: [] },
     inputs: [
-      { key: "target", type: "player", label: "選擇的存活玩家" },
+      { key: "target", type: "alivePlayer", label: "選擇的存活玩家" },
       {
         key: "align",
         type: "select",
@@ -801,7 +807,7 @@ const NEW_RULES = [
     activation: "optional",
     once: true,
     when: { nights: [] },
-    inputs: [{ key: "nominator", type: "player", label: "提名者" }],
+    inputs: [{ key: "nominator", type: "alivePlayer", label: "提名者" }],
     sentence: {
       action: "提名",
       template: "{nominator}提名 {actor}",
@@ -869,7 +875,7 @@ const NEW_RULES = [
         label: "陣營",
         options: ["善良", "邪惡"],
       },
-      { key: "target", type: "player", label: "代替死亡玩家" },
+      { key: "target", type: "otherPlayer", label: "代替死亡玩家" },
     ],
     sentence: {
       action: "",

@@ -125,6 +125,7 @@ const actions = {
         name: p.name,
         isDead: p.isDead,
         isVoteless: p.isVoteless,
+        alignment: p.alignment || null,
         role:
           p.role && (p.role.name || p.role.id)
             ? p.role.name || p.role.id

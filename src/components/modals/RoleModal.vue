@@ -54,6 +54,7 @@
 import { mapMutations, mapState } from "vuex";
 import Modal from "./Modal";
 import Token from "../Token";
+import { defaultAlignmentForTeam } from "../../store/teamTerms";
 
 export default {
   components: { Token, Modal },
@@ -97,6 +98,11 @@ export default {
           player,
           property: "role",
           value: role
+        });
+        this.$store.commit("players/update", {
+          player,
+          property: "alignment",
+          value: role && role.team ? defaultAlignmentForTeam(role.team) : null
         });
       }
       this.tab = "editionRoles";
