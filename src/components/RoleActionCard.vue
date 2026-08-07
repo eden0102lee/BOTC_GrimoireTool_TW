@@ -4,41 +4,78 @@
     :class="{
       recorded: isRecorded && !abilityLost && !editing,
       'ability-lost': abilityLost,
+      'has-rail': !!(sortable || (reminder && !abilityLost)),
       [team]: true,
     }"
   >
-    <button
-      v-if="isRecorded && !abilityLost"
-      type="button"
-      class="record-delete-btn"
-      :title="$t('recorder.deleteRecord')"
-      @click="deleteRecord"
-    >
-      <font-awesome-icon icon="trash-alt" />
-    </button>
+    <div class="card-rail">
+      <div
+        v-if="reminder && !abilityLost"
+        class="reminder-badge-wrap"
+        @mouseenter="reminderHover = true"
+        @mouseleave="reminderHover = false"
+      >
+        <button
+          type="button"
+          class="reminder-badge"
+          :aria-expanded="reminderVisible ? 'true' : 'false'"
+          :aria-label="$t('recorder.reminderNote')"
+          :title="$t('recorder.reminderNote')"
+          @click.stop="toggleReminderPopover"
+        >
+          !
+        </button>
+        <div v-if="reminderVisible" class="reminder-popover" role="tooltip">
+          {{ reminder }}
+        </div>
+      </div>
+      <button
+        v-if="sortable"
+        type="button"
+        class="drag-handle"
+        :title="$t('recorder.dragReorder')"
+        :aria-label="$t('recorder.dragReorder')"
+        @pointerdown.stop.prevent="onDragHandlePointerDown"
+      >
+        <font-awesome-icon icon="arrows-alt" />
+      </button>
+    </div>
+    <div v-if="isRecorded && !abilityLost && !editing" class="record-actions">
+      <button
+        type="button"
+        class="record-edit-btn"
+        :title="$t('recorder.editRecord')"
+        @click="startEdit"
+      >
+        {{ $t("recorder.editRecord") }}
+      </button>
+      <button
+        type="button"
+        class="record-delete-btn"
+        :title="$t('recorder.deleteRecord')"
+        @click="deleteRecord"
+      >
+        <font-awesome-icon icon="trash-alt" />
+      </button>
+    </div>
     <div class="card-head">
-      <span
-        class="icon"
-        v-if="displayRoleForIcon.id"
-        :style="iconStyle"
-      ></span>
+      <span class="icon" v-if="displayRoleForIcon.id" :style="iconStyle"></span>
       <div class="meta">
-        <div class="role-name">{{ displayRoleName }}</div>
+        <div class="role-name-row">
+          <div class="role-name">{{ displayRoleName }}</div>
+          <button
+            type="button"
+            class="toggle-chip ability-lost-chip"
+            :class="{ on: abilityLost }"
+            :aria-pressed="abilityLost ? 'true' : 'false'"
+            @click="onAbilityLostChipClick"
+          >
+            {{ $t("recorder.abilityLost") }}
+          </button>
+        </div>
         <div class="player-name">{{ label }}</div>
       </div>
     </div>
-
-    <button
-      type="button"
-      class="toggle-chip ability-lost-chip"
-      :class="{ on: abilityLost }"
-      :aria-pressed="abilityLost ? 'true' : 'false'"
-      @click="onAbilityLostChipClick"
-    >
-      {{ $t("recorder.abilityLost") }}
-    </button>
-
-    <p class="reminder" v-if="reminder && !abilityLost">{{ reminder }}</p>
 
     <template v-if="abilityLost">
       <div class="recorded-summary">{{ $t("recorder.abilityLostHint") }}</div>
@@ -92,7 +129,9 @@
         </label>
 
         <template v-if="interactionRule && visibleEffectToggles.length">
-          <div class="grimoire-effects-head">{{ $t("interactionRules.grimoireEffects") }}</div>
+          <div class="grimoire-effects-head">
+            {{ $t("interactionRules.grimoireEffects") }}
+          </div>
           <div class="toggle-chip-row">
             <button
               v-for="item in visibleEffectToggles"
@@ -141,9 +180,6 @@
 
     <template v-else>
       <div class="recorded-summary">{{ recordedSummary }}</div>
-      <button type="button" class="btn edit" @click="startEdit">
-        {{ $t("recorder.editRecord") }}
-      </button>
     </template>
   </div>
 </template>
@@ -197,6 +233,8 @@ export default {
     cardKey: { type: String, default: "" },
     /** Original setup role id (e.g. drunk) when surface role was replaced. */
     setupRoleId: { type: String, default: "" },
+    /** Allow drag handle for vertical reorder. */
+    sortable: { type: Boolean, default: false },
     /** Optional prefill for form fields (e.g. soldier target = self). */
     initialFormData: { type: Object, default: null },
   },
@@ -206,7 +244,19 @@ export default {
       detailNote: "",
       editing: false,
       effectToggles: {},
+      reminderHover: false,
+      reminderPinned: false,
     };
+  },
+  mounted() {
+    document.addEventListener("pointerdown", this.onDocumentPointerDown, true);
+  },
+  beforeDestroy() {
+    document.removeEventListener(
+      "pointerdown",
+      this.onDocumentPointerDown,
+      true,
+    );
   },
   watch: {
     configs: {
@@ -216,7 +266,8 @@ export default {
         const next = {};
         (configs || []).forEach((c) => {
           const prev =
-            this.formData && Object.prototype.hasOwnProperty.call(this.formData, c.key)
+            this.formData &&
+            Object.prototype.hasOwnProperty.call(this.formData, c.key)
               ? this.formData[c.key]
               : "";
           next[c.key] = prev != null ? prev : "";
@@ -261,6 +312,9 @@ export default {
   },
   computed: {
     ...mapState("interactionRules", ["overlay"]),
+    reminderVisible() {
+      return !!(this.reminderHover || this.reminderPinned);
+    },
     interactionRule() {
       const role = this.player && this.player.role;
       if (!role || !role.id) {
@@ -314,9 +368,7 @@ export default {
           }));
       }
       const sid = String(
-        this.setupRoleId ||
-          (this.player.role && this.player.role.id) ||
-          "",
+        this.setupRoleId || (this.player.role && this.player.role.id) || "",
       ).toLowerCase();
       if (sid !== "drunk" && sid !== "marionette") {
         return this.configs;
@@ -337,7 +389,9 @@ export default {
     },
     optionalEffects() {
       if (!this.interactionRule || !this.interactionRule.effects) return [];
-      return this.interactionRule.effects.filter((e) => isEffectToggleVisible(e));
+      return this.interactionRule.effects.filter((e) =>
+        isEffectToggleVisible(e),
+      );
     },
     visibleEffectToggles() {
       if (!this.interactionRule || !this.interactionRule.effects) return [];
@@ -348,10 +402,7 @@ export default {
           key: this.effectToggleKey(effect, idx),
           label:
             effect.label ||
-            formatGrimoireEffectSpec(
-              effect,
-              this.interactionRule.inputs || [],
-            ),
+            formatGrimoireEffectSpec(effect, this.interactionRule.inputs || []),
         }))
         .filter((item) => isEffectToggleVisible(item.effect))
         .filter(
@@ -373,10 +424,14 @@ export default {
           (r) => r && String(r.id || "").toLowerCase() === id,
         );
         if (fromOptions && fromOptions.name) return fromOptions.name;
-        if (this.player.role && this.player.role.name) return this.player.role.name;
+        if (this.player.role && this.player.role.name)
+          return this.player.role.name;
         return id === "marionette" ? "提線木偶" : id === "drunk" ? "酒鬼" : id;
       }
-      return (this.player.role && (this.player.role.name || this.player.role.id)) || "";
+      return (
+        (this.player.role && (this.player.role.name || this.player.role.id)) ||
+        ""
+      );
     },
     displayRoleForIcon() {
       if (this.setupMode && this.setupRoleId) {
@@ -404,9 +459,9 @@ export default {
       const role = this.displayRoleForIcon;
       if (!role || !role.id) return {};
       try {
-        const url = require("../assets/icons/" +
-          (role.imageAlt || role.id) +
-          ".png");
+        const url = require(
+          "../assets/icons/" + (role.imageAlt || role.id) + ".png",
+        );
         return { backgroundImage: `url(${url})` };
       } catch (e) {
         return {};
@@ -436,13 +491,36 @@ export default {
     recordedSummary() {
       if (!this.recordedEntry) return this.$t("recorder.recorded");
       const e = this.recordedEntry;
-      let s = e.message || `${e.actor} ${e.action}${e.target && e.target !== "無" ? " " + e.target : ""}`;
+      let s =
+        e.message ||
+        `${e.actor} ${e.action}${
+          e.target && e.target !== "無" ? " " + e.target : ""
+        }`;
       if (e.detail) s += `\n└ ${e.detail}`;
       return s;
     },
   },
   methods: {
     isPlayerInputType,
+    toggleReminderPopover() {
+      this.reminderPinned = !this.reminderPinned;
+    },
+    onDocumentPointerDown(event) {
+      if (!this.reminderPinned) return;
+      const wrap = this.$el && this.$el.querySelector(".reminder-badge-wrap");
+      if (wrap && wrap.contains(event.target)) return;
+      this.reminderPinned = false;
+    },
+    onDragHandlePointerDown(event) {
+      if (!this.sortable) return;
+      this.$emit("drag-handle-start", {
+        roleCardKey: this.roleCardKey,
+        clientX: event.clientX,
+        clientY: event.clientY,
+        pointerId: event.pointerId,
+        event,
+      });
+    },
     playerOption(p, i) {
       return formatPlayerRoleLabel(p, i);
     },
@@ -478,8 +556,7 @@ export default {
       ) {
         base = (this.roleOptions || []).filter(
           (r) =>
-            r.team === "townsfolk" &&
-            String(r.id || "").toLowerCase() !== id,
+            r.team === "townsfolk" && String(r.id || "").toLowerCase() !== id,
         );
       }
       return filterRolesForInput(base, this.players, field);
@@ -718,26 +795,136 @@ export default {
   }
 }
 
+.reminder-badge-wrap {
+  position: relative;
+  z-index: 3;
+}
+
+.card-rail {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.reminder-badge {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 214, 153, 0.85);
+  background: rgba(80, 50, 0, 0.9);
+  color: #ffd699;
+  font-size: 0.72rem;
+  font-weight: bold;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  &:hover,
+  &[aria-expanded="true"] {
+    background: rgba(120, 80, 0, 0.95);
+    color: #fff0cc;
+  }
+}
+
+.drag-handle {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(0, 0, 0, 0.55);
+  color: rgba(255, 255, 255, 0.75);
+  cursor: grab;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  touch-action: none;
+  user-select: none;
+  &:active {
+    cursor: grabbing;
+    background: rgba(70, 213, 255, 0.25);
+    border-color: rgba(70, 213, 255, 0.7);
+    color: #e8fbff;
+  }
+}
+
+.reminder-popover {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 5;
+  min-width: 160px;
+  max-width: min(260px, 70vw);
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 214, 153, 0.45);
+  background: rgba(20, 16, 8, 0.96);
+  color: rgba(255, 245, 220, 0.95);
+  font-size: 0.7rem;
+  font-style: italic;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
 .card-head {
   display: flex;
   gap: 8px;
   align-items: center;
+  padding-right: 8px;
+}
+
+.has-rail .card-head {
+  padding-left: 22px;
+}
+
+.role-action-card.recorded .card-head {
+  padding-right: 92px;
 }
 
 .icon {
-  width: 32px;
-  height: 32px;
+  width: 2.5rem;
+  height: 2.5rem;
   background-size: cover;
   background-position: center;
   flex-shrink: 0;
+  border-radius: 4px;
+}
+
+.meta {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+}
+
+.role-name-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .role-name {
   font-weight: bold;
   font-size: 0.9rem;
+  line-height: 1.2;
 }
 .player-name {
   font-size: 0.75rem;
+  line-height: 1.2;
   opacity: 0.75;
 }
 
@@ -762,7 +949,10 @@ export default {
   user-select: none;
   max-width: 100%;
   text-align: left;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
 
   &.on {
     background: rgba(70, 213, 255, 0.22);
@@ -771,21 +961,16 @@ export default {
   }
 
   &.ability-lost-chip {
-    margin: 6px 0;
+    margin: 0;
+    flex-shrink: 0;
+    padding: 2px 8px;
+    font-size: 0.65rem;
     &.on {
       background: rgba(255, 120, 100, 0.22);
       border-color: rgba(255, 140, 120, 0.8);
       color: #ffe8e4;
     }
   }
-}
-
-.reminder {
-  margin: 6px 0;
-  font-size: 0.7rem;
-  opacity: 0.7;
-  font-style: italic;
-  line-height: 1.3;
 }
 
 .grimoire-effects-head {
@@ -866,12 +1051,6 @@ export default {
       background: rgba(0, 49, 173, 0.95);
     }
   }
-  &.edit {
-    background: rgba(120, 80, 0, 0.75);
-    &:hover {
-      background: rgba(150, 100, 0, 0.9);
-    }
-  }
   &.secondary {
     background: rgba(0, 0, 0, 0.45);
     &:hover {
@@ -880,11 +1059,35 @@ export default {
   }
 }
 
-.record-delete-btn {
+.record-actions {
   position: absolute;
   top: 6px;
   right: 6px;
   z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.record-edit-btn {
+  appearance: none;
+  border: 1px solid rgba(255, 200, 80, 0.45);
+  border-radius: 4px;
+  background: rgba(120, 80, 0, 0.55);
+  color: #ffe8b8;
+  cursor: pointer;
+  padding: 2px 6px;
+  font-size: 0.65rem;
+  font-weight: bold;
+  line-height: 1.3;
+  white-space: nowrap;
+  &:hover {
+    background: rgba(150, 100, 0, 0.85);
+    color: #fff4d6;
+  }
+}
+
+.record-delete-btn {
   width: 24px;
   height: 24px;
   padding: 0;
@@ -897,6 +1100,7 @@ export default {
   align-items: center;
   justify-content: center;
   font-size: 0.75rem;
+  flex-shrink: 0;
   &:hover {
     color: #ff6b6b;
     background: rgba(255, 0, 0, 0.15);

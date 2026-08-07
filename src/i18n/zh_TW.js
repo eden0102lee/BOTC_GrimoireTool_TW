@@ -1,7 +1,6 @@
 export default {
   // Intro
-  "intro.welcome":
-    "歡迎使用 Blood on the Clocktower 的（非官方）線上魔典！",
+  "intro.welcome": "歡迎使用 Blood on the Clocktower 的（非官方）線上魔典！",
   "intro.addPlayers":
     "請透過右上角的選單或按 [A] 新增座位；按 [C] 創建小鎮或 [J] 加入小鎮。",
   "intro.footer":
@@ -87,8 +86,7 @@ export default {
   "prompt.playerName": "玩家名稱",
   "prompt.customReminder": "新增自訂提醒標記",
   "prompt.customScriptUrl": "輸入 custom-script.json 的網址",
-  "confirm.distributeRoles":
-    "是否將已指派的角色發送給所有已就座玩家？",
+  "confirm.distributeRoles": "是否將已指派的角色發送給所有已就座玩家？",
   "confirm.customImages":
     "確定要允許自訂圖示？惡意劇本作者可能藉此追蹤你的 IP。",
   "confirm.leaveSession": "確定要離開目前的小鎮？",
@@ -316,13 +314,16 @@ export default {
   "recorder.recorded": "已記錄",
   "recorder.abilityLost": "略過紀錄",
   "recorder.abilityLostHint": "已略過紀錄，不計入戰報",
+  "recorder.reminderNote": "角色備註",
+  "recorder.dragReorder": "拖曳排序",
   "recorder.moveUp": "上移",
   "recorder.moveDown": "下移",
   "recorder.manualTitle": "手動記錄",
   "recorder.addManual": "+手動記錄",
   "recorder.addOptional": "+可選紀錄",
   "recorder.setupTitle": "開局設置",
-  "recorder.setupHint": "首夜設置：劇本含酒鬼／提線木偶時，已指派則選善良角色並掛標記（A）；未指派且無標記時可選善良玩家僅掛標記（B）。男爵等依提示完成。",
+  "recorder.setupHint":
+    "首夜設置：劇本含酒鬼／提線木偶時，已指派則選善良角色並掛標記（A）；未指派且無標記時可選善良玩家僅掛標記（B）。男爵等依提示完成。",
   "recorder.setupUnassignedPlayer": "（待選玩家）",
   "recorder.setupGoodPlayer": "任一善良玩家",
   "recorder.setupEmpty": "本局無需設置紀錄的角色。",
@@ -332,7 +333,8 @@ export default {
   "recorder.optionalOnceUsed": "本局已用過",
   "recorder.optionalDismiss": "關閉",
   "recorder.dayAbilityTitle": "今日晝間能力",
-  "recorder.dayAbilityHint": "依角色 firstDay／everyDay 自動列出；可用「+可選紀錄」補觸發類事件。",
+  "recorder.dayAbilityHint":
+    "依角色 firstDay／everyDay 自動列出；可用「+可選紀錄」補觸發類事件。",
   "recorder.addVote": "+投票紀錄",
   "recorder.addDeadVote": "+使用遺言票",
   "recorder.voteTitle": "投票紀錄",
@@ -344,10 +346,8 @@ export default {
   "recorder.voteHint": "選擇提名者與被提名者，並勾選投出贊成票的玩家",
   "recorder.deadVotePlayers": "勾選使用遺言票的玩家（0～玩家人數）",
   "recorder.deadVoteHint": "勾選使用遺言票的玩家後寫入",
-  "recorder.deadVoterAutoHint":
-    "寫入後將自動記錄 {names} 使用遺言票",
-  "recorder.deadVoterUsedHint":
-    "{names} 已使用過遺言票，不會重複記錄",
+  "recorder.deadVoterAutoHint": "寫入後將自動記錄 {names} 使用遺言票",
+  "recorder.deadVoterUsedHint": "{names} 已使用過遺言票，不會重複記錄",
   "recorder.votePhaseHint": "投票階段可用「+投票紀錄」「+使用遺言票」記錄。",
   "recorder.dismissManual": "關閉",
   "recorder.confirmCancelRecord": "確定要取消這筆紀錄嗎？此操作無法復原。",
@@ -382,8 +382,10 @@ export default {
   "recorder.exportBattleLogJson": "戰報 JSON",
   "recorder.importBattleLog": "載入戰報",
   "recorder.deleteBattleLog": "刪除戰報",
-  "recorder.confirmDeleteBattleLog": "確定要刪除整份戰報並開始新局？此操作無法復原。",
-  "recorder.confirmImportReplace": "目前已有戰報紀錄，載入將覆蓋現有內容。是否繼續？",
+  "recorder.confirmDeleteBattleLog":
+    "確定要刪除整份戰報並開始新局？此操作無法復原。",
+  "recorder.confirmImportReplace":
+    "目前已有戰報紀錄，載入將覆蓋現有內容。是否繼續？",
   "recorder.importFailed": "無法載入戰報：檔案格式不正確。",
   "recorder.pendingTitle": "待提交（{n}）",
   "recorder.writeSource": "寫入來源",
@@ -469,7 +471,8 @@ export default {
   "interactionRules.inputs": "輸入欄位",
   "interactionRules.effects": "連動效果",
   "interactionRules.grimoireEffects": "魔典效果",
-  "interactionRules.grimoireEffectsHint": "設定寫入戰報時如何更新魔典：選擇對象、動作與標記名稱。可設為「可選」在角色卡上勾選；「跟隨」可綁定另一項（例如勾選目標死亡時一併掛標記）。",
+  "interactionRules.grimoireEffectsHint":
+    "設定寫入戰報時如何更新魔典：選擇對象、動作與標記名稱。可設為「可選」在角色卡上勾選；「跟隨」可綁定另一項（例如勾選目標死亡時一併掛標記）。",
   "interactionRules.pickTarget": "選擇對象",
   "interactionRules.cardToggleLabel": "角色卡勾選標籤",
   "interactionRules.optionalToggle": "可選",

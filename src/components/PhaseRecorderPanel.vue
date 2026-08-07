@@ -197,23 +197,6 @@
           class="setup-block"
         >
           <h4 class="setup-title">{{ $t("recorder.setupTitle") }}</h4>
-          <p class="setup-hint">{{ $t("recorder.setupHint") }}</p>
-          <ul class="setup-task-list">
-            <li
-              v-for="task in setupTasks"
-              :key="task.key"
-              class="setup-task-item"
-              :class="{ done: task.isRecorded }"
-            >
-              <span class="setup-task-label">{{ task.label }}</span>
-              <span v-if="task.note" class="setup-task-note">{{
-                task.note
-              }}</span>
-              <span v-if="task.isRecorded" class="setup-task-done">{{
-                $t("recorder.recorded")
-              }}</span>
-            </li>
-          </ul>
           <div
             v-for="card in setupCards"
             :key="card.roleCardKey"
@@ -307,28 +290,58 @@
               v-else-if="
                 row.type === 'manualRecorded' && !isEditingManual(row.entry)
               "
-              class="manual-recorded-card"
+              class="manual-recorded-card sortable-card"
+              :class="{
+                'drag-over':
+                  cardDrag &&
+                  cardDrag.group === 'nightManual' &&
+                  cardDragOverKey === row.entry.id,
+                dragging:
+                  cardDrag &&
+                  cardDrag.group === 'nightManual' &&
+                  cardDrag.key === row.entry.id,
+              }"
+              :data-sort-key="row.entry.id"
+              :data-sort-group="'nightManual'"
             >
-              <button
-                type="button"
-                class="record-delete-btn"
-                :title="$t('recorder.deleteRecord')"
-                @click="confirmDeleteRecord(row.entry)"
-              >
-                <font-awesome-icon icon="trash-alt" />
-              </button>
-              <div class="manual-label">{{ $t("recorder.manualTitle") }}</div>
+              <div class="entry-card-rail">
+                <button
+                  type="button"
+                  class="drag-handle"
+                  :title="$t('recorder.dragReorder')"
+                  :aria-label="$t('recorder.dragReorder')"
+                  @pointerdown.stop.prevent="
+                    onEntryDragHandleStart('nightManual', row.entry.id, $event)
+                  "
+                >
+                  <font-awesome-icon icon="arrows-alt" />
+                </button>
+              </div>
+              <div class="record-actions">
+                <button
+                  type="button"
+                  class="record-edit-btn"
+                  :title="$t('recorder.editRecord')"
+                  @click="startEditManual(row.entry)"
+                >
+                  {{ $t("recorder.editRecord") }}
+                </button>
+                <button
+                  type="button"
+                  class="record-delete-btn"
+                  :title="$t('recorder.deleteRecord')"
+                  @click="confirmDeleteRecord(row.entry)"
+                >
+                  <font-awesome-icon icon="trash-alt" />
+                </button>
+              </div>
+              <div class="entry-card-head">
+                <div class="manual-label">{{ $t("recorder.manualTitle") }}</div>
+              </div>
               <div class="manual-summary">{{ row.entry.message }}</div>
               <span class="manual-detail" v-if="row.entry.detail"
                 >└ {{ row.entry.detail }}</span
               >
-              <button
-                type="button"
-                class="btn edit"
-                @click="startEditManual(row.entry)"
-              >
-                {{ $t("recorder.editRecord") }}
-              </button>
             </div>
             <ManualLogCard
               v-else-if="
@@ -347,7 +360,19 @@
             />
             <div
               v-else-if="row.type === 'optionalRole'"
-              class="optional-card-wrap"
+              class="optional-card-wrap sortable-card"
+              :class="{
+                'drag-over':
+                  cardDrag &&
+                  cardDrag.group === 'nightOptional' &&
+                  cardDragOverKey === row.card.roleCardKey,
+                dragging:
+                  cardDrag &&
+                  cardDrag.group === 'nightOptional' &&
+                  cardDrag.key === row.card.roleCardKey,
+              }"
+              :data-sort-key="row.card.roleCardKey"
+              :data-sort-group="'nightOptional'"
             >
               <div v-if="!row.card.isRecorded" class="optional-card-bar">
                 <span class="optional-card-tag">{{
@@ -371,23 +396,45 @@
                 :role-options="scriptRoles"
                 :is-recorded="row.card.isRecorded"
                 :recorded-entry="row.card.recordedEntry"
+                :sortable="true"
+                @drag-handle-start="
+                  onCardDragHandleStart('nightOptional', $event)
+                "
                 @record="onOptionalRoleRecord"
                 @delete="onDeleteRoleCard"
               />
             </div>
-            <RoleActionCard
+            <div
               v-else-if="row.type === 'role'"
-              :player="row.card.player"
-              :player-index="row.card.playerIndex"
-              :role-card-key="row.card.roleCardKey"
-              :reminder="row.card.reminder"
-              :players="players"
-              :role-options="scriptRoles"
-              :is-recorded="row.card.isRecorded"
-              :recorded-entry="row.card.recordedEntry"
-              @record="onRoleRecord"
-              @delete="onDeleteRoleCard"
-            />
+              class="sortable-card"
+              :class="{
+                'drag-over':
+                  cardDrag &&
+                  cardDrag.group === 'night' &&
+                  cardDragOverKey === row.card.roleCardKey,
+                dragging:
+                  cardDrag &&
+                  cardDrag.group === 'night' &&
+                  cardDrag.key === row.card.roleCardKey,
+              }"
+              :data-sort-key="row.card.roleCardKey"
+              :data-sort-group="'night'"
+            >
+              <RoleActionCard
+                :player="row.card.player"
+                :player-index="row.card.playerIndex"
+                :role-card-key="row.card.roleCardKey"
+                :reminder="row.card.reminder"
+                :players="players"
+                :role-options="scriptRoles"
+                :is-recorded="row.card.isRecorded"
+                :recorded-entry="row.card.recordedEntry"
+                :sortable="true"
+                @drag-handle-start="onCardDragHandleStart('night', $event)"
+                @record="onRoleRecord"
+                @delete="onDeleteRoleCard"
+              />
+            </div>
           </div>
           <p v-if="!nightCards.length && !setupCards.length" class="empty-hint">
             {{ $t("recorder.noNightActions") }}
@@ -403,7 +450,19 @@
             <div
               v-for="card in dayAbilityCards"
               :key="'day-ability-' + card.roleCardKey"
-              class="day-ability-card-wrap"
+              class="day-ability-card-wrap sortable-card"
+              :class="{
+                'drag-over':
+                  cardDrag &&
+                  cardDrag.group === 'dayAbility' &&
+                  cardDragOverKey === card.roleCardKey,
+                dragging:
+                  cardDrag &&
+                  cardDrag.group === 'dayAbility' &&
+                  cardDrag.key === card.roleCardKey,
+              }"
+              :data-sort-key="card.roleCardKey"
+              :data-sort-group="'dayAbility'"
             >
               <RoleActionCard
                 :player="card.player"
@@ -417,6 +476,8 @@
                 :role-options="scriptRoles"
                 :is-recorded="card.isRecorded"
                 :recorded-entry="card.recordedEntry"
+                :sortable="true"
+                @drag-handle-start="onCardDragHandleStart('dayAbility', $event)"
                 @record="onOptionalRoleRecord"
                 @delete="onDeleteRoleCard"
               />
@@ -426,7 +487,7 @@
             <div
               v-if="!isEditingEntry(entry)"
               :key="'rec-' + (entry.manualKey || entry.id)"
-              class="manual-recorded-card"
+              class="manual-recorded-card sortable-card"
               :class="{
                 vote: entry.category === 'vote',
                 scaffold: entry.category === 'voteScaffold',
@@ -435,45 +496,57 @@
                   entry.category === 'noExecution',
                 alive: entry.category === 'alivePlayers',
                 'dead-vote': entry.category === 'deadVote',
+                'drag-over':
+                  cardDrag &&
+                  cardDrag.group === 'dayEntry' &&
+                  cardDragOverKey === entry.id,
+                dragging:
+                  cardDrag &&
+                  cardDrag.group === 'dayEntry' &&
+                  cardDrag.key === entry.id,
               }"
+              :data-sort-key="entry.id"
+              :data-sort-group="'dayEntry'"
             >
-              <button
-                v-if="entry.category === 'manual'"
-                type="button"
-                class="record-delete-btn"
-                :title="$t('recorder.deleteRecord')"
-                @click="confirmDeleteRecord(entry)"
-              >
-                <font-awesome-icon icon="trash-alt" />
-              </button>
-              <div class="manual-label">
-                {{
-                  entry.category === "vote"
-                    ? $t("recorder.voteTitle")
-                    : entry.category === "voteScaffold"
-                    ? $t("recorder.voteScaffoldTitle")
-                    : entry.category === "execution"
-                    ? $t("recorder.executionTitle")
-                    : entry.category === "noExecution"
-                    ? $t("recorder.noExecution")
-                    : entry.category === "alivePlayers"
-                    ? $t("recorder.alivePlayersTitle")
-                    : entry.category === "deadVote"
-                    ? $t("recorder.deadVoteTitle")
-                    : $t("recorder.manualTitle")
-                }}
+              <div class="entry-card-rail">
+                <button
+                  type="button"
+                  class="drag-handle"
+                  :title="$t('recorder.dragReorder')"
+                  :aria-label="$t('recorder.dragReorder')"
+                  @pointerdown.stop.prevent="
+                    onEntryDragHandleStart('dayEntry', entry.id, $event)
+                  "
+                >
+                  <font-awesome-icon icon="arrows-alt" />
+                </button>
+              </div>
+              <div class="record-actions">
+                <button
+                  type="button"
+                  class="record-edit-btn"
+                  :title="$t('recorder.editRecord')"
+                  @click="startEditEntry(entry)"
+                >
+                  {{ $t("recorder.editRecord") }}
+                </button>
+                <button
+                  v-if="canDeleteEntry(entry)"
+                  type="button"
+                  class="record-delete-btn"
+                  :title="$t('recorder.deleteRecord')"
+                  @click="confirmDeleteRecord(entry)"
+                >
+                  <font-awesome-icon icon="trash-alt" />
+                </button>
+              </div>
+              <div class="entry-card-head">
+                <div class="manual-label">{{ entryCardLabel(entry) }}</div>
               </div>
               <div class="manual-summary">{{ entry.message }}</div>
               <span class="manual-detail" v-if="entry.detail"
                 >└ {{ entry.detail }}</span
               >
-              <button
-                type="button"
-                class="btn edit"
-                @click="startEditEntry(entry)"
-              >
-                {{ $t("recorder.editRecord") }}
-              </button>
             </div>
             <VoteLogCard
               v-else-if="entry.category === 'vote'"
@@ -604,7 +677,19 @@
           <div
             v-for="card in dayOptionalCards"
             :key="'day-opt-' + card.roleCardKey"
-            class="optional-card-wrap"
+            class="optional-card-wrap sortable-card"
+            :class="{
+              'drag-over':
+                cardDrag &&
+                cardDrag.group === 'dayOptional' &&
+                cardDragOverKey === card.roleCardKey,
+              dragging:
+                cardDrag &&
+                cardDrag.group === 'dayOptional' &&
+                cardDrag.key === card.roleCardKey,
+            }"
+            :data-sort-key="card.roleCardKey"
+            :data-sort-group="'dayOptional'"
           >
             <div v-if="!card.isRecorded" class="optional-card-bar">
               <span class="optional-card-tag">{{
@@ -628,6 +713,8 @@
               :role-options="scriptRoles"
               :is-recorded="card.isRecorded"
               :recorded-entry="card.recordedEntry"
+              :sortable="true"
+              @drag-handle-start="onCardDragHandleStart('dayOptional', $event)"
               @record="onOptionalRoleRecord"
               @delete="onDeleteRoleCard"
             />
@@ -741,7 +828,13 @@ export default {
       optionalDraft: null,
       /** roleCardKeys dismissed this phase (unrecorded optional cards) */
       dismissedOptionalKeys: [],
+      /** @type {{ key: string, group: string, pointerId: number } | null} */
+      cardDrag: null,
+      cardDragOverKey: null,
     };
+  },
+  beforeDestroy() {
+    this.teardownCardDragListeners();
   },
   watch: {
     "currentPhase.id"() {
@@ -755,6 +848,7 @@ export default {
       this.optionalPickerOpen = false;
       this.optionalDraft = null;
       this.dismissedOptionalKeys = [];
+      this.endCardDrag();
       this.$store.dispatch("battleLog/clearPreviewEffects");
       this.$nextTick(() => {
         this.maybeAutoOpenExecutionForm();
@@ -769,6 +863,7 @@ export default {
       "gameMeta",
       "linkedMode",
       "phaseOrders",
+      "roleCardOrders",
     ]),
     ...mapState("interactionRules", ["overlay"]),
     ...mapGetters("gamePhase", [
@@ -1004,23 +1099,6 @@ export default {
 
       return cards;
     },
-    setupTasks() {
-      return this.setupCards.map((card) => ({
-        key: card.roleCardKey,
-        label:
-          card.playerIndex < 0
-            ? `${this.$t("recorder.setupUnassignedPlayer")} · ${
-                card.setupRoleId === "marionette"
-                  ? "提線木偶"
-                  : card.setupRoleId === "drunk"
-                  ? "酒鬼"
-                  : card.setupRoleId
-              }`
-            : formatPlayerRoleLabel(card.player, card.playerIndex),
-        note: card.reminder,
-        isRecorded: card.isRecorded,
-      }));
-    },
     scriptRoles() {
       const list = [];
       if (this.roles && typeof this.roles.forEach === "function") {
@@ -1056,7 +1134,7 @@ export default {
         });
       });
       cards.sort((a, b) => a.order - b.order);
-      return cards;
+      return this.applyRoleCardOrder(cards);
     },
     optionalCandidates() {
       const phaseId = this.currentPhase.id;
@@ -1117,7 +1195,7 @@ export default {
           recordedEntry,
         });
       });
-      return cards;
+      return this.applyRoleCardOrder(cards);
     },
     optionalCards() {
       const phaseId = this.currentPhase.id;
@@ -1197,36 +1275,30 @@ export default {
         pushCard(parsed.playerIndex, parsed.roleId, snapKey);
       });
 
-      return cards;
+      return this.applyRoleCardOrder(cards);
     },
     dayOptionalCards() {
       if (this.isNight) return [];
-      const cards = this.optionalCards;
-      const order = this.phaseOrders && this.phaseOrders[this.currentPhase.id];
-      if (!order || !order.length) return cards;
-      const rank = new Map(order.map((eid, i) => [eid, i]));
-      return cards.slice().sort((a, b) => {
-        const ida = a.recordedEntry && a.recordedEntry.id;
-        const idb = b.recordedEntry && b.recordedEntry.id;
-        const ra =
-          ida && rank.has(ida) ? rank.get(ida) : Number.MAX_SAFE_INTEGER;
-        const rb =
-          idb && rank.has(idb) ? rank.get(idb) : Number.MAX_SAFE_INTEGER;
-        if (ra !== rb) return ra - rb;
-        // Unrecorded drafts stay after recorded
-        if (a.isRecorded !== b.isRecorded) return a.isRecorded ? -1 : 1;
-        return 0;
-      });
+      return this.optionalCards;
     },
     phaseManualEntries() {
       const id = this.currentPhase.id;
-      return this.entries.filter(
+      const list = this.entries.filter(
         (e) =>
           e.phase &&
           e.phase.id === id &&
           e.source === "manual" &&
           e.category === "manual",
       );
+      const order = this.phaseOrders && this.phaseOrders[id];
+      if (!order || !order.length) return list;
+      const rank = new Map(order.map((eid, i) => [eid, i]));
+      return list.slice().sort((a, b) => {
+        const ra = rank.has(a.id) ? rank.get(a.id) : Number.MAX_SAFE_INTEGER;
+        const rb = rank.has(b.id) ? rank.get(b.id) : Number.MAX_SAFE_INTEGER;
+        if (ra !== rb) return ra - rb;
+        return 0;
+      });
     },
     phaseDayEntries() {
       const id = this.currentPhase.id;
@@ -1546,6 +1618,219 @@ export default {
     },
   },
   methods: {
+    applyRoleCardOrder(cards) {
+      const phaseId = this.currentPhase && this.currentPhase.id;
+      const order =
+        phaseId && this.roleCardOrders && this.roleCardOrders[phaseId];
+      if (!order || !order.length || !cards || !cards.length) return cards;
+      const rank = new Map(order.map((key, i) => [key, i]));
+      return cards.slice().sort((a, b) => {
+        const ra = rank.has(a.roleCardKey)
+          ? rank.get(a.roleCardKey)
+          : Number.MAX_SAFE_INTEGER;
+        const rb = rank.has(b.roleCardKey)
+          ? rank.get(b.roleCardKey)
+          : Number.MAX_SAFE_INTEGER;
+        if (ra !== rb) return ra - rb;
+        return 0;
+      });
+    },
+    sortableKeysForGroup(group) {
+      if (group === "night") {
+        return (this.nightCards || []).map((c) => c.roleCardKey);
+      }
+      if (group === "nightOptional") {
+        return (this.optionalCards || []).map((c) => c.roleCardKey);
+      }
+      if (group === "nightManual") {
+        return (this.phaseManualEntries || []).map((e) => e.id);
+      }
+      if (group === "dayAbility") {
+        return (this.dayAbilityCards || []).map((c) => c.roleCardKey);
+      }
+      if (group === "dayOptional") {
+        return (this.dayOptionalCards || []).map((c) => c.roleCardKey);
+      }
+      if (group === "dayEntry") {
+        return (this.phaseDayEntries || []).map((e) => e.id);
+      }
+      return [];
+    },
+    onEntryDragHandleStart(group, entryId, event) {
+      if (!entryId || !event) return;
+      this.onCardDragHandleStart(group, {
+        roleCardKey: entryId,
+        pointerId: event.pointerId,
+      });
+    },
+    onCardDragHandleStart(group, payload) {
+      if (!payload || !payload.roleCardKey) return;
+      this.teardownCardDragListeners();
+      this.cardDrag = {
+        key: payload.roleCardKey,
+        group,
+        pointerId: payload.pointerId,
+        kind:
+          group === "nightManual" || group === "dayEntry" ? "entry" : "role",
+      };
+      this.cardDragOverKey = payload.roleCardKey;
+      document.body.classList.add("card-dragging");
+      window.addEventListener("pointermove", this.onCardDragPointerMove, {
+        passive: false,
+      });
+      window.addEventListener("pointerup", this.onCardDragPointerUp, {
+        passive: false,
+      });
+      window.addEventListener("pointercancel", this.onCardDragPointerUp, {
+        passive: false,
+      });
+    },
+    onCardDragPointerMove(event) {
+      if (!this.cardDrag) return;
+      if (
+        this.cardDrag.pointerId != null &&
+        event.pointerId !== this.cardDrag.pointerId
+      ) {
+        return;
+      }
+      event.preventDefault();
+      const el = document.elementFromPoint(event.clientX, event.clientY);
+      const wrap =
+        el && el.closest
+          ? el.closest(
+              `.sortable-card[data-sort-group="${this.cardDrag.group}"]`,
+            )
+          : null;
+      const key = wrap && wrap.getAttribute("data-sort-key");
+      this.cardDragOverKey = key || this.cardDrag.key;
+    },
+    onCardDragPointerUp(event) {
+      if (!this.cardDrag) return;
+      if (
+        this.cardDrag.pointerId != null &&
+        event.pointerId !== this.cardDrag.pointerId
+      ) {
+        return;
+      }
+      const fromKey = this.cardDrag.key;
+      const toKey = this.cardDragOverKey || fromKey;
+      const group = this.cardDrag.group;
+      const kind = this.cardDrag.kind;
+      this.endCardDrag();
+      if (!fromKey || !toKey || fromKey === toKey) return;
+      if (kind === "entry") {
+        this.commitEntryReorder(group, fromKey, toKey);
+      } else {
+        this.commitCardReorder(group, fromKey, toKey);
+      }
+    },
+    commitEntryReorder(group, fromId, toId) {
+      const groupKeys = this.sortableKeysForGroup(group);
+      const from = groupKeys.indexOf(fromId);
+      const to = groupKeys.indexOf(toId);
+      if (from < 0 || to < 0 || from === to) return;
+      const nextGroup = groupKeys.slice();
+      nextGroup.splice(from, 1);
+      nextGroup.splice(to, 0, fromId);
+
+      const phaseId = this.currentPhase.id;
+      const fallback = this.orderedEntryIdsForPhase(
+        phaseId,
+        this.entries.filter((e) => e.phase && e.phase.id === phaseId),
+        this.currentPhase,
+      );
+      const existing =
+        (this.phaseOrders &&
+          this.phaseOrders[phaseId] &&
+          this.phaseOrders[phaseId].length &&
+          this.phaseOrders[phaseId].slice()) ||
+        fallback;
+      const groupSet = new Set(groupKeys);
+      const firstIdx = existing.findIndex((id) => groupSet.has(id));
+      const without = existing.filter((id) => !groupSet.has(id));
+      let merged;
+      if (firstIdx < 0) {
+        merged = without.concat(nextGroup);
+      } else {
+        merged = without.slice();
+        const insertAt = Math.min(firstIdx, merged.length);
+        merged.splice(insertAt, 0, ...nextGroup);
+      }
+      const seen = new Set();
+      const deduped = [];
+      merged.forEach((id) => {
+        if (seen.has(id)) return;
+        seen.add(id);
+        deduped.push(id);
+      });
+      this.$store.commit("battleLog/setPhaseOrder", {
+        phaseId,
+        order: deduped,
+      });
+    },
+    commitCardReorder(group, fromKey, toKey) {
+      const groupKeys = this.sortableKeysForGroup(group);
+      const from = groupKeys.indexOf(fromKey);
+      const to = groupKeys.indexOf(toKey);
+      if (from < 0 || to < 0 || from === to) return;
+      const nextGroup = groupKeys.slice();
+      nextGroup.splice(from, 1);
+      nextGroup.splice(to, 0, fromKey);
+
+      const phaseId = this.currentPhase.id;
+      const existing =
+        (this.roleCardOrders && this.roleCardOrders[phaseId]) || [];
+      const groupSet = new Set(groupKeys);
+      const preserved = existing.filter((k) => !groupSet.has(k));
+      const merged = nextGroup.concat(preserved);
+      const fallbackEntryOrder = this.orderedEntryIdsForPhase(
+        phaseId,
+        this.entries.filter((e) => e.phase && e.phase.id === phaseId),
+        this.currentPhase,
+      );
+      this.$store.dispatch("battleLog/reorderRoleCards", {
+        phaseId,
+        order: merged,
+        fallbackEntryOrder,
+      });
+    },
+    entryCardLabel(entry) {
+      if (!entry) return this.$t("recorder.manualTitle");
+      if (entry.category === "vote") return this.$t("recorder.voteTitle");
+      if (entry.category === "voteScaffold")
+        return this.$t("recorder.voteScaffoldTitle");
+      if (entry.category === "execution")
+        return this.$t("recorder.executionTitle");
+      if (entry.category === "noExecution")
+        return this.$t("recorder.noExecution");
+      if (entry.category === "alivePlayers")
+        return this.$t("recorder.alivePlayersTitle");
+      if (entry.category === "deadVote")
+        return this.$t("recorder.deadVoteTitle");
+      return this.$t("recorder.manualTitle");
+    },
+    canDeleteEntry(entry) {
+      if (!entry) return false;
+      return [
+        "manual",
+        "vote",
+        "deadVote",
+        "execution",
+        "noExecution",
+        "alivePlayers",
+      ].includes(entry.category);
+    },
+    endCardDrag() {
+      this.teardownCardDragListeners();
+      this.cardDrag = null;
+      this.cardDragOverKey = null;
+      document.body.classList.remove("card-dragging");
+    },
+    teardownCardDragListeners() {
+      window.removeEventListener("pointermove", this.onCardDragPointerMove);
+      window.removeEventListener("pointerup", this.onCardDragPointerUp);
+      window.removeEventListener("pointercancel", this.onCardDragPointerUp);
+    },
     disguiseSetupPlaceholder(setupRoleId) {
       const id = String(setupRoleId || "").toLowerCase();
       const fromScript = (this.scriptRoles || []).find(
@@ -2552,45 +2837,6 @@ export default {
   color: #ffd699;
 }
 
-.setup-hint {
-  margin: 0 0 8px;
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.65);
-  line-height: 1.4;
-}
-
-.setup-task-list {
-  margin: 0 0 10px;
-  padding: 0;
-  list-style: none;
-}
-
-.setup-task-item {
-  font-size: 0.75rem;
-  padding: 4px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  &.done {
-    opacity: 0.55;
-  }
-}
-
-.setup-task-label {
-  font-weight: bold;
-  color: #ffe8b8;
-}
-
-.setup-task-note {
-  display: block;
-  color: rgba(255, 255, 255, 0.55);
-  margin-top: 2px;
-}
-
-.setup-task-done {
-  margin-left: 6px;
-  color: #9eecc0;
-  font-size: 0.7rem;
-}
-
 .setup-card-wrap {
   margin-top: 6px;
 }
@@ -2699,6 +2945,20 @@ export default {
   margin-bottom: 8px;
 }
 
+.sortable-card {
+  transition:
+    outline-color 0.12s ease,
+    opacity 0.12s ease;
+  &.dragging {
+    opacity: 0.55;
+  }
+  &.drag-over {
+    outline: 2px solid rgba(70, 213, 255, 0.85);
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
+}
+
 .optional-card-bar {
   display: flex;
   align-items: center;
@@ -2761,11 +3021,84 @@ export default {
   }
 }
 
-.record-delete-btn {
+.entry-card-rail {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.entry-card-head {
+  padding-left: 22px;
+  padding-right: 92px;
+  min-height: 1.4rem;
+  display: flex;
+  align-items: center;
+}
+
+.manual-recorded-card .drag-handle {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(0, 0, 0, 0.55);
+  color: rgba(255, 255, 255, 0.75);
+  cursor: grab;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  touch-action: none;
+  user-select: none;
+  filter: none;
+  opacity: 1;
+  &:active {
+    cursor: grabbing;
+    background: rgba(70, 213, 255, 0.25);
+    border-color: rgba(70, 213, 255, 0.7);
+    color: #e8fbff;
+  }
+}
+
+.manual-recorded-card .record-actions {
   position: absolute;
   top: 6px;
   right: 6px;
-  z-index: 1;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  filter: none;
+  opacity: 1;
+}
+
+.manual-recorded-card .record-edit-btn {
+  appearance: none;
+  border: 1px solid rgba(255, 200, 80, 0.45);
+  border-radius: 4px;
+  background: rgba(120, 80, 0, 0.55);
+  color: #ffe8b8;
+  cursor: pointer;
+  padding: 2px 6px;
+  font-size: 0.65rem;
+  font-weight: bold;
+  line-height: 1.3;
+  white-space: nowrap;
+  filter: none;
+  opacity: 1;
+  &:hover {
+    background: rgba(150, 100, 0, 0.85);
+    color: #fff4d6;
+  }
+}
+
+.manual-recorded-card .record-delete-btn {
+  position: static;
   width: 24px;
   height: 24px;
   padding: 0;
@@ -2778,6 +3111,7 @@ export default {
   align-items: center;
   justify-content: center;
   font-size: 0.75rem;
+  flex-shrink: 0;
   filter: none;
   opacity: 1;
   &:hover {
@@ -2787,17 +3121,19 @@ export default {
 }
 
 .manual-label {
-  font-size: 0.65rem;
+  font-size: 0.9rem;
+  font-weight: bold;
   color: #ffd699;
-  margin-bottom: 4px;
-  padding-right: 28px;
+  margin: 0;
+  line-height: 1.2;
   filter: none;
 }
 
 .manual-summary {
   font-size: 0.75rem;
   word-break: break-word;
-  margin-bottom: 6px;
+  margin: 6px 0 0;
+  padding-left: 22px;
   white-space: pre-line;
 }
 
@@ -2805,7 +3141,8 @@ export default {
   display: block;
   font-size: 0.7rem;
   opacity: 0.7;
-  margin: -2px 0 6px 8px;
+  margin: 4px 0 0;
+  padding-left: 30px;
 }
 
 .btn.edit {
@@ -2861,5 +3198,13 @@ export default {
     opacity: 0.65;
     margin-left: 8px;
   }
+}
+</style>
+
+<style lang="scss">
+body.card-dragging {
+  cursor: grabbing !important;
+  user-select: none;
+  touch-action: none;
 }
 </style>

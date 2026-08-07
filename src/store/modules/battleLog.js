@@ -41,6 +41,8 @@ const state = () => ({
   entries: [],
   /** @type {Record<string, string[]>} phaseId → entry ids in display order */
   phaseOrders: {},
+  /** @type {Record<string, string[]>} phaseId → roleCardKeys in card display order */
+  roleCardOrders: {},
   filterType: null,
   filterNumber: null,
   filterSubPhase: null,
@@ -610,6 +612,7 @@ const mutations = {
   clearLog(state) {
     state.entries = [];
     state.phaseOrders = {};
+    state.roleCardOrders = {};
     state.filterType = null;
     state.filterNumber = null;
     state.filterSubPhase = null;
@@ -623,10 +626,23 @@ const mutations = {
     state.phaseOrders =
       phaseOrders && typeof phaseOrders === "object" ? { ...phaseOrders } : {};
   },
+  loadRoleCardOrders(state, roleCardOrders) {
+    state.roleCardOrders =
+      roleCardOrders && typeof roleCardOrders === "object"
+        ? { ...roleCardOrders }
+        : {};
+  },
   setPhaseOrder(state, { phaseId, order }) {
     if (!phaseId) return;
     state.phaseOrders = {
       ...state.phaseOrders,
+      [phaseId]: Array.isArray(order) ? order.slice() : [],
+    };
+  },
+  setRoleCardOrder(state, { phaseId, order }) {
+    if (!phaseId) return;
+    state.roleCardOrders = {
+      ...state.roleCardOrders,
       [phaseId]: Array.isArray(order) ? order.slice() : [],
     };
   },
@@ -638,6 +654,16 @@ const mutations = {
     state.phaseOrders = {
       ...state.phaseOrders,
       [phaseId]: existing.concat(entryId),
+    };
+  },
+  appendRoleCardOrderKey(state, { phaseId, roleCardKey }) {
+    if (!phaseId || !roleCardKey) return;
+    const existing = state.roleCardOrders[phaseId];
+    if (!Array.isArray(existing)) return;
+    if (existing.includes(roleCardKey)) return;
+    state.roleCardOrders = {
+      ...state.roleCardOrders,
+      [phaseId]: existing.concat(roleCardKey),
     };
   },
   setGameMeta(state, meta = {}) {
@@ -809,6 +835,9 @@ const actions = {
     commit("loadEntries", data.entries);
     if (data.phaseOrders) {
       commit("loadPhaseOrders", data.phaseOrders);
+    }
+    if (data.roleCardOrders) {
+      commit("loadRoleCardOrders", data.roleCardOrders);
     }
     if (data.gameMeta) {
       commit("loadGameMeta", data.gameMeta);
@@ -1077,6 +1106,12 @@ const actions = {
       const entryId = state.entries[state.entries.length - 1]?.id;
       if (entryId && phase && phase.id) {
         commit("appendPhaseOrderId", { phaseId: phase.id, entryId });
+        if (roleCardKey) {
+          commit("appendRoleCardOrderKey", {
+            phaseId: phase.id,
+            roleCardKey,
+          });
+        }
       }
       if (applyBoardEffects) {
         if (resolvedEffects && resolvedEffects.length) {
@@ -1151,6 +1186,76 @@ const actions = {
           },
         });
       }
+    });
+  },
+  /**
+   * Reorder role cards within a phase by roleCardKey list, and sync phaseOrders
+   * for recorded role-card entries to the same relative order.
+   */
+  reorderRoleCards({ commit, state }, { phaseId, order, fallbackEntryOrder }) {
+    if (!phaseId || !Array.isArray(order) || !order.length) return;
+    commit("setRoleCardOrder", { phaseId, order });
+
+    const keyToEntryId = new Map();
+    state.entries.forEach((e) => {
+      if (
+        e &&
+        e.phase &&
+        e.phase.id === phaseId &&
+        e.source === "roleCard" &&
+        e.roleCardKey
+      ) {
+        keyToEntryId.set(e.roleCardKey, e.id);
+      }
+    });
+    const roleEntryIds = order
+      .map((key) => keyToEntryId.get(key))
+      .filter(Boolean);
+    if (!roleEntryIds.length) return;
+
+    const stored = state.phaseOrders[phaseId];
+    const base =
+      Array.isArray(stored) && stored.length
+        ? stored.slice()
+        : Array.isArray(fallbackEntryOrder)
+        ? fallbackEntryOrder.slice()
+        : state.entries
+            .filter((e) => e.phase && e.phase.id === phaseId)
+            .map((e) => e.id);
+
+    const roleIdSet = new Set(roleEntryIds);
+    const nonRole = base.filter((id) => !roleIdSet.has(id));
+    // Place role entries in new card order; keep non-role entries at end
+    // (manuals already interleaved via insertBefore when nightRows renders).
+    const next = roleEntryIds.concat(
+      nonRole.filter((id) => !roleEntryIds.includes(id)),
+    );
+    // Better: preserve relative positions of non-role by replacing role slots
+    const merged = [];
+    let rolePtr = 0;
+    base.forEach((id) => {
+      if (roleIdSet.has(id)) {
+        if (rolePtr < roleEntryIds.length) {
+          merged.push(roleEntryIds[rolePtr++]);
+        }
+      } else {
+        merged.push(id);
+      }
+    });
+    while (rolePtr < roleEntryIds.length) {
+      merged.push(roleEntryIds[rolePtr++]);
+    }
+    // Deduplicate while preserving order
+    const seen = new Set();
+    const deduped = [];
+    merged.forEach((id) => {
+      if (seen.has(id)) return;
+      seen.add(id);
+      deduped.push(id);
+    });
+    commit("setPhaseOrder", {
+      phaseId,
+      order: deduped.length ? deduped : next,
     });
   },
   recordManualCard(
@@ -1546,6 +1651,7 @@ const actions = {
         phaseSections,
         entries: state.entries,
         phaseOrders: state.phaseOrders,
+        roleCardOrders: state.roleCardOrders,
         pendingFacts: state.pendingFacts,
       },
       null,
