@@ -433,6 +433,45 @@
   }
 }
 
+// Portrait phones have vertical room but limited horizontal density. Demon
+// bluffs are a primary Storyteller reference (normally three roles), so keep
+// those tokens substantially larger than Fabled/support trays in this layout.
+@media screen and (max-width: 767.98px) and (orientation: portrait) {
+  #app #townsquare > .bluffs {
+    max-width: min(78vw, 292px);
+    padding: 4px 6px 6px;
+    bottom: max(42px, calc(env(safe-area-inset-bottom, 0px) + 12px));
+  }
+
+  #app #townsquare > .bluffs ul {
+    gap: 4px;
+  }
+
+  #app #townsquare > .bluffs ul li {
+    width: clamp(62px, 18vw, 78px);
+    height: clamp(62px, 18vw, 78px);
+  }
+
+  #app #townsquare > .bluffs h3 {
+    min-height: 28px;
+    margin: 3px 6px 2px;
+    font-size: 0.8em;
+  }
+
+  // The high-player-count compact rule above has intentionally higher
+  // specificity. Match it here so portrait phones still retain readable bluffs.
+  @supports selector(:has(*)) {
+    #app:has(#townsquare .circle[class*="size-"])
+      #townsquare
+      > .bluffs
+      ul
+      li {
+      width: clamp(62px, 18vw, 78px);
+      height: clamp(62px, 18vw, 78px);
+    }
+  }
+}
+
 // Short landscape phones are the most constrained case: protect the actual
 // player ring first, then reduce decorative/support UI.
 @media screen and (max-height: 540px) and (min-aspect-ratio: 4/3) {
