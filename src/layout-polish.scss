@@ -22,6 +22,7 @@ body {
 }
 
 #app {
+  --board-gutter: 20px;
   position: relative;
   width: 100vw;
   height: 100vh;
@@ -32,6 +33,40 @@ body {
   isolation: isolate;
 }
 
+// Keep both geometry and lighting centered on the exact same viewport point.
+// The previous ambience used Y=44% (day) and Y=32% (night), which made the
+// composition feel visually top-heavy even when the DOM itself was centered.
+#app:before {
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      transparent 0 25%,
+      rgba(0, 0, 0, 0.16) 62%,
+      rgba(0, 0, 0, 0.62) 100%
+    ),
+    linear-gradient(
+      115deg,
+      rgba(80, 28, 22, 0.12),
+      transparent 38%,
+      rgba(2, 3, 5, 0.26)
+    );
+}
+
+#app > .backdrop {
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(25, 51, 77, 0.16),
+      transparent 54%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(2, 7, 13, 0.96) 0%,
+      rgba(4, 18, 31, 0.96) 52%,
+      rgba(2, 28, 43, 0.98) 100%
+    );
+}
+
 // The actual grimoire table always occupies the entire visual viewport.
 #app > #townsquare {
   position: absolute;
@@ -39,9 +74,26 @@ body {
   width: 100%;
   height: 100%;
   margin: 0;
+  padding: 0;
   transform: none;
   transform-origin: 50% 50%;
   z-index: 2;
+}
+
+// Give the player circle an explicit centered rectangle. This removes the last
+// dependency on TownSquare's flex layout and keeps the same center at every
+// aspect ratio. Existing portrait rules can still override individual seat arms.
+#app > #townsquare > .circle {
+  position: absolute;
+  inset: var(--board-gutter);
+  width: auto;
+  height: auto;
+  margin: 0;
+  z-index: 2;
+}
+
+#app > #townsquare > .circle > li {
+  top: 0;
 }
 
 // Intro, town status, and voting are independent overlays over the same exact
@@ -100,8 +152,18 @@ body {
   border: 1px solid rgba($grimoire-brass, 0.07);
   border-radius: 50%;
   background:
-    radial-gradient(circle, transparent 0 46%, rgba($grimoire-brass, 0.035) 46.5% 47%, transparent 47.5%),
-    radial-gradient(circle, transparent 0 64%, rgba($grimoire-brass, 0.028) 64.5% 65%, transparent 65.5%),
+    radial-gradient(
+      circle,
+      transparent 0 46%,
+      rgba($grimoire-brass, 0.035) 46.5% 47%,
+      transparent 47.5%
+    ),
+    radial-gradient(
+      circle,
+      transparent 0 64%,
+      rgba($grimoire-brass, 0.028) 64.5% 65%,
+      transparent 65.5%
+    ),
     conic-gradient(
       from -0.5deg,
       rgba($grimoire-brass, 0.06) 0deg 1deg,
@@ -137,10 +199,6 @@ body {
   z-index: 0;
 }
 
-#app > #townsquare > .circle {
-  z-index: 2;
-}
-
 // -----------------------------------------------------------------------------
 // Optical balance / density polish
 // -----------------------------------------------------------------------------
@@ -168,8 +226,8 @@ body {
 // Compact and short viewports
 // -----------------------------------------------------------------------------
 @media screen and (max-width: 991.98px) {
-  #app > #townsquare {
-    padding: 10px;
+  #app {
+    --board-gutter: 10px;
   }
 
   #app > #townsquare:before {
@@ -179,8 +237,8 @@ body {
 }
 
 @media screen and (max-width: 767.98px) {
-  #app > #townsquare {
-    padding: 6px 4px;
+  #app {
+    --board-gutter: 5px;
   }
 
   #app > .intro {
@@ -202,6 +260,10 @@ body {
 }
 
 @media screen and (max-height: 620px) {
+  #app {
+    --board-gutter: 8px;
+  }
+
   #app > .intro {
     height: calc(100dvh - 16px);
     min-height: 0;
@@ -222,6 +284,10 @@ body {
 }
 
 @media screen and (max-height: 480px) {
+  #app {
+    --board-gutter: 4px;
+  }
+
   #app > .info {
     transform: translate3d(-50%, -50%, 0) scale(0.78) !important;
   }
