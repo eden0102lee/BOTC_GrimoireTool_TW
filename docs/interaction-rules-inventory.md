@@ -60,7 +60,7 @@
 - **莽夫** (`goon`) — effects: 自身 醉酒
 - **帽匠** (`hatter`) — effects: 目標對象 今晚開茶會
 - **隱士** (`hermit`) — effects: 能力 1、能力 2、能力 3
-- **瘋子** (`lunatic`) — effects: 目標對象 攻擊1、目標對象 攻擊2、目標對象 攻擊3
+- **瘋子** (`lunatic`) — setup: setRole、掛 是瘋子 標記；everyNight: 目標對象 攻擊1／2／3
 - **月之子** (`moonchild`) — effects: 目標對象 死亡
 - **食人魔** (`ogre`) — effects: 目標對象 朋友
 - **瘟疫醫生** (`plaguedoctor`) — effects: 目標對象 (說書人能力)

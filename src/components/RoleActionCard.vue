@@ -200,6 +200,11 @@ import {
   parseSetupRoleCardKey,
   buildSetupRoleCardKey,
   resolveDisguiseSetupVariant,
+  DISGUISE_SETUP_ROLE_IDS,
+  isGoodDisguiseSetup,
+  isEvilDisguiseSetup,
+  playerHasDisguiseIdentityMarker,
+  isDisguiseSetupSeat,
 } from "../store/roleInteractionEngine";
 import { buildNaturalRoleMessage } from "../store/battleLogFormat";
 import { resolvePlayerIndex } from "../store/battleLogEffects";
@@ -295,12 +300,18 @@ export default {
         const setupId = String(this.setupRoleId || roleId || "").toLowerCase();
         if (
           this.setupMode &&
-          (setupId === "drunk" || setupId === "marionette") &&
-          setupId === roleId &&
+          DISGUISE_SETUP_ROLE_IDS.has(setupId) &&
           Object.prototype.hasOwnProperty.call(next, "p1") &&
           !next.p1
         ) {
-          next.p1 = this.label;
+          if (setupId === roleId) {
+            next.p1 = this.label;
+          } else if (
+            isEvilDisguiseSetup(setupId) &&
+            playerHasDisguiseIdentityMarker(this.player, setupId)
+          ) {
+            next.p1 = this.label;
+          }
         }
         this.formData = next;
         this.initEffectToggles();
@@ -360,6 +371,9 @@ export default {
     visibleConfigs() {
       if (!this.setupMode || !this.interactionRule) return this.configs;
       if (this.disguiseSetupVariant === "markOnly") {
+        if (isEvilDisguiseSetup(this.setupRoleId || "")) {
+          return [];
+        }
         return this.configs
           .filter((c) => c.key === "p1")
           .map((c) => ({
@@ -367,16 +381,21 @@ export default {
             label: this.$t("recorder.setupGoodPlayer"),
           }));
       }
+      if (
+        isEvilDisguiseSetup(this.setupRoleId || "") &&
+        this.disguiseSetupVariant !== "disguise"
+      ) {
+        return [];
+      }
       const sid = String(
         this.setupRoleId || (this.player.role && this.player.role.id) || "",
       ).toLowerCase();
-      if (sid !== "drunk" && sid !== "marionette") {
+      if (!DISGUISE_SETUP_ROLE_IDS.has(sid)) {
         return this.configs;
       }
-      const holderId = String(
-        this.player.role && this.player.role.id,
-      ).toLowerCase();
-      if (sid === holderId && this.playerIndex >= 0) {
+      if (
+        isDisguiseSetupSeat(this.players, sid, this.playerIndex)
+      ) {
         return this.configs.filter((c) => c.key !== "p1");
       }
       return this.configs;
@@ -426,7 +445,13 @@ export default {
         if (fromOptions && fromOptions.name) return fromOptions.name;
         if (this.player.role && this.player.role.name)
           return this.player.role.name;
-        return id === "marionette" ? "提線木偶" : id === "drunk" ? "酒鬼" : id;
+        return id === "marionette"
+          ? "提線木偶"
+          : id === "drunk"
+            ? "酒鬼"
+            : id === "lunatic"
+              ? "瘋子"
+              : id;
       }
       return (
         (this.player.role && (this.player.role.name || this.player.role.id)) ||
@@ -531,8 +556,12 @@ export default {
         this.playerIndex,
         this.playerOption,
       );
-      // Drunk/marionette markOnly: prefer alignment; allow unassigned seats.
-      if (this.disguiseSetupVariant === "markOnly" && field.key === "p1") {
+      // Good-side disguise markOnly: prefer alignment; allow unassigned seats.
+      if (
+        this.disguiseSetupVariant === "markOnly" &&
+        field.key === "p1" &&
+        isGoodDisguiseSetup(this.setupRoleId || "")
+      ) {
         if (field.alignment) return list;
         return list.filter(({ player }) => {
           if (!player || !player.role || !player.role.team) return true;
@@ -548,15 +577,24 @@ export default {
         (this.interactionRule && this.interactionRule.id) ||
         (this.player.role && this.player.role.id);
       const id = String(ruleId || "").toLowerCase();
-      // Legacy: drunk/marionette disguise picks townsfolk only when rule has no teams.
+      // Legacy: good-side disguise picks townsfolk when rule has no teams.
       if (
         this.setupMode &&
-        (id === "drunk" || id === "marionette") &&
+        isGoodDisguiseSetup(id) &&
         !(field.teams && field.teams.length)
       ) {
         base = (this.roleOptions || []).filter(
           (r) =>
             r.team === "townsfolk" && String(r.id || "").toLowerCase() !== id,
+        );
+      }
+      if (
+        this.setupMode &&
+        isEvilDisguiseSetup(id) &&
+        !(field.teams && field.teams.length)
+      ) {
+        base = (this.roleOptions || []).filter(
+          (r) => r.team === "demon" && String(r.id || "").toLowerCase() !== id,
         );
       }
       return filterRolesForInput(base, this.players, field);
@@ -636,8 +674,15 @@ export default {
       this.editing = false;
       this.$emit("delete", key);
     },
+    ensureDisguiseSetupFormData() {
+      if (!this.setupMode || this.disguiseSetupVariant !== "disguise") return;
+      if (!Object.prototype.hasOwnProperty.call(this.formData, "p1")) return;
+      if (this.formData.p1 && String(this.formData.p1).trim()) return;
+      this.$set(this.formData, "p1", this.label);
+    },
     write() {
       if (this.abilityLost) return;
+      this.ensureDisguiseSetupFormData();
       if (
         this.setupMode &&
         this.disguiseSetupVariant === "markOnly" &&
@@ -702,12 +747,12 @@ export default {
         : null;
 
       let roleCardKey = this.roleCardKey;
-      // Only drunk/marionette remaps the setup card onto the chosen player seat.
+      // Disguise setup remaps the setup card onto the chosen player seat.
       const setupId = String(this.setupRoleId || "").toLowerCase();
       if (
         this.setupMode &&
         this.formData.p1 &&
-        (setupId === "drunk" || setupId === "marionette")
+        DISGUISE_SETUP_ROLE_IDS.has(setupId)
       ) {
         const parsed = parseSetupRoleCardKey(this.roleCardKey);
         const p1Idx = resolvePlayerIndex(this.players, this.formData.p1);

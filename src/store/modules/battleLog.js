@@ -960,11 +960,22 @@ const actions = {
     }
   },
   applyEntryEffects(ctx, { entry, effects }) {
-    if (!ctx.state.linkedMode) return;
+    const isSetup =
+      (entry &&
+        entry.formSnapshot &&
+        entry.formSnapshot.setup) ||
+      (entry &&
+        entry.roleCardKey &&
+        String(entry.roleCardKey).startsWith("setup|"));
+    if (!ctx.state.linkedMode && !isSetup) return;
     applyEffects(ctx, effects);
   },
-  undoEntryEffects(ctx, { effects }) {
-    if (!ctx.state.linkedMode) return;
+  undoEntryEffects(ctx, { entry, effects }) {
+    const isSetup =
+      entry &&
+      entry.roleCardKey &&
+      String(entry.roleCardKey).startsWith("setup|");
+    if (!ctx.state.linkedMode && !isSetup) return;
     undoEffects(ctx, effects);
   },
   afterEntryWritten(ctx, { entryId, entry, effects }) {
@@ -1083,7 +1094,7 @@ const actions = {
     if (existing) {
       if (applyBoardEffects) {
         const oldEffects = effectsFromEntry(existing, players);
-        dispatch("undoEntryEffects", { effects: oldEffects });
+        dispatch("undoEntryEffects", { entry: existing, effects: oldEffects });
       }
       commit("updateEntry", { id: existing.id, patch: fields });
       if (applyBoardEffects) {
@@ -1610,7 +1621,7 @@ const actions = {
     const shouldUndo = state.linkedMode || isSetupCard;
     if (shouldUndo) {
       const effects = effectsFromEntry(entry, rootState.players.players);
-      dispatch("undoEntryEffects", { effects });
+      dispatch("undoEntryEffects", { entry, effects });
       dispatch("afterEntryRemoved", { entry });
     }
     commit("removeEntry", entry.id);

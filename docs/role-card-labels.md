@@ -33,7 +33,7 @@
 | `investigator` | 調查員 | firstNight |
 | `gambler` | 賭徒 | otherNight |
 | `fanggu` | 方古 | setup:once + otherNight |
-| `lunatic` | 瘋子 | everyNight |
+| `lunatic` | 瘋子 | setup:once + everyNight |
 | `snitch` | 告密者 | firstNight |
 | `engineer` | 工程師 | everyNight |
 | `princess` | 公主 | otherNight |

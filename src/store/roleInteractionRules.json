@@ -207,7 +207,7 @@
               "label": "（記錄用）不會死／鄰居保護"
             }
           ],
-          "notes": "被動；兩側存活鄰居皆善良時他們不會死；標記由說書人手動"
+          "notes": "被動；兩側存活鄰居皆善良時他們不會死；標記由說書人手動掛在鄰居"
         }
       ]
     },
@@ -797,6 +797,67 @@
               "reminderRole": "fanggu",
               "bindTo": "kill",
               "label": "目標掛死亡標記"
+            }
+          ],
+          "notes": "一般夜殺；若殺外來者且要轉化，改用「轉化」卡"
+        },
+        {
+          "key": "convert",
+          "label": "convert",
+          "enabled": true,
+          "activation": "optional",
+          "once": true,
+          "when": {
+            "nights": [
+              "other"
+            ],
+            "days": []
+          },
+          "inputs": [
+            {
+              "key": "target",
+              "type": "alivePlayer",
+              "label": "外來者目標"
+            }
+          ],
+          "sentence": {
+            "action": "轉化",
+            "template": "{actor}殺害 {target}（外來者）→ 轉化"
+          },
+          "effects": [
+            {
+              "id": "killSelf",
+              "type": "setDead",
+              "targetFrom": "actor",
+              "value": true,
+              "optional": true,
+              "defaultOn": true,
+              "label": "方古自身死亡"
+            },
+            {
+              "type": "addReminder",
+              "targetFrom": "actor",
+              "reminderName": "死亡",
+              "reminderRole": "fanggu",
+              "bindTo": "killSelf",
+              "label": "自身掛死亡標記"
+            },
+            {
+              "id": "becomeFanggu",
+              "type": "setRole",
+              "targetFrom": "target",
+              "roleId": "fanggu",
+              "optional": true,
+              "defaultOn": true,
+              "label": "目標變成方古"
+            },
+            {
+              "type": "setAlignment",
+              "targetFrom": "target",
+              "alignment": "evil",
+              "optional": true,
+              "defaultOn": true,
+              "label": "目標改為邪惡"
             },
             {
               "type": "addReminder",
@@ -804,11 +865,11 @@
               "reminderName": "第一位外來者",
               "reminderRole": "fanggu",
               "optional": true,
-              "defaultOn": false,
-              "label": "目標對象 第一位外來者"
+              "defaultOn": true,
+              "label": "目標 第一位外來者（已轉化）"
             }
           ],
-          "notes": "殺外來者可轉化（每局一次）；開局 +1 外來者"
+          "notes": "每局一次：殺到外來者時己死、對方變邪惡方古（勿同時開一般夜殺死亡）"
         }
       ]
     },
@@ -817,6 +878,54 @@
       "name": "瘋子",
       "enabled": true,
       "cards": [
+        {
+          "key": "setup",
+          "label": "setup",
+          "enabled": true,
+          "activation": "setup",
+          "once": true,
+          "when": {
+            "nights": [],
+            "days": []
+          },
+          "inputs": [
+            {
+              "key": "p1",
+              "type": "player",
+              "label": "瘋子玩家",
+              "teams": [
+                "outsider"
+              ]
+            },
+            {
+              "key": "r1",
+              "type": "role",
+              "label": "惡魔角色",
+              "teams": [
+                "demon"
+              ]
+            }
+          ],
+          "sentence": {
+            "action": "是",
+            "template": "{p1}是[瘋子]"
+          },
+          "effects": [
+            {
+              "type": "setRole",
+              "targetFrom": "p1",
+              "roleFrom": "r1"
+            },
+            {
+              "type": "addReminder",
+              "targetFrom": "p1",
+              "reminderName": "是瘋子",
+              "reminderRole": "lunatic",
+              "label": "掛 是瘋子 標記"
+            }
+          ],
+          "notes": "劇本含瘋子且（已指派瘋子字卡，或玩家已有「是瘋子」標記）時顯示；選惡魔角色並掛「是瘋子」"
+        },
         {
           "key": "every-night",
           "label": "everyNight",
@@ -1439,7 +1548,7 @@
             {
               "key": "target",
               "type": "player",
-              "label": "目標對象"
+              "label": "死亡玩家"
             }
           ],
           "sentence": {
@@ -1458,6 +1567,37 @@
             }
           ],
           "notes": "至明昏恢復能力；每局一次"
+        }
+      ]
+    },
+    {
+      "id": "butcher",
+      "name": "屠夫",
+      "enabled": true,
+      "cards": [
+        {
+          "key": "trigger",
+          "label": "trigger",
+          "enabled": true,
+          "activation": "optional",
+          "once": false,
+          "when": {
+            "nights": [],
+            "days": []
+          },
+          "inputs": [
+            {
+              "key": "target",
+              "type": "alivePlayer",
+              "label": "追加提名目標"
+            }
+          ],
+          "sentence": {
+            "action": "追加提名",
+            "template": "{actor} → {action} → {target}"
+          },
+          "effects": [],
+          "notes": "白天首次處決後可再提名一人"
         }
       ]
     },
@@ -1543,7 +1683,7 @@
           "key": "other-night",
           "label": "otherNight",
           "enabled": true,
-          "activation": null,
+          "activation": "optional",
           "once": false,
           "when": {
             "nights": [
@@ -1590,7 +1730,7 @@
               "label": "目標掛死亡標記"
             }
           ],
-          "notes": "當日無人死亡才夜殺；第一次死亡不真正死（視為已死）"
+          "notes": "僅當日無人死亡才可夜殺（optional）；第一次死亡不真正死（視為已死）"
         },
         {
           "key": "death",
@@ -1627,13 +1767,20 @@
             "nights": [],
             "days": []
           },
-          "inputs": [],
+          "inputs": [
+            {
+              "key": "res",
+              "type": "select",
+              "label": "外來者調整",
+              "options": ["−1", "+1"]
+            }
+          ],
           "sentence": {
             "action": "設置",
-            "template": "{actor} → {action} → 外來者數量變化"
+            "template": "{actor} → {action} → 外來者 [{res}]"
           },
           "effects": [],
-          "notes": "開局：外來者數量變化"
+          "notes": "開局：外來者 −1 或 +1"
         },
         {
           "key": "first-night",
@@ -1647,19 +1794,25 @@
             ],
             "days": []
           },
-          "inputs": [],
+          "inputs": [
+            {
+              "key": "note",
+              "type": "text",
+              "label": "場上外來者角色"
+            }
+          ],
           "sentence": {
             "action": "得知",
-            "template": "{actor} → {action} → 外來者"
+            "template": "{actor} → {action} → 外來者：{note}"
           },
           "effects": [],
-          "notes": "首夜得知外來者是誰"
+          "notes": "首夜得知場上有哪些外來者角色"
         },
         {
           "key": "other-night",
           "label": "otherNight",
           "enabled": true,
-          "activation": null,
+          "activation": "optional",
           "once": false,
           "when": {
             "nights": [
@@ -1671,12 +1824,12 @@
             {
               "key": "target",
               "type": "alivePlayer",
-              "label": "目標對象"
+              "label": "擊殺目標"
             }
           ],
           "sentence": {
-            "action": "得知",
-            "template": "{actor} → 得知外來者…` / `{actor} → 殺害 → {target}"
+            "action": "殺害",
+            "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
           },
           "effects": [
             {
@@ -1685,20 +1838,28 @@
               "reminderName": "外來者死亡",
               "reminderRole": "godfather",
               "optional": true,
-              "defaultOn": false,
+              "defaultOn": true,
               "label": "外來者死亡（今日）"
+            },
+            {
+              "id": "kill",
+              "type": "setDead",
+              "targetFrom": "target",
+              "value": true,
+              "optional": true,
+              "defaultOn": true,
+              "label": "目標死亡"
             },
             {
               "type": "addReminder",
               "targetFrom": "target",
               "reminderName": "死亡",
               "reminderRole": "godfather",
-              "optional": true,
-              "defaultOn": true,
-              "label": "目標死亡標記"
+              "bindTo": "kill",
+              "label": "目標掛死亡標記"
             }
           ],
-          "notes": "首夜資訊；殺人僅在外來者白日死後"
+          "notes": "僅當日有外來者白日死亡時可殺；可選紀錄"
         }
       ]
     },
@@ -1872,20 +2033,39 @@
             {
               "key": "p1",
               "type": "player",
-              "label": "玩家 1"
+              "label": "鏡像雙子"
             },
             {
               "key": "p2",
               "type": "player",
-              "label": "玩家 2"
+              "label": "對立雙子"
             }
           ],
           "sentence": {
-            "action": "選擇",
+            "action": "",
             "template": "{p1} 與 {p2} 互認"
           },
-          "effects": [],
-          "notes": "首夜互認；善側雙子處決→邪勝；雙方皆活時善不能勝"
+          "effects": [
+            {
+              "type": "addReminder",
+              "targetFrom": "p1",
+              "reminderName": "雙胞胎",
+              "reminderRole": "eviltwin",
+              "optional": true,
+              "defaultOn": true,
+              "label": "鏡像雙子 雙胞胎"
+            },
+            {
+              "type": "addReminder",
+              "targetFrom": "p2",
+              "reminderName": "雙胞胎",
+              "reminderRole": "eviltwin",
+              "optional": true,
+              "defaultOn": true,
+              "label": "對立雙子 雙胞胎"
+            }
+          ],
+          "notes": "首夜互認；雙方掛雙胞胎標記"
         },
         {
           "key": "trigger",
@@ -1899,14 +2079,18 @@
           },
           "inputs": [
             {
-              "key": "note",
-              "type": "text",
-              "label": "結果備註"
+              "key": "res",
+              "type": "select",
+              "label": "結果",
+              "options": [
+                "雙方皆存活，善良無法獲勝",
+                "善良雙子死於處決，邪惡獲勝"
+              ]
             }
           ],
           "sentence": {
             "action": "觸發",
-            "template": "{actor} → {action} → {note}"
+            "template": "{actor} → {action} → {res}"
           },
           "effects": [],
           "notes": "善側雙子處決→邪勝；雙方皆活時善不能勝"
@@ -2127,8 +2311,8 @@
             }
           ],
           "sentence": {
-            "action": "得知",
-            "template": "{actor} → {action} → {p1} / {res}"
+            "action": "選擇",
+            "template": "{actor} → {action} → {p1} → {res}"
           },
           "effects": [
             {
@@ -2150,7 +2334,7 @@
               "label": "目標玩家 能力x2"
             }
           ],
-          "notes": "旅行者夜動；若要記戰報可寫「咖啡師 → 玩家／清醒&健康或能力x2」。目前依例句保留 (無)"
+          "notes": "說書人二選一；該玩家會得知是哪個效果"
         }
       ]
     },
@@ -2303,6 +2487,36 @@
             "nights": [],
             "days": []
           },
+          "inputs": [],
+          "sentence": {
+            "action": "",
+            "template": "{actor}死亡 → 今晚可剪頭髮"
+          },
+          "effects": [
+            {
+              "type": "addReminder",
+              "targetFrom": "actor",
+              "reminderName": "今晚剪頭髮",
+              "reminderRole": "barber",
+              "optional": true,
+              "defaultOn": true,
+              "label": "自身 今晚剪頭髮"
+            }
+          ],
+          "notes": "理髮師死亡之夜標記；惡魔可換角色"
+        },
+        {
+          "key": "swap",
+          "label": "swap",
+          "enabled": true,
+          "activation": "optional",
+          "once": false,
+          "when": {
+            "nights": [
+              "other"
+            ],
+            "days": []
+          },
           "inputs": [
             {
               "key": "p1",
@@ -2316,21 +2530,11 @@
             }
           ],
           "sentence": {
-            "action": "選擇",
-            "template": "{actor} → {action} → {p1} & {p2}"
+            "action": "交換",
+            "template": "惡魔交換 {p1} ↔ {p2} 角色"
           },
-          "effects": [
-            {
-              "type": "addReminder",
-              "targetFrom": "p1",
-              "reminderName": "今晚剪頭髮",
-              "reminderRole": "barber",
-              "optional": true,
-              "defaultOn": true,
-              "label": "玩家 1 今晚剪頭髮"
-            }
-          ],
-          "notes": "標記「今晚剪頭髮」；不可選其他惡魔"
+          "effects": [],
+          "notes": "不可選其他惡魔；角色互換由說書人手動"
         }
       ]
     },
@@ -2633,7 +2837,7 @@
               "bindTo": "killSelf"
             }
           ],
-          "notes": "不同意則無└；說書人可讓雙方死亡"
+          "notes": "不同意則無└；說書人可讓雙方死亡（可選雙殺 effect）"
         }
       ]
     },
@@ -2676,21 +2880,39 @@
               "targetFrom": "p1",
               "reminderName": "保護",
               "reminderRole": "innkeeper",
-              "optional": false,
+              "optional": true,
               "defaultOn": true,
               "label": "玩家 1 保護"
             },
             {
               "type": "addReminder",
               "targetFrom": "p2",
+              "reminderName": "保護",
+              "reminderRole": "innkeeper",
+              "optional": true,
+              "defaultOn": true,
+              "label": "玩家 2 保護"
+            },
+            {
+              "type": "addReminder",
+              "targetFrom": "p1",
               "reminderName": "醉酒",
               "reminderRole": "innkeeper",
-              "optional": false,
+              "optional": true,
               "defaultOn": true,
-              "label": "玩家 2 醉酒"
+              "label": "玩家 1 醉酒（二選一）"
+            },
+            {
+              "type": "addReminder",
+              "targetFrom": "p2",
+              "reminderName": "醉酒",
+              "reminderRole": "innkeeper",
+              "optional": true,
+              "defaultOn": false,
+              "label": "玩家 2 醉酒（二選一）"
             }
           ],
-          "notes": ""
+          "notes": "兩人當晚不會死；其中一人醉酒至下個黃昏"
         }
       ]
     },
@@ -2757,6 +2979,15 @@
           },
           "effects": [
             {
+              "id": "become",
+              "type": "setRole",
+              "targetFrom": "p1",
+              "roleFrom": "r1",
+              "optional": true,
+              "defaultOn": true,
+              "label": "目標變成該角色（角色不在場）"
+            },
+            {
               "id": "kill",
               "type": "setDead",
               "targetFrom": "p1",
@@ -2764,6 +2995,14 @@
               "optional": true,
               "defaultOn": false,
               "label": "（若創造新惡魔）當晚死亡—說書人選"
+            },
+            {
+              "type": "addReminder",
+              "targetFrom": "p1",
+              "reminderName": "死亡",
+              "reminderRole": "pithag",
+              "bindTo": "kill",
+              "label": "目標掛死亡標記"
             }
           ],
           "notes": "角色不在場時目標變成該角色；若變出新惡魔，當晚死亡由說書人決定"
@@ -3062,8 +3301,8 @@
               "type": "select",
               "label": "結果判斷",
               "options": [
-                "是 (Yes)",
-                "否 (No)"
+                "是",
+                "否"
               ]
             }
           ],
@@ -3150,13 +3389,55 @@
               "label": "目標對象 詛咒"
             }
           ],
-          "notes": "僅三人存活時失去能力；夜動只掛詛咒，死亡在隔日提名時"
+          "notes": "僅三人存活時失去能力；夜動只掛詛咒"
+        },
+        {
+          "key": "curse-kill",
+          "label": "curseKill",
+          "enabled": true,
+          "activation": "optional",
+          "once": false,
+          "when": {
+            "nights": [],
+            "days": []
+          },
+          "inputs": [
+            {
+              "key": "target",
+              "type": "player",
+              "label": "被咒殺玩家"
+            }
+          ],
+          "sentence": {
+            "action": "",
+            "template": "{target}被咒殺死亡"
+          },
+          "effects": [
+            {
+              "id": "kill",
+              "type": "setDead",
+              "targetFrom": "target",
+              "value": true,
+              "optional": true,
+              "defaultOn": true,
+              "label": "目標死亡"
+            },
+            {
+              "type": "addReminder",
+              "targetFrom": "target",
+              "reminderName": "死亡",
+              "reminderRole": "witch",
+              "bindTo": "kill",
+              "label": "目標掛死亡標記"
+            }
+          ],
+          "notes": "被詛咒者白天提名時死亡"
         }
       ]
     },
     {
       "id": "nodashii",
-      "name": "諾達鯴",
+      "name": "諾-達鯴",
       "enabled": true,
       "cards": [
         {
@@ -3169,12 +3450,42 @@
             "nights": [],
             "days": []
           },
-          "inputs": [],
+          "inputs": [
+            {
+              "key": "p1",
+              "type": "player",
+              "label": "鄰近鎮民 1"
+            },
+            {
+              "key": "p2",
+              "type": "player",
+              "label": "鄰近鎮民 2"
+            }
+          ],
           "sentence": {
             "action": "設置",
-            "template": "{actor} → {action} → 鄰座鎮民中毒"
+            "template": "{actor} → {action} → {p1} & {p2} 中毒"
           },
-          "effects": [],
+          "effects": [
+            {
+              "type": "addReminder",
+              "targetFrom": "p1",
+              "reminderName": "中毒",
+              "reminderRole": "nodashii",
+              "optional": true,
+              "defaultOn": true,
+              "label": "鄰近鎮民 1 中毒"
+            },
+            {
+              "type": "addReminder",
+              "targetFrom": "p2",
+              "reminderName": "中毒",
+              "reminderRole": "nodashii",
+              "optional": true,
+              "defaultOn": true,
+              "label": "鄰近鎮民 2 中毒"
+            }
+          ],
           "notes": "開局：兩側最近鎮民中毒（座位／角色變動時需更新）"
         },
         {
@@ -3215,22 +3526,11 @@
               "targetFrom": "target",
               "reminderName": "死亡",
               "reminderRole": "nodashii",
-              "optional": true,
-              "defaultOn": true,
-              "label": "目標掛死亡標記",
-              "bindTo": "kill"
-            },
-            {
-              "type": "addReminder",
-              "targetFrom": "actor",
-              "reminderName": "中毒",
-              "reminderRole": "nodashii",
-              "optional": true,
-              "defaultOn": false,
-              "label": "（setup）鄰近鎮民中毒—說書人手動"
+              "bindTo": "kill",
+              "label": "目標掛死亡標記"
             }
           ],
-          "notes": "夜殺目標；setup 時對兩側最近鎮民掛中毒（座位／角色變動時需更新）"
+          "notes": "夜殺目標"
         }
       ]
     },
@@ -3275,22 +3575,131 @@
             {
               "type": "addReminder",
               "targetFrom": "target",
-              "reminderName": "攻擊x3",
-              "reminderRole": "po",
-              "optional": true,
-              "defaultOn": true,
-              "label": "目標對象 攻擊x3"
-            },
-            {
-              "type": "addReminder",
-              "targetFrom": "target",
               "reminderName": "死亡",
               "reminderRole": "po",
               "bindTo": "kill",
               "label": "目標掛死亡標記"
             }
           ],
-          "notes": "沒有選擇任何玩家後隔晚可殺三；標記攻擊x3"
+          "notes": "每晚可殺一人；若不殺則用「跳過」卡掛攻擊x3"
+        },
+        {
+          "key": "skip",
+          "label": "skip",
+          "enabled": true,
+          "activation": "optional",
+          "once": false,
+          "when": {
+            "nights": [
+              "other"
+            ],
+            "days": []
+          },
+          "inputs": [],
+          "sentence": {
+            "action": "",
+            "template": "{actor}沒有選擇任何玩家"
+          },
+          "effects": [
+            {
+              "type": "addReminder",
+              "targetFrom": "actor",
+              "reminderName": "攻擊x3",
+              "reminderRole": "po",
+              "optional": true,
+              "defaultOn": true,
+              "label": "自身 攻擊x3（隔晚三殺）"
+            }
+          ],
+          "notes": "本晚不殺；次夜必須用三殺卡"
+        },
+        {
+          "key": "other-night-x3",
+          "label": "otherNightX3",
+          "enabled": true,
+          "activation": "optional",
+          "once": false,
+          "when": {
+            "nights": [
+              "other"
+            ],
+            "days": []
+          },
+          "inputs": [
+            {
+              "key": "p1",
+              "type": "alivePlayer",
+              "label": "玩家 1"
+            },
+            {
+              "key": "p2",
+              "type": "alivePlayer",
+              "label": "玩家 2"
+            },
+            {
+              "key": "p3",
+              "type": "alivePlayer",
+              "label": "玩家 3"
+            }
+          ],
+          "sentence": {
+            "action": "殺害",
+            "template": "{actor} → {action} → {p1} & {p2} & {p3}"
+          },
+          "effects": [
+            {
+              "id": "kill1",
+              "type": "setDead",
+              "targetFrom": "p1",
+              "value": true,
+              "optional": true,
+              "defaultOn": true,
+              "label": "玩家 1 死亡"
+            },
+            {
+              "type": "addReminder",
+              "targetFrom": "p1",
+              "reminderName": "死亡",
+              "reminderRole": "po",
+              "bindTo": "kill1",
+              "label": "玩家 1 掛死亡標記"
+            },
+            {
+              "id": "kill2",
+              "type": "setDead",
+              "targetFrom": "p2",
+              "value": true,
+              "optional": true,
+              "defaultOn": true,
+              "label": "玩家 2 死亡"
+            },
+            {
+              "type": "addReminder",
+              "targetFrom": "p2",
+              "reminderName": "死亡",
+              "reminderRole": "po",
+              "bindTo": "kill2",
+              "label": "玩家 2 掛死亡標記"
+            },
+            {
+              "id": "kill3",
+              "type": "setDead",
+              "targetFrom": "p3",
+              "value": true,
+              "optional": true,
+              "defaultOn": true,
+              "label": "玩家 3 死亡"
+            },
+            {
+              "type": "addReminder",
+              "targetFrom": "p3",
+              "reminderName": "死亡",
+              "reminderRole": "po",
+              "bindTo": "kill3",
+              "label": "玩家 3 掛死亡標記"
+            }
+          ],
+          "notes": "上晚未選人後必須三殺；用完後手動移除攻擊x3"
         }
       ]
     },
@@ -3316,7 +3725,12 @@
             {
               "key": "target",
               "type": "alivePlayer",
-              "label": "目標對象"
+              "label": "新中毒目標"
+            },
+            {
+              "key": "prev",
+              "type": "player",
+              "label": "上夜中毒者（可空）"
             }
           ],
           "sentence": {
@@ -3325,33 +3739,33 @@
           },
           "effects": [
             {
-              "id": "kill",
-              "type": "setDead",
-              "targetFrom": "target",
-              "value": true,
-              "optional": true,
-              "defaultOn": true,
-              "label": "目標死亡"
-            },
-            {
               "type": "addReminder",
               "targetFrom": "target",
               "reminderName": "中毒",
               "reminderRole": "pukka",
               "optional": true,
               "defaultOn": true,
-              "label": "目標對象 中毒"
+              "label": "新目標 中毒"
+            },
+            {
+              "id": "killPrev",
+              "type": "setDead",
+              "targetFrom": "prev",
+              "value": true,
+              "optional": true,
+              "defaultOn": true,
+              "label": "上夜中毒者死亡"
             },
             {
               "type": "addReminder",
-              "targetFrom": "target",
+              "targetFrom": "prev",
               "reminderName": "死亡",
               "reminderRole": "pukka",
-              "bindTo": "kill",
-              "label": "目標掛死亡標記"
+              "bindTo": "killPrev",
+              "label": "上夜中毒者掛死亡標記"
             }
           ],
-          "notes": ""
+          "notes": "新選中毒；上夜中毒者今晚死亡並恢復健康（首夜通常無 prev）"
         }
       ]
     },
@@ -3640,8 +4054,13 @@
             },
             {
               "key": "p2",
-              "type": "player",
+              "type": "alivePlayer",
               "label": "玩家 2"
+            },
+            {
+              "key": "revived",
+              "type": "player",
+              "label": "反芻復活（可空）"
             }
           ],
           "sentence": {
@@ -3650,33 +4069,59 @@
           },
           "effects": [
             {
-              "id": "kill",
+              "id": "kill1",
               "type": "setDead",
               "targetFrom": "p1",
               "value": true,
               "optional": true,
               "defaultOn": true,
-              "label": "目標死亡"
-            },
-            {
-              "type": "addReminder",
-              "targetFrom": "p1",
-              "reminderName": "復活",
-              "reminderRole": "shabaloth",
-              "optional": false,
-              "defaultOn": true,
-              "label": "玩家 1 復活"
+              "label": "玩家 1 死亡"
             },
             {
               "type": "addReminder",
               "targetFrom": "p1",
               "reminderName": "死亡",
               "reminderRole": "shabaloth",
-              "bindTo": "kill",
-              "label": "目標掛死亡標記"
+              "bindTo": "kill1",
+              "label": "玩家 1 掛死亡標記"
+            },
+            {
+              "id": "kill2",
+              "type": "setDead",
+              "targetFrom": "p2",
+              "value": true,
+              "optional": true,
+              "defaultOn": true,
+              "label": "玩家 2 死亡"
+            },
+            {
+              "type": "addReminder",
+              "targetFrom": "p2",
+              "reminderName": "死亡",
+              "reminderRole": "shabaloth",
+              "bindTo": "kill2",
+              "label": "玩家 2 掛死亡標記"
+            },
+            {
+              "id": "revive",
+              "type": "setRevive",
+              "targetFrom": "revived",
+              "optional": true,
+              "defaultOn": false,
+              "label": "（可選）反芻復活"
+            },
+            {
+              "type": "addReminder",
+              "targetFrom": "revived",
+              "reminderName": "復活",
+              "reminderRole": "shabaloth",
+              "optional": true,
+              "defaultOn": false,
+              "bindTo": "revive",
+              "label": "反芻者 復活標記"
             }
           ],
-          "notes": ""
+          "notes": "殺兩人；可能反芻上夜選過且當前死亡者之一"
         }
       ]
     },
@@ -3944,29 +4389,29 @@
           },
           "inputs": [
             {
-              "key": "target",
-              "type": "player",
-              "label": "醉酒玩家"
-            },
-            {
               "key": "r1",
               "type": "role",
               "label": "選擇角色"
+            },
+            {
+              "key": "target",
+              "type": "player",
+              "label": "在場則醉酒的玩家（可空）"
             }
           ],
           "sentence": {
             "action": "選擇",
-            "template": "{actor} → {action} → 選擇 {target} → {target} 醉酒"
+            "template": "{actor} → {action} → [{r1}] → {target} 醉酒"
           },
           "effects": [
             {
               "type": "addReminder",
               "targetFrom": "target",
-              "reminderName": "醉酒 1",
+              "reminderName": "醉酒 3",
               "reminderRole": "courtier",
               "optional": true,
               "defaultOn": true,
-              "label": "醉酒標記 醉酒 1"
+              "label": "醉酒標記 醉酒 3（首晚）"
             },
             {
               "type": "addReminder",
@@ -3980,14 +4425,14 @@
             {
               "type": "addReminder",
               "targetFrom": "target",
-              "reminderName": "醉酒 3",
+              "reminderName": "醉酒 1",
               "reminderRole": "courtier",
               "optional": true,
               "defaultOn": false,
-              "label": "醉酒標記 醉酒 3"
+              "label": "醉酒標記 醉酒 1"
             }
           ],
-          "notes": "輸入為角色；標記醉酒 1/2/3 遞減；次夜自動帶入戰報及醉酒標記"
+          "notes": "每局一次選角色；在場則掛醉酒 3 並逐日遞減"
         }
       ]
     },
@@ -4171,7 +4616,7 @@
           ],
           "sentence": {
             "action": "選擇",
-            "template": "{actor} → {action} → 選擇 {target} → {target} 醉酒"
+            "template": "{actor} → {action} → 選擇 {target}"
           },
           "effects": [
             {
@@ -4181,10 +4626,19 @@
               "reminderRole": "sailor",
               "optional": true,
               "defaultOn": true,
-              "label": "目標對象 醉酒"
+              "label": "目標 醉酒"
+            },
+            {
+              "type": "addReminder",
+              "targetFrom": "actor",
+              "reminderName": "醉酒",
+              "reminderRole": "sailor",
+              "optional": true,
+              "defaultOn": false,
+              "label": "自身 醉酒"
             }
           ],
-          "notes": "自己或目標醉酒；水手不會死（被動）"
+          "notes": "你或目標之一醉酒；水手不會死（被動）"
         }
       ]
     },
@@ -4444,7 +4898,12 @@
             {
               "key": "target",
               "type": "alivePlayer",
-              "label": "目標對象"
+              "label": "擊殺目標"
+            },
+            {
+              "key": "poisoned",
+              "type": "player",
+              "label": "鄰近中毒鎮民（可空）"
             }
           ],
           "sentence": {
@@ -4464,11 +4923,10 @@
             {
               "type": "addReminder",
               "targetFrom": "target",
-              "reminderName": "中毒",
+              "reminderName": "死亡",
               "reminderRole": "vigormortis",
-              "optional": true,
-              "defaultOn": true,
-              "label": "目標對象 中毒"
+              "bindTo": "kill",
+              "label": "目標掛死亡標記"
             },
             {
               "type": "addReminder",
@@ -4477,15 +4935,16 @@
               "reminderRole": "vigormortis",
               "optional": true,
               "defaultOn": false,
-              "label": "目標對象 具有能力"
+              "label": "（殺爪牙）目標保留能力"
             },
             {
               "type": "addReminder",
-              "targetFrom": "target",
-              "reminderName": "死亡",
+              "targetFrom": "poisoned",
+              "reminderName": "中毒",
               "reminderRole": "vigormortis",
-              "bindTo": "kill",
-              "label": "目標掛死亡標記"
+              "optional": true,
+              "defaultOn": false,
+              "label": "鄰近鎮民 中毒"
             }
           ],
           "notes": "殺爪牙→保留能力＋鄰近一鎮民中毒；開局 −1 外來者"
@@ -4658,10 +5117,10 @@
           "inputs": [],
           "sentence": {
             "action": "觸發",
-            "template": "{actor} → {action} → 白天無處決，邪惡獲勝"
+            "template": "白天無處決 → [邪惡]陣營獲勝"
           },
           "effects": [],
-          "notes": "白天無處決 → 邪惡獲勝；鎮民資訊必錯"
+          "notes": "白天無處決 → 邪惡陣營獲勝；鎮民資訊必錯"
         }
       ]
     },
@@ -4726,7 +5185,7 @@
           ],
           "sentence": {
             "action": "選擇",
-            "template": "{actor} → {action} → 選擇 {target} → {target} 中毒"
+            "template": "{actor} → {action} → 選擇 {target}"
           },
           "effects": [
             {
@@ -4735,11 +5194,11 @@
               "reminderName": "中毒",
               "reminderRole": "snakecharmer",
               "optional": true,
-              "defaultOn": true,
-              "label": "目標對象 中毒"
+              "defaultOn": false,
+              "label": "（命中惡魔後）新舞蛇人中毒"
             }
           ],
-          "notes": "僅命中惡魔時交換；新舞蛇人中毒"
+          "notes": "僅命中惡魔時互換角色／陣營（說書人手動換代幣）；新舞蛇人中毒"
         }
       ]
     },
@@ -5397,6 +5856,14 @@
           },
           "effects": [
             {
+              "type": "setRole",
+              "targetFrom": "actor",
+              "roleFrom": "r1",
+              "optional": true,
+              "defaultOn": true,
+              "label": "換成獲得能力的角色代幣"
+            },
+            {
               "type": "addReminder",
               "targetFrom": "actor",
               "reminderName": "是學徒",
@@ -5540,13 +6007,13 @@
           "inputs": [
             {
               "key": "target",
-              "type": "otherPlayer",
-              "label": "目標對象"
+              "type": "player",
+              "label": "被處決的爪牙（可空）"
             }
           ],
           "sentence": {
-            "action": "選擇",
-            "template": "{actor} → {action} → 選擇 {target} → {target} 醉酒"
+            "action": "",
+            "template": "{target}被處決 → {actor}觸發全員醉酒"
           },
           "effects": [
             {
@@ -5559,7 +6026,7 @@
               "label": "自身 所有人醉酒"
             }
           ],
-          "notes": "白天觸發；標記「所有人醉酒」"
+          "notes": "白天觸發；除吟遊詩人與旅行者外全員醉酒至明天黃昏"
         }
       ]
     },
@@ -5755,16 +6222,24 @@
           },
           "effects": [
             {
+              "id": "kill",
+              "type": "setDead",
+              "targetFrom": "target",
+              "value": true,
+              "optional": true,
+              "defaultOn": true,
+              "label": "目標死亡（須為善良）"
+            },
+            {
               "type": "addReminder",
               "targetFrom": "target",
               "reminderName": "死亡",
               "reminderRole": "moonchild",
-              "optional": true,
-              "defaultOn": true,
-              "label": "目標對象 死亡"
+              "bindTo": "kill",
+              "label": "目標掛死亡標記"
             }
           ],
-          "notes": "可選 effect 關閉時無 └；目標須為善良才死"
+          "notes": "目標善良才死；邪惡可關 effect"
         }
       ]
     },
@@ -5945,16 +6420,24 @@
           },
           "effects": [
             {
+              "id": "kill",
+              "type": "setDead",
+              "targetFrom": "target",
+              "value": true,
+              "optional": true,
+              "defaultOn": true,
+              "label": "目標死亡"
+            },
+            {
               "type": "addReminder",
               "targetFrom": "target",
               "reminderName": "死亡",
               "reminderRole": "gossip",
-              "optional": true,
-              "defaultOn": true,
-              "label": "目標對象 死亡"
+              "bindTo": "kill",
+              "label": "目標掛死亡標記"
             }
           ],
-          "notes": "夜裡由說書人選死者；白天公開聲明"
+          "notes": "聲明正確時當晚由說書人選死者；可關 effect"
         }
       ]
     },
@@ -6381,10 +6864,16 @@
             "nights": [],
             "days": []
           },
-          "inputs": [],
+          "inputs": [
+            {
+              "key": "p1",
+              "type": "player",
+              "label": "孫子（被惡魔殺害）"
+            }
+          ],
           "sentence": {
-            "action": "連坐",
-            "template": "{actor} → {action} → 孫子被惡魔殺死，自身死亡"
+            "action": "死亡",
+            "template": "{p1}被惡魔殺害 → {actor}死亡"
           },
           "effects": [
             {
@@ -6395,6 +6884,16 @@
               "optional": true,
               "defaultOn": true,
               "label": "自身死亡"
+            },
+            {
+              "type": "addReminder",
+              "targetFrom": "actor",
+              "reminderName": "死亡",
+              "reminderRole": "grandmother",
+              "bindTo": "kill",
+              "optional": true,
+              "defaultOn": true,
+              "label": "自身掛死亡標記"
             }
           ],
           "notes": "孫子被惡魔殺死 → 祖母死亡"
@@ -6931,7 +7430,7 @@
             "template": "{actor} → {action} → 兩條資訊"
           },
           "effects": [],
-          "notes": "每個白天可問；自動列入今日晝間能力"
+          "notes": "可選列入晝間能力"
         }
       ]
     },

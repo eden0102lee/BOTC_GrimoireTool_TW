@@ -155,6 +155,14 @@ const STRUCTURAL = {
     },
     effects: [
       rem("goon", "醉酒", "target", { label: "選中者 醉酒" }),
+      {
+        type: "setAlignment",
+        targetFrom: "actor",
+        alignmentFrom: "target",
+        optional: true,
+        defaultOn: true,
+        label: "自身 轉為選中者陣營",
+      },
     ],
     notes: "被動；選中者醉酒，莽夫轉為其陣營",
   },
@@ -186,7 +194,6 @@ const STRUCTURAL = {
       action: "獲得",
       template: "{actor} → {action} → [{r1}] 能力",
     },
-    effects: [rem("apprentice", "是學徒", "actor", { label: "自身 是學徒" })],
     notes: "善→鎮民能力／邪→爪牙能力；換代幣+標記",
   },
   nodashii: {
@@ -194,15 +201,7 @@ const STRUCTURAL = {
       action: "殺害",
       template: "{actor} → {action} → 選擇 {target} → {target} 死亡",
     },
-    effects: [
-      ...kill("nodashii", "target"),
-      rem("nodashii", "中毒", "actor", {
-        label: "（setup）鄰近鎮民中毒—說書人手動",
-        defaultOn: false,
-      }),
-    ],
-    notes:
-      "夜殺目標；setup 時對兩側最近鎮民掛中毒（座位／角色變動時需更新）",
+    notes: "夜殺目標；setup 時對兩側最近鎮民掛中毒",
     activation: null,
   },
   sweetheart: {
@@ -218,6 +217,15 @@ const STRUCTURAL = {
       template: "{actor} → {action} → {p1} → {r1}",
     },
     effects: [
+      {
+        id: "become",
+        type: "setRole",
+        targetFrom: "p1",
+        roleFrom: "r1",
+        optional: true,
+        defaultOn: true,
+        label: "目標變成該角色（角色不在場）",
+      },
       {
         id: "kill",
         type: "setDead",
@@ -237,7 +245,7 @@ const STRUCTURAL = {
       template: "{actor} → {action} → 選擇 {target}",
     },
     effects: [rem("witch", "詛咒", "target", { label: "目標對象 詛咒" })],
-    notes: "僅三人存活時失去能力；夜動只掛詛咒，死亡在隔日提名時",
+    notes: "僅三人存活時失去能力；夜動掛詛咒，提名時用咒殺卡",
   },
   cerenovus: {
     sentence: {
@@ -312,10 +320,19 @@ const STRUCTURAL = {
       action: "保護",
       template: "{actor} → {action} → {p1} & {p2}",
     },
+    notes: "兩人皆保護；其中一人醉酒",
   },
   courtier: {
     once: true,
-    notes: "輸入為角色；標記醉酒 1/2/3 遞減；次夜自動帶入戰報及醉酒標記",
+    inputs: [
+      { key: "r1", type: "role", label: "選擇角色" },
+      { key: "target", type: "player", label: "在場則醉酒的玩家（可空）" },
+    ],
+    sentence: {
+      action: "選擇",
+      template: "{actor} → {action} → [{r1}] → {target} 醉酒",
+    },
+    notes: "先選角色；在場才掛醉酒 3 並逐日遞減",
   },
   exorcist: {
     sentence: {
@@ -325,20 +342,28 @@ const STRUCTURAL = {
     notes: "不可與昨晚同目標；命中惡魔才有 └",
   },
   godfather: {
-    notes: "首夜資訊；殺人僅在外來者白日死後",
+    notes: "首夜資訊；殺人僅在外來者白日死後（optional 卡）",
   },
   moonchild: {
     sentence: {
       action: "選擇",
       template: "{actor} → {action} → 選擇 {target} → {target} 死亡",
     },
-    notes: "可選 effect 關閉時無 └；目標須為善良才死",
+    notes: "目標善良才死；邪惡可關 effect",
   },
   gossip: {
-    notes: "夜裡由說書人選死者；白天公開聲明",
+    notes: "聲明正確才夜殺；夜裡由說書人選死者",
   },
   minstrel: {
-    notes: "白天觸發；標記「所有人醉酒」",
+    activation: "optional",
+    inputs: [
+      { key: "target", type: "player", label: "被處決的爪牙（可空）" },
+    ],
+    sentence: {
+      action: "",
+      template: "{target}被處決 → {actor}觸發全員醉酒",
+    },
+    notes: "白天觸發；除吟遊詩人與旅行者外全員醉酒至明天黃昏",
   },
   grandmother: {
     notes: "孫子被惡魔殺死 → 祖母死亡",
@@ -348,14 +373,14 @@ const STRUCTURAL = {
       action: "殺害",
       template: "{actor} → {action} → 選擇 {target} → {target} 死亡",
     },
-    notes: "殺外來者可轉化（每局一次）；開局 +1 外來者",
+    notes: "一般夜殺；轉化用 convert 卡（每局一次）；開局 +1 外來者",
   },
   vigormortis: {
     sentence: {
       action: "殺害",
       template: "{actor} → {action} → 選擇 {target} → {target} 死亡",
     },
-    notes: "殺爪牙→保留能力＋鄰近一鎮民中毒；開局 −1 外來者",
+    notes: "殺爪牙才開「具有能力」與鄰近中毒；開局 −1 外來者",
   },
   vortox: {
     sentence: {
@@ -367,16 +392,16 @@ const STRUCTURAL = {
   snakecharmer: {
     sentence: {
       action: "選擇",
-      template: "{actor} → {action} → 選擇 {target} → {target} 中毒",
+      template: "{actor} → {action} → 選擇 {target}",
     },
-    notes: "僅命中惡魔時交換；新舞蛇人中毒",
+    notes: "僅命中惡魔時交換（說書人手動換代幣）；新舞蛇人中毒",
   },
   barber: {
-    notes: "標記「今晚剪頭髮」；不可選其他惡魔",
+    notes: "標記掛在理髮師；不可選其他惡魔；換角由說書人手動",
   },
   eviltwin: {
     when: { nights: ["first"] },
-    notes: "首夜互認；善側雙子處決→邪勝；雙方皆活時善不能勝",
+    notes: "首夜互認；雙方掛雙胞胎；善側雙子處決→邪勝；雙方皆活時善不能勝",
   },
   towncrier: {
     notes: "得知爪牙今日是否提名",
@@ -405,32 +430,60 @@ const STRUCTURAL = {
     notes: "死亡玩家中邪惡數量",
   },
   lunatic: {
-    notes: "瘋子假殺＋告知真惡魔；無真實死亡除非他因",
+    activation: "setup",
+    once: true,
+    when: { nights: [] },
+    inputs: [
+      { key: "p1", type: "player", label: "瘋子玩家", teams: ["outsider"] },
+      { key: "r1", type: "role", label: "惡魔角色", teams: ["demon"] },
+    ],
+    sentence: { action: "是", template: "{p1}是[瘋子]" },
+    effects: [
+      { type: "setRole", targetFrom: "p1", roleFrom: "r1" },
+      {
+        type: "addReminder",
+        targetFrom: "p1",
+        reminderName: "是瘋子",
+        reminderRole: "lunatic",
+        label: "掛 是瘋子 標記",
+      },
+    ],
+    notes:
+      "劇本含瘋子且（已指派瘋子字卡，或玩家已有「是瘋子」標記）時顯示；選惡魔角色並掛「是瘋子」",
   },
   po: {
-    notes: "沒有選擇任何玩家後隔晚可殺三；標記攻擊x3",
+    notes: "跳過後隔晚必須三殺；攻擊x3 掛在珀自身",
+  },
+  barista: {
+    sentence: {
+      action: "選擇",
+      template: "{actor} → {action} → {p1} → {res}",
+    },
+    notes: "說書人二選一；該玩家會得知是哪個效果",
   },
   pukka: {
     sentence: {
       action: "投毒",
       template: "{actor} → {action} → 選擇 {target} → {target} 中毒",
     },
+    notes: "新選中毒；上夜中毒者今晚死亡（首夜通常無 prev）",
   },
   shabaloth: {
     sentence: {
       action: "殺害",
       template: "{actor} → {action} → {p1} & {p2}",
     },
+    notes: "殺兩人；可能反芻上夜選過且當前死亡者之一",
   },
   zombuul: {
     sentence: {
       action: "殺害",
       template: "{actor} → {action} → 選擇 {target}",
     },
-    notes: "當日無人死亡才夜殺；第一次死亡不真正死（視為已死）",
+    notes: "僅當日無人死亡才可夜殺（optional）；第一次死亡不真正死（視為已死）",
   },
   sailor: {
-    notes: "自己或目標醉酒；水手不會死（被動）",
+    notes: "你或目標之一醉酒；水手不會死（被動）",
   },
   devilsadvocate: {
     notes: "不可與昨晚同目標",
@@ -716,6 +769,20 @@ const NEW_RULES = [
     sentence: { action: "", template: "{actor}互換座位：{note}" },
     effects: [],
     notes: "白天可換至多三對座位；不可離座密談",
+  },
+  {
+    id: "butcher",
+    name: "屠夫",
+    enabled: true,
+    activation: "optional",
+    when: { nights: [] },
+    inputs: [{ key: "target", type: "alivePlayer", label: "追加提名目標" }],
+    sentence: {
+      action: "追加提名",
+      template: "{actor} → {action} → {target}",
+    },
+    effects: [],
+    notes: "白天首次處決後可再提名一人",
   },
   // --- TB optional/trigger rules (was apply-tb-skill-cards-to-rules.js) ---
   {

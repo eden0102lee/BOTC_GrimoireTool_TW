@@ -774,6 +774,10 @@ import {
   setupTaskNote,
   parseSetupRoleCardKey,
   shouldShowMarkOnlyDisguiseSetup,
+  DISGUISE_SETUP_ROLE_IDS,
+  isEvilDisguiseSetup,
+  findDisguiseIdentityMarkerPlayerIndex,
+  isDisguiseSetupSeat,
   listRoleCards,
   isDayAbilityCard,
   cardAppearsInNightOptional,
@@ -996,7 +1000,7 @@ export default {
       const phaseId = this.currentPhase.id;
       const cards = [];
       const seen = new Set();
-      const disguiseSetupRoles = new Set(["drunk", "marionette"]);
+      const disguiseSetupRoles = DISGUISE_SETUP_ROLE_IDS;
 
       const pushCard = (playerIndex, setupRoleId, playerOverride = null) => {
         const player =
@@ -1072,6 +1076,14 @@ export default {
         );
         if (assignedIdx >= 0) {
           pushCard(assignedIdx, setupRoleId);
+        } else if (isEvilDisguiseSetup(setupRoleId)) {
+          const markedIdx = findDisguiseIdentityMarkerPlayerIndex(
+            this.players,
+            setupRoleId,
+          );
+          if (markedIdx >= 0 && !hasRecordedDisguiseSetup(setupRoleId)) {
+            pushCard(markedIdx, setupRoleId);
+          }
         } else if (
           shouldShowMarkOnlyDisguiseSetup(this.players, setupRoleId) &&
           !hasRecordedDisguiseSetup(setupRoleId)
@@ -1086,6 +1098,13 @@ export default {
         const parsed = parseSetupRoleCardKey(e.roleCardKey);
         if (!parsed || !disguiseSetupRoles.has(parsed.roleId)) return;
         if (!isDisguiseRoleInScript(parsed.roleId)) return;
+        if (
+          isEvilDisguiseSetup(parsed.roleId) &&
+          e.formSnapshot &&
+          e.formSnapshot.setupVariant === "markOnly"
+        ) {
+          return;
+        }
         let playerIndex = parsed.playerIndex;
         if (playerIndex < 0) {
           const p1 =
@@ -1097,7 +1116,14 @@ export default {
         if (playerIndex >= 0) pushCard(playerIndex, parsed.roleId);
       });
 
-      return cards;
+      return cards.filter((card) => {
+        if (!isEvilDisguiseSetup(card.setupRoleId)) return true;
+        return isDisguiseSetupSeat(
+          this.players,
+          card.setupRoleId,
+          card.playerIndex,
+        );
+      });
     },
     scriptRoles() {
       const list = [];
@@ -1842,7 +1868,12 @@ export default {
           ? this.roles.get(id)
           : null;
       if (fromStore) return { name: "", id: "", role: { ...fromStore } };
-      const fallbackName = id === "marionette" ? "提線木偶" : "酒鬼";
+      const fallbackName =
+        id === "marionette"
+          ? "提線木偶"
+          : id === "lunatic"
+            ? "瘋子"
+            : "酒鬼";
       return { name: "", id: "", role: { id, name: fallbackName } };
     },
     toggleLinkedMode(checked) {

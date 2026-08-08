@@ -559,12 +559,30 @@ export function parseSetupRoleCardKey(roleCardKey) {
   return { phaseId, playerIndex, roleId, setup: true };
 }
 
-export const DISGUISE_SETUP_ROLE_IDS = new Set(["drunk", "marionette"]);
+export const GOOD_DISGUISE_SETUP_ROLE_IDS = new Set(["drunk", "marionette"]);
+export const EVIL_DISGUISE_SETUP_ROLE_IDS = new Set(["lunatic"]);
+export const DISGUISE_SETUP_ROLE_IDS = new Set([
+  ...GOOD_DISGUISE_SETUP_ROLE_IDS,
+  ...EVIL_DISGUISE_SETUP_ROLE_IDS,
+]);
+
+export function isGoodDisguiseSetup(setupRoleId) {
+  return GOOD_DISGUISE_SETUP_ROLE_IDS.has(
+    String(setupRoleId || "").toLowerCase(),
+  );
+}
+
+export function isEvilDisguiseSetup(setupRoleId) {
+  return EVIL_DISGUISE_SETUP_ROLE_IDS.has(
+    String(setupRoleId || "").toLowerCase(),
+  );
+}
 
 export function disguiseIdentityReminderName(setupRoleId) {
   const id = String(setupRoleId || "").toLowerCase();
   if (id === "marionette") return "是提線木偶";
   if (id === "drunk") return "是酒鬼";
+  if (id === "lunatic") return "是瘋子";
   return "";
 }
 
@@ -579,16 +597,36 @@ export function hasDisguiseRoleAssigned(players, setupRoleId) {
 }
 
 export function hasDisguiseIdentityMarker(players, setupRoleId) {
+  return findDisguiseIdentityMarkerPlayerIndex(players, setupRoleId) >= 0;
+}
+
+export function playerHasDisguiseIdentityMarker(player, setupRoleId) {
   const name = disguiseIdentityReminderName(setupRoleId);
-  if (!name) return false;
-  return (players || []).some((p) =>
-    (p && p.reminders ? p.reminders : []).some(
-      (r) => r && r.name === name,
-    ),
+  if (!name || !player) return false;
+  return (player.reminders || []).some((r) => r && r.name === name);
+}
+
+export function findDisguiseIdentityMarkerPlayerIndex(players, setupRoleId) {
+  const id = String(setupRoleId || "").toLowerCase();
+  if (!DISGUISE_SETUP_ROLE_IDS.has(id)) return -1;
+  return (players || []).findIndex((p) =>
+    playerHasDisguiseIdentityMarker(p, id),
   );
 }
 
-/** disguise = 已指派身份字卡；markOnly = 僅掛身份標記於善良玩家 */
+export function isDisguiseSetupSeat(players, setupRoleId, playerIndex = -1) {
+  const id = String(setupRoleId || "").toLowerCase();
+  if (!DISGUISE_SETUP_ROLE_IDS.has(id) || playerIndex < 0) return false;
+  const p = players[playerIndex];
+  if (!p) return false;
+  if (p.role && String(p.role.id || "").toLowerCase() === id) return true;
+  if (isEvilDisguiseSetup(id) && playerHasDisguiseIdentityMarker(p, id)) {
+    return true;
+  }
+  return false;
+}
+
+/** disguise = 已指派身份字卡，或（瘋子）已有「是瘋子」標記；markOnly = 僅掛身份標記（酒鬼／提線木偶，不含瘋子） */
 export function resolveDisguiseSetupVariant(
   players,
   setupRoleId,
@@ -596,20 +634,17 @@ export function resolveDisguiseSetupVariant(
 ) {
   const id = String(setupRoleId || "").toLowerCase();
   if (!DISGUISE_SETUP_ROLE_IDS.has(id)) return null;
-  if (
-    playerIndex >= 0 &&
-    players[playerIndex] &&
-    players[playerIndex].role &&
-    String(players[playerIndex].role.id || "").toLowerCase() === id
-  ) {
+  if (isDisguiseSetupSeat(players, setupRoleId, playerIndex)) {
     return "disguise";
   }
+  if (isEvilDisguiseSetup(id)) return null;
   return "markOnly";
 }
 
 export function shouldShowMarkOnlyDisguiseSetup(players, setupRoleId) {
   const id = String(setupRoleId || "").toLowerCase();
   if (!DISGUISE_SETUP_ROLE_IDS.has(id)) return false;
+  if (isEvilDisguiseSetup(id)) return false;
   if (hasDisguiseRoleAssigned(players, id)) return false;
   if (hasDisguiseIdentityMarker(players, id)) return false;
   return true;
@@ -621,6 +656,7 @@ function inferDisguiseSetupVariantFromForm(rule, formData) {
   if (!DISGUISE_SETUP_ROLE_IDS.has(id)) return null;
   const fd = formData || {};
   if (fd.r1 != null && String(fd.r1).trim() !== "") return "disguise";
+  if (isEvilDisguiseSetup(id)) return null;
   if (fd.p1 != null && String(fd.p1).trim() !== "") return "markOnly";
   return null;
 }
@@ -713,6 +749,12 @@ function resolveEffectTargetIndex(targetFrom, formData, players, actorIndex = -1
   return resolvePlayerIndex(players, label);
 }
 
+function isDisguiseIdentityReminderEffect(spec) {
+  if (!spec || spec.type !== "addReminder") return false;
+  const name = String(spec.reminderName || "").trim();
+  return name === "是酒鬼" || name === "是提線木偶" || name === "是瘋子";
+}
+
 export function effectsFromRule(
   rule,
   formData,
@@ -730,7 +772,13 @@ export function effectsFromRule(
     inferDisguiseSetupVariantFromForm(rule, formData);
 
   rule.effects.forEach((spec, idx) => {
-    const enabled = resolveEffectEnabled(spec, idx, rule, effectToggles);
+    let enabled = resolveEffectEnabled(spec, idx, rule, effectToggles);
+    if (
+      setupVariant === "disguise" &&
+      isDisguiseIdentityReminderEffect(spec)
+    ) {
+      enabled = true;
+    }
     if (!enabled) return;
 
     if (setupVariant === "markOnly" && spec.type !== "addReminder") return;
