@@ -1,0 +1,22 @@
+// Responsive clock-face positioning for Intro.vue role sigils.
+// Kept global so the geometry stays independent from the component's visual skin.
+.intro .ritual .role-sigil {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.intro .ritual .p1 { left: 50%; top: 0%; }
+.intro .ritual .p2 { left: 85.35%; top: 14.65%; }
+.intro .ritual .p3 { left: 100%; top: 50%; }
+.intro .ritual .p4 { left: 85.35%; top: 85.35%; }
+.intro .ritual .p5 { left: 50%; top: 100%; }
+.intro .ritual .p6 { left: 14.65%; top: 85.35%; }
+.intro .ritual .p7 { left: 0%; top: 50%; }
+.intro .ritual .p8 { left: 14.65%; top: 14.65%; }
+
+@media screen and (max-width: 767.98px) {
+  .intro .ritual .role-sigil {
+    transform: translate(-50%, -50%);
+  }
+}
