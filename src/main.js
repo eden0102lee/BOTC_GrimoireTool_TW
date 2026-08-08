@@ -4,6 +4,7 @@ import "./art-direction.scss";
 import "./intro-layout.scss";
 import "./game-ui.scss";
 import "./play-ui.scss";
+import "./layout-polish.scss";
 import store from "./store";
 import i18n from "./i18n";
 import { library } from "@fortawesome/fontawesome-svg-core";
