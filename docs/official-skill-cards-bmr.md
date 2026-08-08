@@ -64,9 +64,9 @@
 - 對象: other
 - 觸發: 兩側存活鄰居皆善良 → 他們不會死
 - 動詞: (無)
-- 輸入: (無)（被動；標記掛在兩側鄰居）
-- effects: （記錄用）不會死／鄰居保護
-- template: `{actor}茶藝師保護鄰居`
+- 輸入: player:p1(鄰居 1), player:p2(鄰居 2)
+- effects: 鄰居 1 不會死、鄰居 2 不會死
+- template: `{actor}兩側存活鄰居皆善良`
 - 例句:
 
 ```
@@ -189,7 +189,7 @@
 - 動詞: (無)
 - 輸入: player:target(倖免的玩家)
 - effects: (無)
-- template: `{target}被處決 → {actor}：倖免`
+- template: `{target}被處決`
 - 例句:
 
 ```
@@ -369,7 +369,7 @@
 - 動詞: (無)
 - 輸入: (無)
 - effects: 自身 無能力
-- template: `{actor}第一次死亡 → 倖免`
+- template: `{actor}第一次死亡`
 - 例句:
 
 ```
@@ -691,7 +691,7 @@
 - 動詞: 選擇
 - 輸入: alivePlayer:target(目標對象)
 - effects: 目標死亡、目標掛死亡標記
-- template: `{actor} → {action} → 選擇 {target} → {target} 死亡`
+- template: `{actor}死亡時選擇 {target}`
 - 例句:
 
 ```
@@ -764,7 +764,7 @@
 - 動詞: (無)
 - 輸入: player:target(翌日被處決的玩家（可空）), select:align(落敗陣營)
 - effects: (無)
-- template: `主謀生效；{target}被處決 → [{align}]陣營落敗`
+- template: （雙卡）`惡魔被處決，觸發主謀能力：遊戲再進行一天`／`{target}被處決，因為主謀能力導致[{align}]陣營落敗`
 - 例句:
 
 ```

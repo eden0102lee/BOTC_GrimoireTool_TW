@@ -146,15 +146,22 @@ const STRUCTURAL = {
   tealady: {
     activation: "optional",
     when: { nights: [] },
-    inputs: [],
-    sentence: { action: "", template: "{actor}茶藝師保護鄰居" },
+    inputs: [
+      { key: "p1", type: "player", label: "鄰居 1" },
+      { key: "p2", type: "player", label: "鄰居 2" },
+    ],
+    sentence: { action: "", template: "{actor}兩側存活鄰居皆善良" },
     effects: [
-      rem("tealady", "不會死", "actor", {
-        label: "（記錄用）不會死／鄰居保護",
-        defaultOn: false,
+      rem("tealady", "不會死", "p1", {
+        optional: false,
+        label: "鄰居 1 不會死",
+      }),
+      rem("tealady", "不會死", "p2", {
+        optional: false,
+        label: "鄰居 2 不會死",
       }),
     ],
-    notes: "被動；兩側存活鄰居皆善良時他們不會死；標記由說書人手動",
+    notes: "被動；兩側存活鄰居皆善良時他們不會死",
   },
   goon: {
     activation: "optional",
@@ -369,7 +376,7 @@ const STRUCTURAL = {
   moonchild: {
     sentence: {
       action: "選擇",
-      template: "{actor} → {action} → 選擇 {target} → {target} 死亡",
+      template: "{actor}死亡時選擇 {target}",
     },
     notes: "目標善良才死；邪惡可關 effect",
   },
@@ -678,9 +685,9 @@ const NEW_RULES = [
     once: true,
     when: { nights: [] },
     inputs: [],
-    sentence: { action: "", template: "{actor}第一次死亡 → 倖免" },
+    sentence: { action: "", template: "{actor}第一次死亡" },
     effects: [
-      rem("fool", "無能力", "actor", { label: "自身 無能力／失去能力" }),
+      rem("fool", "無能力", "actor", { label: "自身 無能力" }),
     ],
     notes: "第一次死亡時不會死；之後掛無能力",
   },
@@ -693,7 +700,7 @@ const NEW_RULES = [
     inputs: [{ key: "target", type: "player", label: "倖免的玩家" }],
     sentence: {
       action: "",
-      template: "{target}被處決 → {actor}：倖免",
+      template: "{target}被處決",
     },
     effects: [],
     notes: "被動／說書人裁定；善良玩家被處決時可能不死",
@@ -702,23 +709,7 @@ const NEW_RULES = [
     id: "mastermind",
     name: "主謀",
     enabled: true,
-    activation: "optional",
-    when: { nights: [] },
-    inputs: [
-      { key: "target", type: "player", label: "翌日被處決的玩家（可空）" },
-      {
-        key: "align",
-        type: "select",
-        label: "落敗陣營",
-        options: ["善良", "邪惡"],
-      },
-    ],
-    sentence: {
-      action: "",
-      template: "主謀生效；{target}被處決 → [{align}]陣營落敗",
-    },
-    effects: [],
-    notes: "惡魔被處決後遊戲多一日；再有人處決則其陣營敗",
+    notes: "惡魔被處決後遊戲多一日；再有人處決則其陣營敗（cards[] 雙卡：triggerExtend / triggerDefeat）",
   },
   {
     id: "artist",

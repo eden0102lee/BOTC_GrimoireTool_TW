@@ -352,7 +352,15 @@ export function formatEffectResultLines(effects, players) {
           (e.reminder && e.reminder.name) || e.reminderName || "";
         if (!name) break;
         if (name === "死亡" && deadSeats.has(e.playerIndex)) break;
-        text = `${label}${name}`;
+        const remRole =
+          e.reminder && e.reminder.role ? String(e.reminder.role) : "";
+        if (name === "不會死" && remRole === "tealady") {
+          text = `${label}不會死亡`;
+        } else if (name === "無能力" && remRole === "fool") {
+          text = `倖免，${label}失去能力`;
+        } else {
+          text = `${label}${name}`;
+        }
         break;
       }
       case "setAlignment": {
@@ -447,6 +455,40 @@ export function buildNaturalRoleMessage(rule, { players, actorIndex, formData, e
   ) {
     const t = labelForKey(players, fd, "target") || fd.target;
     main = `${actor} 被 ${t} 選擇`;
+  } else if (
+    roleId === "tealady" ||
+    template.includes("兩側存活鄰居皆善良")
+  ) {
+    main = `${actor}兩側存活鄰居皆善良`;
+  } else if (
+    roleId === "pacifist" ||
+    (template === "{target}被處決" && fd.target)
+  ) {
+    const t = labelForKey(players, fd, "target") || fd.target;
+    main = `${t}被處決`;
+  } else if (
+    roleId === "moonchild" ||
+    template.includes("死亡時選擇")
+  ) {
+    const t = labelForKey(players, fd, "target") || fd.target;
+    main = `${actor}死亡時選擇 ${t}`;
+  } else if (
+    roleId === "fool" ||
+    template.includes("第一次死亡")
+  ) {
+    main = `${actor}第一次死亡`;
+  } else if (
+    roleId === "mastermind" &&
+    template.includes("惡魔被處決，觸發主謀")
+  ) {
+    main = "惡魔被處決，觸發主謀能力：遊戲再進行一天";
+  } else if (
+    roleId === "mastermind" &&
+    template.includes("主謀能力導致")
+  ) {
+    const t = labelForKey(players, fd, "target") || fd.target;
+    const align = fd.align || "?";
+    main = `${t}被處決，因為主謀能力導致[${align}]陣營落敗`;
   } else if (action === "成為" || template.includes("成為[")) {
     if (fd.r1) main = `${actor}成為[${fd.r1}]`;
     else main = `${actor}成為惡魔`;
@@ -599,6 +641,12 @@ export function buildNaturalRoleMessage(rule, { players, actorIndex, formData, e
     for (let i = 0; i < resultLines.length; i++) {
       resultLines[i] = resultLines[i].replace(/^(└ .+?)死亡$/, "$1被處決死亡");
     }
+  }
+
+  if (roleId === "pacifist" && fd.target) {
+    const t = labelForKey(players, fd, "target") || fd.target;
+    const line = `└ ${actor}：${t}倖免`;
+    if (!resultLines.includes(line)) resultLines.push(line);
   }
 
   if (!resultLines.length) return main;

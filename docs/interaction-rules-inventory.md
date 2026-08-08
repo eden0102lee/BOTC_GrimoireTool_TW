@@ -49,7 +49,7 @@
 - **獵手** (`slayer`) — effects: 目標死亡、目標掛死亡標記
 - **舞蛇人** (`snakecharmer`) — effects: 目標對象 中毒
 - **事務官** (`steward`) — effects: 目標對象 已得知
-- **茶藝師** (`tealady`) — effects: 自身 不會死
+- **茶藝師** (`tealady`) — effects: 鄰居 1 不會死、鄰居 2 不會死
 - **城鎮公告員** (`towncrier`) — effects: 自身 爪牙提名、自身 爪牙未提名
 - **村夫** (`villageidiot`) — effects: 目標玩家 醉酒
 - **貞潔者** (`virgin`) — effects: 提名者被處決死亡、提名者掛死亡標記

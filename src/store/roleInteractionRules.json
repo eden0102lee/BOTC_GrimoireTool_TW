@@ -191,23 +191,41 @@
             "nights": [],
             "days": []
           },
-          "inputs": [],
+          "inputs": [
+            {
+              "key": "p1",
+              "type": "player",
+              "label": "鄰居 1"
+            },
+            {
+              "key": "p2",
+              "type": "player",
+              "label": "鄰居 2"
+            }
+          ],
           "sentence": {
             "action": "",
-            "template": "{actor}茶藝師保護鄰居"
+            "template": "{actor}兩側存活鄰居皆善良"
           },
           "effects": [
             {
               "type": "addReminder",
-              "targetFrom": "actor",
+              "targetFrom": "p1",
               "reminderName": "不會死",
               "reminderRole": "tealady",
-              "optional": true,
-              "defaultOn": false,
-              "label": "（記錄用）不會死／鄰居保護"
+              "optional": false,
+              "label": "鄰居 1 不會死"
+            },
+            {
+              "type": "addReminder",
+              "targetFrom": "p2",
+              "reminderName": "不會死",
+              "reminderRole": "tealady",
+              "optional": false,
+              "label": "鄰居 2 不會死"
             }
           ],
-          "notes": "被動；兩側存活鄰居皆善良時他們不會死；標記由說書人手動掛在鄰居"
+          "notes": "被動；兩側存活鄰居皆善良時他們不會死"
         }
       ]
     },
@@ -6200,7 +6218,7 @@
           ],
           "sentence": {
             "action": "選擇",
-            "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+            "template": "{actor}死亡時選擇 {target}"
           },
           "effects": [
             {
@@ -6398,7 +6416,7 @@
           ],
           "sentence": {
             "action": "殺害",
-            "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+            "template": "{actor} → {action} → 選擇 {target}"
           },
           "effects": [
             {
@@ -7256,7 +7274,7 @@
           "inputs": [],
           "sentence": {
             "action": "",
-            "template": "{actor}第一次死亡 → 倖免"
+            "template": "{actor}第一次死亡"
           },
           "effects": [
             {
@@ -7266,7 +7284,7 @@
               "reminderRole": "fool",
               "optional": true,
               "defaultOn": true,
-              "label": "自身 無能力／失去能力"
+              "label": "自身 無能力"
             }
           ],
           "notes": "第一次死亡時不會死；之後掛無能力"
@@ -7297,7 +7315,7 @@
           ],
           "sentence": {
             "action": "",
-            "template": "{target}被處決 → {actor}：倖免"
+            "template": "{target}被處決"
           },
           "effects": [],
           "notes": "被動／說書人裁定；善良玩家被處決時可能不死"
@@ -7310,8 +7328,26 @@
       "enabled": true,
       "cards": [
         {
-          "key": "trigger",
-          "label": "trigger",
+          "key": "trigger-extend",
+          "label": "triggerExtend",
+          "enabled": true,
+          "activation": "optional",
+          "once": false,
+          "when": {
+            "nights": [],
+            "days": []
+          },
+          "inputs": [],
+          "sentence": {
+            "action": "",
+            "template": "惡魔被處決，觸發主謀能力：遊戲再進行一天"
+          },
+          "effects": [],
+          "notes": "惡魔被處決後遊戲多一日"
+        },
+        {
+          "key": "trigger-defeat",
+          "label": "triggerDefeat",
           "enabled": true,
           "activation": "optional",
           "once": false,
@@ -7323,7 +7359,7 @@
             {
               "key": "target",
               "type": "player",
-              "label": "翌日被處決的玩家（可空）"
+              "label": "被處決的玩家"
             },
             {
               "key": "align",
@@ -7337,10 +7373,10 @@
           ],
           "sentence": {
             "action": "",
-            "template": "主謀生效；{target}被處決 → [{align}]陣營落敗"
+            "template": "{target}被處決，因為主謀能力導致[{align}]陣營落敗"
           },
           "effects": [],
-          "notes": "惡魔被處決後遊戲多一日；再有人處決則其陣營敗"
+          "notes": "主謀延長後的白天有人被處決 → 其陣營落敗"
         }
       ]
     },
