@@ -6,6 +6,7 @@ import "./game-ui.scss";
 import "./play-ui.scss";
 import "./layout-polish.scss";
 import "./ux-polish.scss";
+import "./stacking-system.scss";
 import store from "./store";
 import i18n from "./i18n";
 import { library } from "@fortawesome/fontawesome-svg-core";
