@@ -1063,6 +1063,9 @@ const actions = {
           actorIndex,
           formData: formSnapshot.formData || {},
           effects: resolvedEffects,
+          roleOptions: rootState.roles
+            ? Array.from(rootState.roles.values())
+            : [],
         });
       }
     }

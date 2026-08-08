@@ -949,6 +949,16 @@ export function effectsFromRule(
         });
         break;
       }
+      case "logLine": {
+        const text = String(spec.text || "").trim();
+        if (!text) break;
+        effects.push({
+          type: "logLine",
+          playerIndex,
+          text,
+        });
+        break;
+      }
       default:
         break;
     }
@@ -977,9 +987,11 @@ export function describeEffects(effects, players) {
       case "setDisguiseRole":
         return `${label} 表面角色改為「${(e.role && e.role.name) || "?"}」`;
       case "setAlignment":
-        return `${label} 陣營轉變為 [${alignmentLabel(e.alignment) || e.alignment || "?"}]`;
+        return `${label} 轉變為[${alignmentLabel(e.alignment) || e.alignment || "?"}]`;
       case "removeReminder":
         return `${label} 移除「${(e.reminder && e.reminder.name) || "提醒"}」`;
+      case "logLine":
+        return `${label} ${e.text || ""}`.trim();
       default:
         return `${e.type} → ${label}`;
     }

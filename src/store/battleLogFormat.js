@@ -4,6 +4,7 @@
  */
 
 import gameSetupTable from "../game.json";
+import { alignmentLabel } from "./teamTerms";
 
 export function baseOutsiderCountForPlayers(playerCount) {
   const n = Number(playerCount);
@@ -23,6 +24,31 @@ export function baronOutsiderBonus(players) {
       p.role &&
       String(p.role.id || "").toLowerCase() === "baron",
   ).length * 2;
+}
+
+/** Unique outsider role names currently on the grimoire (role / disguiseRole). */
+export function outsiderRolesInPlayLabel(roles, players) {
+  const roleById = new Map();
+  (roles || []).forEach((r) => {
+    if (r && r.id) roleById.set(String(r.id).toLowerCase(), r);
+  });
+  const ids = new Set();
+  (players || []).forEach((p) => {
+    if (p && p.role && p.role.id) ids.add(String(p.role.id).toLowerCase());
+    if (p && p.disguiseRole && p.disguiseRole.id) {
+      ids.add(String(p.disguiseRole.id).toLowerCase());
+    }
+  });
+  const names = [];
+  ids.forEach((id) => {
+    const r = roleById.get(id);
+    if (r && String(r.team || "").toLowerCase() === "outsider") {
+      names.push(r.name || r.id);
+    }
+  });
+  names.sort((a, b) => String(a).localeCompare(String(b), "zh"));
+  if (!names.length) return "（無）";
+  return names.map((n) => `[${n}]`).join(" ");
 }
 
 export function formatSeatNumber(seatIndex) {
@@ -329,11 +355,23 @@ export function formatEffectResultLines(effects, players) {
         text = `${label}${name}`;
         break;
       }
+      case "setAlignment": {
+        const align =
+          alignmentLabel(e.alignment) || e.alignment || "?";
+        text = `${label} 轉變為[${align}]`;
+        break;
+      }
       case "removeReminder": {
         const name =
           (e.reminder && e.reminder.name) || e.reminderName || "";
         if (!name) break;
         text = `${label}移除${name}`;
+        break;
+      }
+      case "logLine": {
+        const suffix = String(e.text || "").trim();
+        if (!suffix) break;
+        text = `${label}${suffix}`;
         break;
       }
       default:
@@ -367,7 +405,7 @@ function fixedResultLines(rule) {
  * Build concise role-action message: main line + optional └ result lines.
  * Style: short verb + targets; no「對／導致／使用能力」padding.
  */
-export function buildNaturalRoleMessage(rule, { players, actorIndex, formData, effects }) {
+export function buildNaturalRoleMessage(rule, { players, actorIndex, formData, effects, roleOptions }) {
   if (!rule) return "";
   const actor =
     actorIndex >= 0 && players[actorIndex]
@@ -403,6 +441,12 @@ export function buildNaturalRoleMessage(rule, { players, actorIndex, formData, e
   ) {
     const nom = labelForKey(players, fd, "nominator");
     main = `${nom}提名 ${actor}`;
+  } else if (
+    roleId === "goon" ||
+    (template.includes("被 {target} 選擇") && fd.target)
+  ) {
+    const t = labelForKey(players, fd, "target") || fd.target;
+    main = `${actor} 被 ${t} 選擇`;
   } else if (action === "成為" || template.includes("成為[")) {
     if (fd.r1) main = `${actor}成為[${fd.r1}]`;
     else main = `${actor}成為惡魔`;
@@ -436,6 +480,15 @@ export function buildNaturalRoleMessage(rule, { players, actorIndex, formData, e
           ? "提線木偶"
           : "酒鬼";
     main = `${subject}是[${roleName}]`;
+  } else if (
+    roleId === "godfather" &&
+    (String(rule.cardLabel || rule.label || "").toLowerCase() === "firstnight" ||
+      template.includes("外來者："))
+  ) {
+    const manual =
+      fd.note && String(fd.note).trim() ? String(fd.note).trim() : "";
+    const list = manual || outsiderRolesInPlayLabel(roleOptions, players);
+    main = `${actor}得知 → 外來者：${list}`;
   } else if (
     roleId === "baron" ||
     template.includes("外來者人數")

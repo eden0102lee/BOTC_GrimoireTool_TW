@@ -57,7 +57,7 @@
 - **理髮師** (`barber`) — effects: 玩家 1 今晚剪頭髮
 - **管家** (`butler`) — effects: 目標對象 主人
 - **酒鬼** (`drunk`) — effects: setRole、掛 是酒鬼 標記
-- **莽夫** (`goon`) — effects: 自身 醉酒
+- **莽夫** (`goon`) — effects: 玩家 醉酒、莽夫 轉變為[陣營]（可選）
 - **帽匠** (`hatter`) — effects: 目標對象 今晚開茶會
 - **隱士** (`hermit`) — effects: 能力 1、能力 2、能力 3
 - **瘋子** (`lunatic`) — setup: setRole、掛 是瘋子 標記；everyNight: 目標對象 攻擊1／2／3
@@ -71,7 +71,7 @@
 - **洗腦師** (`cerenovus`) — effects: 目標玩家 瘋狂
 - **魔鬼代言人** (`devilsadvocate`) — effects: 目標對象 處決保護
 - **恐懼之靈** (`fearmonger`) — effects: 目標對象 恐懼
-- **教父** (`godfather`) — effects: 外來者死亡（今日）、目標死亡標記
+- **教父** (`godfather`) — effects: (無)；首夜自動列出在場外來者
 - **鷹身女妖** (`harpy`) — effects: 玩家 1 瘋狂、玩家 2 目標
 - **提線木偶** (`marionette`) — effects: setRole、掛 是提線木偶 標記
 - **靈言師** (`mezepheles`) — effects: 自身 轉為邪惡

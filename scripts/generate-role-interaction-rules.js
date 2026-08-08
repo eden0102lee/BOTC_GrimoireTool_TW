@@ -535,8 +535,6 @@ function buildReminderMappings(id, reminders, inputs) {
   }
 
   if (id === "godfather") {
-    push("外來者死亡", "actor", { optional: true, defaultOn: false, label: "外來者死亡（今日）" });
-    push("死亡", "target", { optional: true, defaultOn: true, label: "目標死亡標記" });
     return mappings;
   }
 

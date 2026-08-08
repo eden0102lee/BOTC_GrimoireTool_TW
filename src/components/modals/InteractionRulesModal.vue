@@ -795,6 +795,7 @@ export default {
         actorIndex: this.previewActorIndex,
         formData: this.previewForm,
         effects,
+        roleOptions: this.scriptRoles,
       });
     },
     previewEffectLines() {

@@ -511,6 +511,7 @@ export default {
         actorIndex: this.playerIndex,
         formData: this.formData,
         effects: this.liveEffects,
+        roleOptions: this.roleOptions,
       });
     },
     recordedSummary() {
@@ -743,6 +744,7 @@ export default {
             actorIndex: this.playerIndex,
             formData: this.formData,
             effects,
+            roleOptions: this.roleOptions,
           })
         : null;
 

@@ -1794,19 +1794,13 @@
             ],
             "days": []
           },
-          "inputs": [
-            {
-              "key": "note",
-              "type": "text",
-              "label": "場上外來者角色"
-            }
-          ],
+          "inputs": [],
           "sentence": {
             "action": "得知",
-            "template": "{actor} → {action} → 外來者：{note}"
+            "template": "{actor} → {action} → 外來者：{auto}"
           },
           "effects": [],
-          "notes": "首夜得知場上有哪些外來者角色"
+          "notes": "首夜自動帶入在場外來者角色"
         },
         {
           "key": "other-night",
@@ -1829,37 +1823,10 @@
           ],
           "sentence": {
             "action": "殺害",
-            "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+            "template": "{actor} → {action} → 選擇 {target}"
           },
-          "effects": [
-            {
-              "type": "addReminder",
-              "targetFrom": "actor",
-              "reminderName": "外來者死亡",
-              "reminderRole": "godfather",
-              "optional": true,
-              "defaultOn": true,
-              "label": "外來者死亡（今日）"
-            },
-            {
-              "id": "kill",
-              "type": "setDead",
-              "targetFrom": "target",
-              "value": true,
-              "optional": true,
-              "defaultOn": true,
-              "label": "目標死亡"
-            },
-            {
-              "type": "addReminder",
-              "targetFrom": "target",
-              "reminderName": "死亡",
-              "reminderRole": "godfather",
-              "bindTo": "kill",
-              "label": "目標掛死亡標記"
-            }
-          ],
-          "notes": "僅當日有外來者白日死亡時可殺；可選紀錄"
+          "effects": [],
+          "notes": "僅當日有外來者白日死亡時可殺；僅記錄殺害動作"
         }
       ]
     },
@@ -3084,12 +3051,12 @@
             {
               "key": "target",
               "type": "player",
-              "label": "首位選中莽夫的玩家"
+              "label": "玩家"
             }
           ],
           "sentence": {
-            "action": "選擇",
-            "template": "{target} 選擇 {actor}（莽夫）"
+            "action": "被選擇",
+            "template": "{actor} 被 {target} 選擇"
           },
           "effects": [
             {
@@ -3097,9 +3064,7 @@
               "targetFrom": "target",
               "reminderName": "醉酒",
               "reminderRole": "goon",
-              "optional": true,
-              "defaultOn": true,
-              "label": "選中者 醉酒"
+              "label": "玩家 醉酒"
             },
             {
               "type": "setAlignment",
@@ -3107,7 +3072,7 @@
               "alignmentFrom": "target",
               "optional": true,
               "defaultOn": true,
-              "label": "自身 轉為選中者陣營"
+              "label": "莽夫 轉變為[陣營]"
             }
           ],
           "notes": "被動；選中者醉酒，莽夫轉為其陣營（陣營≠角色類型）"
@@ -3981,8 +3946,25 @@
             "action": "選擇",
             "template": "{actor} → {action} → 選擇 {target}"
           },
-          "effects": [],
-          "notes": "不可與昨晚同目標；命中惡魔才有 └"
+          "effects": [
+            {
+              "type": "addReminder",
+              "targetFrom": "target",
+              "reminderName": "已選擇",
+              "reminderRole": "exorcist",
+              "optional": false,
+              "label": "目標對象 已選擇"
+            },
+            {
+              "type": "logLine",
+              "targetFrom": "target",
+              "text": "得知驅魔人",
+              "optional": true,
+              "defaultOn": false,
+              "label": "惡魔玩家 得知驅魔人"
+            }
+          ],
+          "notes": "不可與昨晚同目標；命中惡魔才勾選得知"
         }
       ]
     },

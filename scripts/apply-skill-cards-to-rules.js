@@ -62,6 +62,17 @@ function rem(roleId, name, targetFrom, opts = {}) {
   };
 }
 
+function logLine(targetFrom, text, opts = {}) {
+  return {
+    type: "logLine",
+    targetFrom,
+    text,
+    optional: opts.optional !== false,
+    defaultOn: opts.defaultOn !== false,
+    label: opts.label || text,
+  };
+}
+
 function kill(roleId, targetFrom = "target", opts = {}) {
   const id = opts.id || "kill";
   return [
@@ -148,20 +159,20 @@ const STRUCTURAL = {
   goon: {
     activation: "optional",
     when: { nights: [] },
-    inputs: [{ key: "target", type: "player", label: "首位選中莽夫的玩家" }],
+    inputs: [{ key: "target", type: "player", label: "玩家" }],
     sentence: {
-      action: "選擇",
-      template: "{target} 選擇 {actor}（莽夫）",
+      action: "被選擇",
+      template: "{actor} 被 {target} 選擇",
     },
     effects: [
-      rem("goon", "醉酒", "target", { label: "選中者 醉酒" }),
+      rem("goon", "醉酒", "target", { optional: false, label: "玩家 醉酒" }),
       {
         type: "setAlignment",
         targetFrom: "actor",
         alignmentFrom: "target",
         optional: true,
         defaultOn: true,
-        label: "自身 轉為選中者陣營",
+        label: "莽夫 轉變為[陣營]",
       },
     ],
     notes: "被動；選中者醉酒，莽夫轉為其陣營",
@@ -339,10 +350,21 @@ const STRUCTURAL = {
       action: "選擇",
       template: "{actor} → {action} → 選擇 {target}",
     },
-    notes: "不可與昨晚同目標；命中惡魔才有 └",
+    effects: [
+      rem("exorcist", "已選擇", "target", {
+        optional: false,
+        label: "目標對象 已選擇",
+      }),
+      logLine("target", "得知驅魔人", {
+        optional: true,
+        defaultOn: false,
+        label: "惡魔玩家 得知驅魔人",
+      }),
+    ],
+    notes: "不可與昨晚同目標；命中惡魔才勾選得知",
   },
   godfather: {
-    notes: "首夜資訊；殺人僅在外來者白日死後（optional 卡）",
+    notes: "首夜自動帶入在場外來者；殺人僅在外來者白日死後（optional 卡），僅記錄殺害動作",
   },
   moonchild: {
     sentence: {
