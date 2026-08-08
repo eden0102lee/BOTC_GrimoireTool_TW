@@ -48,7 +48,7 @@
 
 ### Version 2.15.1
 - fix Mephit not showing up on scripts, futureproof Mephit name change
-- add Boomdandy to list of available characters (thanks @eddgabriel)
+- add Boomdandy to list of available characters
 
 ---
 
@@ -71,7 +71,7 @@
 - added record vote history toggle to session menu, and clear vote history button
 - add support for custom Fabled characters
 - show Jinxed interactions on character reference list
-- added 'marked for execution' indicator
+- add 'marked for execution' indicator
 
 ---
 
@@ -100,6 +100,7 @@
 
 ### Version 2.9.1
 - fix gamestate JSON not showing (custom) roles and failing to load states with custom scripts properly
+- fix gamestate not stripping out special characters from role.id on load
 - made character assignment modal a bit prettier
 - got rid of the extra pixels on the  Soldier icon
 - fixed lengthy live session channel names not being correctly cut off
@@ -115,24 +116,20 @@
 
 ---
 
+### Version 2.8.0
+- added hands-off live session support for homebrew / custom characters again!
+- added custom image opt-in that will prevent any (potentially malicious / harmful) images from loading until a player manually allows them to
+
+---
+
 ## Version 2.7.0
 - added support for assigning duplicate characters to more than one player (like Legion)
 - further live session bandwidth optimizations
-- sessions can be joined by pasting the whole link into the popup (thanks @davotronic5000)
-- Characters selected in the bluff window now also show up in the list of reminder tokens
-- Homebrew scripts / custom characters no longer automatically load in live sessions, for 2 reasons:
-  - the players in a live session have no control over the script that the storyteller loads,
-    so a malicious storyteller could load a custom script that contains harmful / inappropriate images
-  - some homebrew scripts are quite big JSON files and synching these through the live session
-    server can cause traffic / performance issue easily
-  - this change may be reverted in the future when I figure out a way to sync custom characters safely and without
-    such a big impact on performance constraints
-- Buggy (spamming) live session connections will now be terminated on the server side and display an error message
-- Balloonist reminder tokens adjusted
-- Live session URLs shortened
-- Deus Ex Fiasco and Stormcatcher Fabled added / updated
-- Custom Reminder text looks better when there is a lot of text
-- added a README for the backend server
+- sessions can now be joined by pasting the whole link into the popup (thanks @davotronic5000)
+- fabled night order bug fixed
+- added Legion to list of available characters (thanks @eddgabriel)
+- added support for mp4/webm video backgrounds
+- added tooltips to night order popup
 
 ---
 
@@ -150,9 +147,8 @@
 
 ## Version 2.4.0
 - added spoiler role (Pixie!)
-- automatically switch to grimoire view when joining a session through a link
-- fixed a bug with shifting roles when the storyteller deletes a player
-- fixed a bug that prevented connecting to a session when previously being connected and joining through a link
+- fixed bug with ST sending out roles that are not part of the current edition / script (ie. travelers or base set roles)
+- better Lycanthrope icon (thanks @AWConant)
 
 ---
 
@@ -166,13 +162,13 @@
 ## Version 2.3.0
 - added spoiler role (Lycanthrope!)
 - fixed copy to clipboard in Firefox
-- fix non-countdown votes still playing countdown sound for a split second
+- fixed non-countdown votes still playing countdown sound for a split second
 
 ---
 
 ## Version 2.2.1
 - clearing players / roles now also clears Fabled
-- fix issue where a player and storyteller updating the same players pronouns at around the same time causes an infinite loop disconnecting the session.
+- fix list of locked votes showing unlocked votes sometimes
 
 ---
 
@@ -214,14 +210,24 @@
 ---
 
 ## Version 2.0.2
-- fix gamestate JSON not showing (custom) roles and failing to load states with custom scripts properly
-- fix game state JSON not handling custom Fabled correctly
-- fix session URLs shortened
+- fix nomination history type not detecting travelers
+- fix live session domain whitelist
+- fix build path
+- fix changelog version numbering
 
 ---
 
 ## Version 2.0.1
-- fix issue where a player and storyteller updating the same players pronouns at around the same time causes an infinite loop disconnecting the session.
+- clearing the nomination history as the Storyteller clears it for the players too
+- vote buttons should work in all situations correctly now
+- fixed some minor styling and live session issues
+
+---
+
+## Version 2.0.0
+- The project is now available under its own domain: [clocktower.online](https://clocktower.online)
+- Added a feature that allows a live session Storyteller to automatically (and safely) distribute assigned
+  characters to all players that have claimed a seat, eliminating the need to manually tell every player their role
 - Visible "night phase" that can be toggled by the Storyteller
 - Voting history added with nomination and vote results
 - Optional, audible voting countdown added (featuring an actual clock tower bell!)
