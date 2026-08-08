@@ -1,0 +1,618 @@
+@import "vars";
+
+// Gameplay design system: player seats, reminders, controls, and modal chrome.
+// This layer intentionally avoids touching gameplay state or Vue component logic.
+
+$ui-line: rgba($grimoire-brass, 0.5);
+$ui-line-soft: rgba($grimoire-brass, 0.22);
+$ui-glass: rgba(11, 9, 8, 0.9);
+$ui-glass-soft: rgba(20, 16, 13, 0.82);
+$ui-hover: rgba($grimoire-brass, 0.1);
+
+// -----------------------------------------------------------------------------
+// Player seat / token
+// -----------------------------------------------------------------------------
+.circle .player {
+  border-radius: 50%;
+  transition:
+    filter 180ms ease,
+    opacity 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.circle .player .token,
+.circle .player .life {
+  border: 1px solid rgba($grimoire-brass, 0.5);
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, 0.48),
+    0 0 0 2px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 1px rgba(255, 239, 204, 0.055);
+}
+
+.circle .player .token:after,
+.circle .player .life:before {
+  border-radius: 50%;
+}
+
+// A selected/local seat remains readable without a neon debug glow.
+.circle .player.you .token {
+  outline: 1px solid rgba($grimoire-brass-light, 0.7);
+  outline-offset: 2px;
+}
+
+.circle .player.townsfolk .token,
+.circle .player.outsider .token {
+  border-color: rgba(76, 125, 177, 0.68);
+}
+
+.circle .player.minion .token,
+.circle .player.demon .token {
+  border-color: rgba($grimoire-blood-bright, 0.68);
+}
+
+// Dead seats should read as "extinguished", not merely disabled.
+.circle .player.dead .token {
+  filter: saturate(0.2) brightness(0.62) contrast(0.95);
+}
+
+.circle .player.dead .life {
+  filter: saturate(0.45) brightness(0.72);
+  border-color: rgba($grimoire-muted, 0.32);
+}
+
+.circle .player.dead .shroud:before {
+  filter:
+    grayscale(0.3)
+    drop-shadow(0 6px 7px rgba(0, 0, 0, 0.85));
+}
+
+.circle .player.dead.no-vote {
+  opacity: 0.78;
+}
+
+// Nomination / mark overlays become ceremonial rather than stark white.
+.circle .player .marked svg {
+  stroke: rgba($grimoire-text, 0.92);
+}
+
+.circle .player.marked .marked {
+  opacity: 0.7;
+  filter:
+    drop-shadow(0 0 6px rgba(0, 0, 0, 0.9))
+    drop-shadow(0 0 9px rgba($grimoire-blood-bright, 0.28));
+}
+
+.circle .player .seat,
+.circle .player .has-vote {
+  color: $grimoire-text;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.92));
+}
+
+.circle .player.you .seat {
+  color: $grimoire-brass-light;
+}
+
+// -----------------------------------------------------------------------------
+// Player nameplate
+// -----------------------------------------------------------------------------
+.circle .player > .name {
+  min-height: 1.5em;
+  top: 7px;
+  padding: 2px 9px 3px;
+  color: $grimoire-text;
+  background:
+    linear-gradient(180deg, rgba(255, 242, 214, 0.035), transparent 54%),
+    rgba(12, 10, 9, 0.9);
+  border: 1px solid rgba($grimoire-brass, 0.5);
+  border-radius: 4px;
+  box-shadow:
+    0 5px 14px rgba(0, 0, 0, 0.48),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.58);
+  letter-spacing: 0.015em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  transition:
+    color 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    opacity 160ms ease;
+}
+
+.circle .player > .name:before,
+.circle .player > .name:after {
+  content: "◆";
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba($grimoire-brass-light, 0.42);
+  font-size: 0.32em;
+  pointer-events: none;
+}
+
+.circle .player > .name:before {
+  left: 3px;
+}
+
+.circle .player > .name:after {
+  right: 3px;
+}
+
+#townsquare:not(.spectator) .circle .player > .name:hover,
+.circle .player > .name.active {
+  color: $grimoire-brass-light;
+  border-color: rgba($grimoire-brass-light, 0.86);
+  background:
+    linear-gradient(180deg, rgba(255, 242, 214, 0.06), transparent 58%),
+    rgba(24, 18, 14, 0.94);
+}
+
+.circle .player.dead > .name {
+  opacity: 0.68;
+  color: $grimoire-muted;
+  border-color: rgba($grimoire-muted, 0.24);
+  background: rgba(10, 10, 10, 0.82);
+}
+
+// -----------------------------------------------------------------------------
+// Player contextual menu
+// -----------------------------------------------------------------------------
+.circle .player > .menu {
+  padding: 5px;
+  margin-left: 14px;
+  overflow: hidden;
+  color: $grimoire-text;
+  background:
+    linear-gradient(135deg, rgba(255, 241, 211, 0.025), transparent 42%),
+    rgba(10, 8, 7, 0.96);
+  border: 1px solid rgba($grimoire-brass, 0.56);
+  border-radius: 6px;
+  box-shadow:
+    0 14px 34px rgba(0, 0, 0, 0.58),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.62);
+}
+
+.circle .player > .menu:before {
+  border-right-color: rgba($grimoire-brass, 0.56);
+}
+
+.circle .player > .menu li {
+  min-height: 38px;
+  padding: 5px 9px;
+  border-radius: 3px;
+  color: rgba($grimoire-text, 0.92);
+  transition:
+    color 140ms ease,
+    background 140ms ease;
+}
+
+.circle .player > .menu li + li {
+  border-top: 1px solid rgba($grimoire-brass, 0.08);
+}
+
+.circle .player > .menu li:hover:not(.disabled) {
+  color: $grimoire-brass-light;
+  background: $ui-hover;
+}
+
+.circle .player > .menu li svg {
+  color: rgba($grimoire-brass-light, 0.72);
+}
+
+.circle .player > .menu li.disabled {
+  color: rgba($grimoire-muted, 0.5);
+  opacity: 0.56;
+}
+
+// -----------------------------------------------------------------------------
+// Reminder tokens
+// -----------------------------------------------------------------------------
+.circle .reminder {
+  border: 1px solid rgba($grimoire-brass, 0.42);
+  box-shadow:
+    0 5px 13px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+.circle .reminder .icon {
+  filter: saturate(0.86) contrast(1.03);
+}
+
+.circle .reminder .text {
+  color: #18120d;
+  text-shadow:
+    0 1px 1px rgba(245, 227, 194, 0.92),
+    0 -1px 1px rgba(245, 227, 194, 0.72),
+    1px 0 1px rgba(245, 227, 194, 0.72),
+    -1px 0 1px rgba(245, 227, 194, 0.72);
+}
+
+.circle .reminder:hover {
+  border-color: rgba($grimoire-blood-bright, 0.78);
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.55),
+    0 0 12px rgba($grimoire-blood-bright, 0.12);
+}
+
+.circle .reminder.add {
+  border-color: rgba($grimoire-brass-light, 0.42);
+  background-color: rgba(18, 14, 11, 0.94);
+  filter: saturate(0.55);
+}
+
+.circle li:hover .reminder.add {
+  opacity: 0.86;
+}
+
+.circle .reminder.preview-ghost-reminder {
+  border-style: dashed;
+  border-color: rgba(110, 189, 226, 0.58);
+}
+
+.circle li.seat-pending > .player {
+  box-shadow:
+    0 0 0 2px rgba(183, 114, 54, 0.78),
+    0 0 16px rgba(135, 68, 24, 0.24);
+}
+
+.circle li.seat-preview > .player {
+  box-shadow:
+    0 0 0 1px rgba(106, 163, 190, 0.78),
+    0 0 14px rgba(65, 121, 151, 0.22);
+}
+
+.circle .pending-badge {
+  background: rgba(119, 59, 24, 0.96);
+  border: 1px solid rgba($grimoire-brass-light, 0.52);
+  color: $grimoire-text;
+  box-shadow: 0 4px 9px rgba(0, 0, 0, 0.62);
+}
+
+// -----------------------------------------------------------------------------
+// Main menu / top-right controls
+// -----------------------------------------------------------------------------
+#controls {
+  color: $grimoire-text;
+}
+
+#controls > span {
+  border: 1px solid rgba($grimoire-brass, 0.34);
+  border-radius: 999px;
+  background: rgba(10, 8, 7, 0.72);
+  box-shadow:
+    0 5px 15px rgba(0, 0, 0, 0.36),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+}
+
+#controls span.nomlog-summary {
+  color: #8ab4df;
+}
+
+#controls span.session {
+  color: #ce7276;
+}
+
+#controls span.session.spectator {
+  color: #8ab4df;
+}
+
+#controls .menu {
+  width: min(264px, calc(100vw - 24px - env(safe-area-inset-right, 0px)));
+  transform-origin: calc(100% - 22px) 22px;
+}
+
+#controls .menu > svg {
+  width: 46px;
+  height: 48px;
+  padding: 10px;
+  margin-bottom: 6px;
+  color: $grimoire-brass-light;
+  background:
+    radial-gradient(circle at 50% 34%, rgba(255, 244, 218, 0.055), transparent 55%),
+    rgba(10, 8, 7, 0.92);
+  border: 1px solid rgba($grimoire-brass, 0.58);
+  border-radius: 50%;
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.62);
+  transition:
+    color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+#controls .menu > svg:hover {
+  color: #f1d8a8;
+  border-color: rgba($grimoire-brass-light, 0.9);
+  transform: rotate(12deg);
+}
+
+#controls .menu ul {
+  overflow: hidden;
+  border: 1px solid rgba($grimoire-brass, 0.52);
+  border-radius: 7px;
+  background:
+    linear-gradient(135deg, rgba(255, 241, 211, 0.025), transparent 42%),
+    rgba(9, 8, 7, 0.96);
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.62),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.56);
+  backdrop-filter: blur(12px);
+}
+
+#controls .menu ul li {
+  min-height: 42px;
+  padding: 6px 11px;
+  color: rgba($grimoire-text, 0.92);
+  background: transparent;
+  border-bottom: 1px solid rgba($grimoire-brass, 0.075);
+  transition:
+    color 140ms ease,
+    background 140ms ease;
+}
+
+#controls .menu ul li:last-child {
+  border-bottom: 0;
+}
+
+#controls .menu ul li:not(.headline):not(.tabs):not(.disclaimer):hover {
+  color: $grimoire-brass-light;
+  background: rgba($grimoire-brass, 0.09);
+}
+
+#controls .menu ul li em {
+  color: rgba($grimoire-muted, 0.72);
+  letter-spacing: 0.03em;
+}
+
+#controls .menu a {
+  color: inherit;
+}
+
+#controls .menu a:hover {
+  color: $grimoire-brass-light;
+}
+
+#controls .menu ul li.tabs {
+  min-height: 48px;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.22);
+  border-bottom: 1px solid rgba($grimoire-brass, 0.28);
+}
+
+#controls .menu ul li.tabs svg {
+  height: 48px;
+  padding: 13px 0;
+  color: rgba($grimoire-muted, 0.72);
+  border-right: 1px solid rgba($grimoire-brass, 0.12);
+  border-bottom: 0;
+  transition:
+    color 150ms ease,
+    background 150ms ease;
+}
+
+#controls .menu ul li.tabs svg:hover {
+  color: $grimoire-brass-light;
+  background: rgba($grimoire-brass, 0.08);
+}
+
+#controls .menu ul li.tabs.grimoire .fa-book-open,
+#controls .menu ul li.tabs.players .fa-users,
+#controls .menu ul li.tabs.characters .fa-theater-masks,
+#controls .menu ul li.tabs.gstone .fa-broadcast-tower,
+#controls .menu ul li.tabs.settings .fa-question {
+  color: $grimoire-brass-light;
+  background:
+    linear-gradient(180deg, rgba($grimoire-brass, 0.16), rgba($grimoire-blood, 0.04));
+  box-shadow: inset 0 -2px 0 rgba($grimoire-brass, 0.58);
+}
+
+#controls .menu ul .headline {
+  min-height: 32px;
+  justify-content: center;
+  color: $grimoire-brass-light;
+  font-family: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  font-size: 0.86em;
+  letter-spacing: 0.16em;
+  background:
+    linear-gradient(to right, transparent, rgba($grimoire-brass, 0.1) 22%, rgba($grimoire-brass, 0.1) 78%, transparent);
+  border-top: 1px solid rgba($grimoire-brass, 0.16);
+  border-bottom: 1px solid rgba($grimoire-brass, 0.16);
+}
+
+#controls .menu ul .disclaimer,
+#controls .menu ul .hint {
+  color: rgba($grimoire-muted, 0.78);
+  background: rgba(0, 0, 0, 0.12);
+}
+
+#controls .menu ul li.disabled {
+  color: rgba($grimoire-muted, 0.46);
+}
+
+// -----------------------------------------------------------------------------
+// Modal system
+// -----------------------------------------------------------------------------
+#app .modal-backdrop {
+  background:
+    radial-gradient(circle at 50% 34%, rgba(66, 39, 29, 0.14), transparent 50%),
+    rgba(2, 2, 3, 0.72);
+  backdrop-filter: blur(7px) saturate(0.75);
+}
+
+#app .modal-backdrop > .modal {
+  padding: 26px 28px 22px;
+  color: $grimoire-text;
+  background:
+    linear-gradient(135deg, rgba(255, 241, 211, 0.026), transparent 36%),
+    radial-gradient(circle at 50% 0%, rgba($grimoire-blood, 0.075), transparent 40%),
+    rgba(9, 8, 7, 0.965);
+  border: 1px solid rgba($grimoire-brass, 0.58);
+  border-radius: 8px;
+  box-shadow:
+    0 26px 80px rgba(0, 0, 0, 0.68),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.68),
+    inset 0 0 80px rgba($grimoire-blood, 0.035);
+}
+
+#app .modal-backdrop > .modal:before,
+#app .modal-backdrop > .modal:after {
+  content: "◆";
+  position: absolute;
+  top: 9px;
+  color: rgba($grimoire-brass-light, 0.5);
+  font-size: 8px;
+  pointer-events: none;
+}
+
+#app .modal-backdrop > .modal:before {
+  left: 11px;
+}
+
+#app .modal-backdrop > .modal:after {
+  right: 11px;
+}
+
+#app .modal-backdrop > .modal.maximized {
+  padding: 18px;
+  border: 0;
+  border-radius: 0;
+  background:
+    radial-gradient(circle at 50% 0%, rgba($grimoire-blood, 0.065), transparent 42%),
+    rgba(7, 7, 8, 0.985);
+  box-shadow: none;
+}
+
+#app .modal .top-right-buttons {
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 2px;
+}
+
+#app .modal .top-right-buttons .top-right-button {
+  min-width: 38px;
+  min-height: 38px;
+  width: 38px;
+  height: 38px;
+  padding: 10px;
+  color: rgba($grimoire-muted, 0.8);
+  border: 1px solid transparent;
+  border-radius: 50%;
+  transition:
+    color 140ms ease,
+    border-color 140ms ease,
+    background 140ms ease;
+}
+
+#app .modal .top-right-buttons .top-right-button:hover {
+  color: $grimoire-brass-light;
+  border-color: rgba($grimoire-brass, 0.34);
+  background: rgba($grimoire-brass, 0.07);
+}
+
+#app .modal .slot > h1,
+#app .modal .slot > h2,
+#app .modal .slot > h3,
+#app .modal .slot > h4 {
+  color: $grimoire-brass-light;
+  font-family: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  font-weight: normal;
+  letter-spacing: 0.1em;
+  text-shadow: 0 2px 7px rgba(0, 0, 0, 0.72);
+}
+
+#app .modal .slot > h1:after,
+#app .modal .slot > h2:after,
+#app .modal .slot > h3:after,
+#app .modal .slot > h4:after {
+  content: "";
+  display: block;
+  width: min(220px, 68%);
+  height: 1px;
+  margin: 8px auto 14px;
+  background: linear-gradient(to right, transparent, rgba($grimoire-brass, 0.6), transparent);
+}
+
+#app .modal input,
+#app .modal select,
+#app .modal textarea {
+  color: $grimoire-text;
+  background: rgba(5, 5, 6, 0.64);
+  border: 1px solid rgba($grimoire-brass, 0.3);
+  border-radius: 5px;
+  outline: none;
+}
+
+#app .modal input:focus,
+#app .modal select:focus,
+#app .modal textarea:focus {
+  border-color: rgba($grimoire-brass-light, 0.72);
+  box-shadow: 0 0 0 2px rgba($grimoire-brass, 0.1);
+}
+
+#app .modal .warning {
+  color: #e7c989;
+  border-color: rgba(183, 131, 60, 0.38);
+}
+
+// Role-selection modals keep gameplay colors on the token itself, while the
+// surrounding selection state uses the same brass language as the rest of UI.
+#app .roles .modal .tokens > li.selected .token,
+#app .characters .modal .tokens > li.selected .token {
+  outline: 2px solid rgba($grimoire-brass-light, 0.8);
+  outline-offset: 2px;
+}
+
+#app .roles .modal .count,
+#app .characters .modal .count {
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.85);
+}
+
+// -----------------------------------------------------------------------------
+// Mobile density adjustments
+// -----------------------------------------------------------------------------
+@media screen and (max-width: 767.98px) {
+  .circle .player > .name {
+    top: 4px;
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  .circle .player > .name:before,
+  .circle .player > .name:after {
+    display: none;
+  }
+
+  .circle .player > .menu {
+    min-width: 9em;
+    max-width: min(220px, calc(100vw - 20px));
+  }
+
+  #controls .menu {
+    width: min(286px, calc(100vw - 16px - env(safe-area-inset-right, 0px)));
+  }
+
+  #controls .menu ul li {
+    min-height: 44px;
+  }
+
+  #app .modal-backdrop > .modal {
+    max-width: calc(100vw - 14px);
+    max-height: calc(100dvh - 14px);
+    padding: 24px 14px 16px;
+    border-radius: 6px;
+  }
+
+  #app .modal .top-right-buttons {
+    top: 4px;
+    right: 4px;
+  }
+
+  #app .modal .top-right-buttons .top-right-button {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    padding: 9px;
+  }
+}
