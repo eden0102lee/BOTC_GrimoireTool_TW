@@ -1,36 +1,51 @@
-$fabled: #ffe91f;
-$loric: #7cfc00;
-$townsfolk: #1f65ff;
-$outsider: #46d5ff;
-$minion: #ff6900;
-$demon: #ce0100;
-$traveler: #cc04ff;
-
-// Shared grimoire chrome (botc.app-inspired, restrained)
-$chrome-border-width: 2px;
-$chrome-border: rgba(0, 0, 0, 0.85);
-$chrome-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.25);
-$panel-bg: rgba(8, 6, 4, 0.72);
-$panel-radius: 7px;
-$nameplate-bg: rgba(12, 10, 8, 0.65);
-$nameplate-border: rgba(0, 0, 0, 0.75);
-
-@mixin token-chrome {
-  border: $chrome-border-width solid $chrome-border;
-  box-shadow: $chrome-shadow;
-}
-
-@mixin panel-chrome {
-  background: $panel-bg;
-  border: $chrome-border-width solid $chrome-border;
-  border-radius: $panel-radius;
-  box-shadow: $chrome-shadow;
-}
-
-@mixin nameplate-chrome {
-  background: $nameplate-bg;
-  border: $chrome-border-width solid $nameplate-border;
-  border-radius: $panel-radius;
-  box-shadow: $chrome-shadow;
-}
-
+$fabled: #ffe91f;
+$loric: #7cfc00;
+$townsfolk: #1f65ff;
+$outsider: #46d5ff;
+$minion: #ff6900;
+$demon: #ce0100;
+$traveler: #cc04ff;
+
+// Grimoire art direction palette. Keep team colors above high-saturation for
+// gameplay readability; these colors are used for chrome, panels, and ambience.
+$grimoire-ink: #09090b;
+$grimoire-ink-warm: #120d0c;
+$grimoire-panel: rgba(12, 10, 9, 0.88);
+$grimoire-panel-soft: rgba(22, 17, 13, 0.76);
+$grimoire-brass: #b18a55;
+$grimoire-brass-light: #dcc08a;
+$grimoire-blood: #84282e;
+$grimoire-blood-bright: #a63a41;
+$grimoire-text: #f2e8d5;
+$grimoire-muted: #b8aa95;
+
+// Shared grimoire chrome.
+$chrome-border-width: 1px;
+$chrome-border: rgba($grimoire-brass, 0.52);
+$chrome-shadow:
+  0 12px 34px rgba(0, 0, 0, 0.36),
+  0 2px 8px rgba(0, 0, 0, 0.3),
+  inset 0 1px 0 rgba(255, 244, 219, 0.04);
+$panel-bg: $grimoire-panel;
+$panel-radius: 8px;
+$nameplate-bg: rgba(14, 11, 9, 0.78);
+$nameplate-border: rgba($grimoire-brass, 0.42);
+
+@mixin token-chrome {
+  border: $chrome-border-width solid $chrome-border;
+  box-shadow: $chrome-shadow;
+}
+
+@mixin panel-chrome {
+  background: $panel-bg;
+  border: $chrome-border-width solid $chrome-border;
+  border-radius: $panel-radius;
+  box-shadow: $chrome-shadow;
+}
+
+@mixin nameplate-chrome {
+  background: $nameplate-bg;
+  border: $chrome-border-width solid $nameplate-border;
+  border-radius: $panel-radius;
+  box-shadow: $chrome-shadow;
+}
