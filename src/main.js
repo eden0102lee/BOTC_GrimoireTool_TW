@@ -6,6 +6,7 @@ import "./game-ui.scss";
 import "./play-ui.scss";
 import "./layout-polish.scss";
 import "./ux-polish.scss";
+import "./token-polish.scss";
 import "./visual-hierarchy.scss";
 import "./stacking-system.scss";
 import store from "./store";
