@@ -90,17 +90,17 @@ export default {
   data() {
     return {
       version: pkg.version,
-      _unbindViewport: null,
+      unbindViewport: null,
     };
   },
   mounted() {
-    this._unbindViewport = bindViewportUnitSync(this.$store);
+    this.unbindViewport = bindViewportUnitSync(this.$store);
     this.openModalFromQuery();
   },
   beforeDestroy() {
-    if (this._unbindViewport) {
-      this._unbindViewport();
-      this._unbindViewport = null;
+    if (this.unbindViewport) {
+      this.unbindViewport();
+      this.unbindViewport = null;
     }
   },
   methods: {
