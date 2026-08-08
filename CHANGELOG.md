@@ -1,5 +1,13 @@
 # Release Notes
 
+### Unreleased
+- redesigned the Traditional Chinese Grimoire homepage around BOTC character tokens and a clock-face ritual motif
+- unified player tokens, nameplates, death states, reminders, menus, modals, and active-play storyteller controls under a dark grimoire / antique-brass visual system
+- refreshed TownInfo, nomination and voting, Night Order, reference sheets, role and reminder selection, Battle Log, Vote History, and bluff/fabled trays without changing gameplay behavior
+- added responsive styling and reduced-motion handling for the refreshed interface
+
+---
+
 ### Version 2.16.2
 - fixed custom script format to support new script tool JSON
 - updated packages to be compatible with Node >= 18 again
