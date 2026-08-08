@@ -66,7 +66,7 @@
 - **瘟疫醫生** (`plaguedoctor`) — effects: 目標對象 (說書人能力)
 - **解謎大師** (`puzzlemaster`) — effects: 醉酒玩家標記
 - **心上人** (`sweetheart`) — effects: 自身 醉酒
-- **修補匠** (`tinker`) — effects: 目標對象 死亡
+- **修補匠** (`tinker`) — effects: (無)
 - **刺客** (`assassin`) — effects: 目標死亡、目標掛死亡標記
 - **洗腦師** (`cerenovus`) — effects: 目標玩家 瘋狂
 - **魔鬼代言人** (`devilsadvocate`) — effects: 目標對象 處決保護
@@ -100,7 +100,7 @@
 - **亡骨魔** (`vigormortis`) — effects: 目標死亡、目標對象 中毒、目標對象 具有能力、目標掛死亡標記
 - **渦流** (`vortox`) — effects: 目標死亡、目標掛死亡標記
 - **牙噶巴卜** (`yaggababble`) — effects: 自身 死亡
-- **僵怖** (`zombuul`) — effects: 目標死亡、目標對象 今天死亡、目標掛死亡標記
+- **僵怖** (`zombuul`) — effects: 目標死亡、目標掛死亡標記
 - **學徒** (`apprentice`) — effects: 目標對象 是學徒
 - **咖啡師** (`barista`) — effects: 目標玩家 清醒&健康、目標玩家 能力x2
 - **主教** (`bishop`) — effects: 自身 提名善良、自身 提名邪惡

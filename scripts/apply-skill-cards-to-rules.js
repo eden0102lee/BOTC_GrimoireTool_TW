@@ -202,8 +202,8 @@ const STRUCTURAL = {
     activation: "optional",
     inputs: [],
     sentence: { action: "", template: "{actor}死亡" },
-    effects: kill("tinker", "actor", { label: "自身死亡" }),
-    notes: "可無主動選擇；隨時可能死亡",
+    effects: [],
+    notes: "可無主動選擇；隨時可能死亡；戰報僅主句",
   },
   apprentice: {
     when: { nights: ["first"] },
@@ -509,7 +509,8 @@ const STRUCTURAL = {
       action: "殺害",
       template: "{actor} → {action} → 選擇 {target}",
     },
-    notes: "僅當日無人死亡才可夜殺（optional）；第一次死亡不真正死（視為已死）",
+    notes:
+      "僅當日無人死亡才可夜殺（optional）；「今天死亡」由說書人手動掛標記",
   },
   sailor: {
     notes: "你或目標之一醉酒；水手不會死（被動）",

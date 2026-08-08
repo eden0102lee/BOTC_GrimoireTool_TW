@@ -1733,15 +1733,6 @@
             {
               "type": "addReminder",
               "targetFrom": "target",
-              "reminderName": "今天死亡",
-              "reminderRole": "zombuul",
-              "optional": true,
-              "defaultOn": true,
-              "label": "目標對象 今天死亡"
-            },
-            {
-              "type": "addReminder",
-              "targetFrom": "target",
               "reminderName": "死亡",
               "reminderRole": "zombuul",
               "bindTo": "kill",
@@ -1762,8 +1753,8 @@
           },
           "inputs": [],
           "sentence": {
-            "action": "假死",
-            "template": "{actor} → {action} → 第一次死亡不真正死"
+            "action": "",
+            "template": "{actor}第一次「死亡」→ 仍存活但視為已死"
           },
           "effects": [],
           "notes": "第一次死亡不真正死（視為已死）"
@@ -3543,7 +3534,7 @@
           ],
           "sentence": {
             "action": "殺害",
-            "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+            "template": "{actor} → {action} → 選擇 {target}"
           },
           "effects": [
             {
@@ -5763,28 +5754,8 @@
             "action": "",
             "template": "{actor}死亡"
           },
-          "effects": [
-            {
-              "id": "kill",
-              "type": "setDead",
-              "targetFrom": "actor",
-              "value": true,
-              "optional": true,
-              "defaultOn": true,
-              "label": "自身死亡"
-            },
-            {
-              "type": "addReminder",
-              "targetFrom": "actor",
-              "reminderName": "死亡",
-              "reminderRole": "tinker",
-              "optional": true,
-              "defaultOn": true,
-              "label": "自身掛死亡標記",
-              "bindTo": "kill"
-            }
-          ],
-          "notes": "可無主動選擇；隨時可能死亡"
+          "effects": [],
+          "notes": "可無主動選擇；隨時可能死亡；戰報僅主句"
         }
       ]
     },

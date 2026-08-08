@@ -473,6 +473,16 @@ export function buildNaturalRoleMessage(rule, { players, actorIndex, formData, e
     const t = labelForKey(players, fd, "target") || fd.target;
     main = `${actor}死亡時選擇 ${t}`;
   } else if (
+    roleId === "tinker" ||
+    template === "{actor}死亡"
+  ) {
+    main = `${actor}死亡`;
+  } else if (
+    roleId === "zombuul" &&
+    (template.includes("第一次") || template.includes("仍存活"))
+  ) {
+    main = `${actor}第一次「死亡」→ 仍存活但視為已死`;
+  } else if (
     roleId === "fool" ||
     template.includes("第一次死亡")
   ) {

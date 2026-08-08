@@ -264,7 +264,14 @@
               </p>
               <button
                 v-for="c in optionalCandidates"
-                :key="'pick-' + c.playerIndex + '-' + c.role.id"
+                :key="
+                  'pick-' +
+                  c.playerIndex +
+                  '-' +
+                  c.role.id +
+                  '-' +
+                  (c.cardKey || '')
+                "
                 type="button"
                 class="optional-pick-btn"
                 :class="{ disabled: c.onceUsed && !c.recordedThisPhase }"
@@ -661,7 +668,14 @@
             </p>
             <button
               v-for="c in optionalCandidates"
-              :key="'day-pick-' + c.playerIndex + '-' + c.role.id"
+              :key="
+                'day-pick-' +
+                c.playerIndex +
+                '-' +
+                c.role.id +
+                '-' +
+                (c.cardKey || '')
+              "
               type="button"
               class="optional-pick-btn"
               :class="{ disabled: c.onceUsed && !c.recordedThisPhase }"
@@ -1171,7 +1185,6 @@ export default {
         const cards = listRoleCards(role.id, this.overlay);
         const usable = cards.filter((card) => {
           if (this.isNight) return cardAppearsInNightOptional(card);
-          // Day picker: event/optional only — auto-listed day abilities excluded
           if (
             isDayAbilityCard(card) &&
             ruleAppliesToday(card, this.dayNumber)
@@ -1181,21 +1194,22 @@ export default {
           return cardAppearsInDayOptional(card, this.dayNumber);
         });
         if (!usable.length) return;
-        const primary = usable[0];
-        const onceUsed = !!(
-          primary.once && this.isOptionalOnceUsed(playerIndex, role.id)
-        );
         const roleCardKey = buildRoleCardKey(phaseId, playerIndex, role.id);
         const recordedThisPhase = !!this.entryByRoleCardKey(roleCardKey);
-        list.push({
-          player,
-          playerIndex,
-          role,
-          rule: primary,
-          cardKey: primary.cardKey,
-          onceUsed,
-          recordedThisPhase,
-          label: formatPlayerRoleLabel(player, playerIndex),
+        usable.forEach((card) => {
+          const onceUsed = !!(
+            card.once && this.isOptionalOnceUsed(playerIndex, role.id)
+          );
+          list.push({
+            player,
+            playerIndex,
+            role,
+            rule: card,
+            cardKey: card.cardKey || card.key || "",
+            onceUsed,
+            recordedThisPhase,
+            label: this.formatOptionalCandidateLabel(player, playerIndex, card),
+          });
         });
       });
       return list;
@@ -1644,6 +1658,25 @@ export default {
     },
   },
   methods: {
+    formatOptionalCandidateLabel(player, playerIndex, card) {
+      const base = formatPlayerRoleLabel(player, playerIndex);
+      const key = String((card && (card.cardKey || card.key)) || "").toLowerCase();
+      const label = String((card && (card.cardLabel || card.label)) || "").toLowerCase();
+      if (key === "skip" || label === "skip") return `${base} — 跳過`;
+      if (key === "other-night-x3" || label === "othernightx3") {
+        return `${base} — 三殺`;
+      }
+      if (key === "death" && String(card.id || "").toLowerCase() === "zombuul") {
+        return `${base} — 假死`;
+      }
+      if (key === "trigger-defeat" || label === "triggerdefeat") {
+        return `${base} — 陣營落敗`;
+      }
+      if (key === "trigger-extend" || label === "triggerextend") {
+        return `${base} — 延長一天`;
+      }
+      return base;
+    },
     applyRoleCardOrder(cards) {
       const phaseId = this.currentPhase && this.currentPhase.id;
       const order =

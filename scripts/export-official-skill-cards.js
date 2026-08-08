@@ -486,7 +486,7 @@ const OVERRIDES = {
     example:
       "1.\n小華【01.僵怖】殺害 小明【03.水手】\n└ 小明【03.水手】死亡\n2.\n小華【01.僵怖】第一次「死亡」→ 仍存活但視為已死",
     verb: "殺害",
-    notes: "夜殺卡為 optional（僅白日無人死時用）；假死另卡",
+    notes: "夜殺卡為 optional；「今天死亡」由說書人手動掛標記",
   },
   apprentice: {
     timing: ["firstOnly"],
