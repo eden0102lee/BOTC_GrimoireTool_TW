@@ -31,11 +31,12 @@
       repeating-linear-gradient(0deg, rgba(255,255,255,.018) 0, rgba(255,255,255,.018) 1px, transparent 1px, transparent 4px),
       repeating-linear-gradient(90deg, rgba(0,0,0,.025) 0, rgba(0,0,0,.025) 1px, transparent 1px, transparent 5px);
   }
-
-  > * {
-    z-index: 1;
-  }
 }
+
+// Root-layer ordering is intentionally NOT assigned here. Applying z-index to
+// every direct child of #app creates independent stacking contexts and traps
+// modal/menu descendants under unrelated UI. stacking-system.scss owns all
+// application-level layers explicitly.
 
 // Keep backdrop behind functional UI but above the environmental texture.
 #app > .backdrop {
