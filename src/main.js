@@ -1,5 +1,14 @@
 import Vue from "vue";
 import App from "./App";
+import "./art-direction.scss";
+import "./intro-layout.scss";
+import "./game-ui.scss";
+import "./play-ui.scss";
+import "./layout-polish.scss";
+import "./ux-polish.scss";
+import "./token-polish.scss";
+import "./visual-hierarchy.scss";
+import "./stacking-system.scss";
 import store from "./store";
 import i18n from "./i18n";
 import { library } from "@fortawesome/fontawesome-svg-core";

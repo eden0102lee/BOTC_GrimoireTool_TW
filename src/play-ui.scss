@@ -1,0 +1,825 @@
+@import "vars";
+
+// Active-play visual system. Keeps game logic untouched while unifying the
+// always-visible storyteller surfaces with the homepage / modal art direction.
+
+$play-panel: rgba(10, 8, 7, 0.9);
+$play-panel-soft: rgba(18, 14, 12, 0.82);
+$play-line: rgba($grimoire-brass, 0.34);
+$play-line-strong: rgba($grimoire-brass, 0.58);
+
+// -----------------------------------------------------------------------------
+// Center town information
+// -----------------------------------------------------------------------------
+#app .info {
+  width: min(22%, 310px);
+  height: auto;
+  min-height: 150px;
+  padding: 46px 14px 13px;
+  color: $grimoire-text;
+  background:
+    radial-gradient(circle at 50% -18%, rgba($grimoire-brass, 0.09), transparent 48%),
+    linear-gradient(180deg, rgba(255, 241, 211, 0.025), transparent 44%),
+    rgba(9, 8, 7, 0.72);
+  border: 1px solid rgba($grimoire-brass, 0.34);
+  border-radius: 8px;
+  box-shadow:
+    0 14px 38px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.48);
+  backdrop-filter: blur(6px);
+}
+
+#app .info:before,
+#app .info:after {
+  content: "◆";
+  position: absolute;
+  top: 7px;
+  color: rgba($grimoire-brass-light, 0.34);
+  font-size: 7px;
+}
+
+#app .info:before { left: 9px; }
+#app .info:after { right: 9px; }
+
+#app .info li {
+  width: 100%;
+  font-weight: 600;
+  filter: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  gap: 3px 7px;
+}
+
+#app .info li + li {
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 1px solid rgba($grimoire-brass, 0.11);
+}
+
+#app .info li span {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.015);
+}
+
+#app .info li .meta {
+  flex-basis: 100%;
+  justify-content: center;
+  color: $grimoire-muted;
+  font-family: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  letter-spacing: 0.04em;
+}
+
+#app .info li svg {
+  margin-right: 0;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.8));
+}
+
+#app .info li .players { color: #9fbd8f; }
+#app .info li .alive { color: #c98079; }
+#app .info li .votes { color: $grimoire-brass-light; }
+
+#app .info li span:has(.fa-cloud-moon) {
+  margin-top: 2px;
+  color: #b7cde1;
+  border: 1px solid rgba(102, 143, 177, 0.22);
+  background: rgba(31, 56, 78, 0.24);
+}
+
+#app .info li.edition {
+  width: clamp(72px, 17vmin, 170px);
+  height: clamp(64px, 15vmin, 150px);
+  top: -42%;
+  filter:
+    saturate(0.82)
+    drop-shadow(0 8px 12px rgba(0, 0, 0, 0.55));
+}
+
+// -----------------------------------------------------------------------------
+// Nomination / vote ritual
+// -----------------------------------------------------------------------------
+#app #vote {
+  width: min(24%, 360px);
+  min-width: 210px;
+  padding: 20px;
+  background: none;
+  color: $grimoire-text;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.92);
+}
+
+#app #vote:before {
+  content: "";
+  position: absolute;
+  inset: 4%;
+  border-radius: 50%;
+  border: 1px solid rgba($grimoire-brass, 0.34);
+  background:
+    radial-gradient(circle, rgba(20, 12, 11, 0.9) 0 55%, rgba(8, 7, 7, 0.76) 56% 70%, transparent 71%),
+    conic-gradient(from 0deg, transparent 0 11deg, rgba($grimoire-brass, 0.11) 12deg 13deg, transparent 14deg 44deg);
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.5),
+    inset 0 0 45px rgba($grimoire-blood, 0.12),
+    inset 0 0 0 10px rgba(0, 0, 0, 0.14);
+  pointer-events: none;
+}
+
+#app #vote .overlay {
+  z-index: 2;
+  width: 88%;
+  padding: 15px 12px;
+  border-radius: 8px;
+  background: rgba(8, 7, 7, 0.76);
+  border: 1px solid rgba($grimoire-brass, 0.22);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(5px);
+}
+
+#app #vote .overlay > em {
+  display: inline-block;
+  margin: 3px 4px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 1px solid rgba($grimoire-blood-bright, 0.28);
+  background: rgba($grimoire-blood, 0.1);
+  color: #d88a8e;
+  font-size: 0.82em;
+}
+
+#app #vote .overlay > em.blue {
+  color: #9fc1e1;
+  border-color: rgba(92, 137, 179, 0.28);
+  background: rgba(48, 86, 122, 0.12);
+}
+
+#app #vote .button-group {
+  margin-top: 8px;
+}
+
+#app #vote .button-group.mark {
+  margin-top: 5px;
+  opacity: 0.88;
+}
+
+#app #vote .arrows {
+  height: 158%;
+  width: 28%;
+  opacity: 0.8;
+}
+
+#app #vote .arrows span:before {
+  filter:
+    saturate(0.7)
+    sepia(0.08)
+    drop-shadow(0 0 5px rgba(0, 0, 0, 0.85));
+}
+
+#app #vote .countdown span {
+  color: $grimoire-brass-light;
+  font-family: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  text-shadow:
+    0 5px 16px rgba(0, 0, 0, 0.95),
+    0 0 22px rgba($grimoire-brass, 0.18);
+}
+
+// -----------------------------------------------------------------------------
+// Left storyteller panels / phase navigation
+// -----------------------------------------------------------------------------
+#app .left-panels .toggle-tab,
+#app .left-panels .stack-header,
+#app .left-panels .phase-tracker,
+#app .left-panels .phase-recorder {
+  color: $grimoire-text;
+  background:
+    linear-gradient(180deg, rgba(255, 241, 211, 0.025), transparent 48%),
+    $play-panel;
+  border: 1px solid $play-line-strong;
+  border-radius: 7px;
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.42),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.52);
+  backdrop-filter: blur(8px);
+}
+
+#app .left-panels .toggle-tab:hover,
+#app .left-panels .collapse-btn:hover {
+  color: $grimoire-brass-light;
+}
+
+#app .left-panels .stack-header {
+  min-height: 42px;
+  padding: 5px 8px 5px 12px;
+}
+
+#app .left-panels .stack-title {
+  color: $grimoire-brass-light;
+  font-family: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  letter-spacing: 0.1em;
+}
+
+#app .left-panels .collapse-btn {
+  color: rgba($grimoire-muted, 0.8);
+}
+
+#app .left-panels .phase-tracker {
+  padding: 5px;
+  gap: 5px;
+}
+
+#app .left-panels .phase-label {
+  color: $grimoire-text;
+  font-family: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  letter-spacing: 0.06em;
+}
+
+#app .left-panels .phase-arrow {
+  border: 1px solid rgba($grimoire-brass, 0.26);
+  border-radius: 5px;
+  box-shadow: none;
+  color: $grimoire-muted;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+#app .left-panels .phase-arrow:hover:not(:disabled) {
+  color: $grimoire-brass-light;
+  border-color: rgba($grimoire-brass-light, 0.6);
+  background: rgba($grimoire-brass, 0.09);
+}
+
+#app .left-panels .advance-btn,
+#app .left-panels .retreat-btn {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+#app .left-panels .phase-recorder {
+  overflow: hidden;
+}
+
+#app .left-panels .game-meta,
+#app .left-panels .linked-mode-row,
+#app .left-panels .recorder-header {
+  border-color: rgba($grimoire-brass, 0.12);
+}
+
+#app .left-panels .game-meta input,
+#app .left-panels .phase-recorder input,
+#app .left-panels .phase-recorder select,
+#app .left-panels .phase-recorder textarea {
+  color: $grimoire-text;
+  background: rgba(4, 4, 5, 0.52);
+  border-color: rgba($grimoire-brass, 0.22);
+}
+
+#app .left-panels .phase-recorder input:focus,
+#app .left-panels .phase-recorder select:focus,
+#app .left-panels .phase-recorder textarea:focus {
+  border-color: rgba($grimoire-brass-light, 0.6);
+  outline: none;
+}
+
+#app .left-panels .tab {
+  color: rgba($grimoire-muted, 0.74);
+  border-color: rgba($grimoire-brass, 0.18);
+  background: rgba(0, 0, 0, 0.23);
+}
+
+#app .left-panels .tab:hover {
+  color: $grimoire-text;
+}
+
+#app .left-panels .tab.active {
+  color: $grimoire-brass-light;
+  border-color: rgba($grimoire-brass, 0.52);
+  background: rgba($grimoire-brass, 0.09);
+  box-shadow: inset 0 -2px 0 rgba($grimoire-brass, 0.48);
+}
+
+#app .left-panels .phase-hint,
+#app .left-panels .game-header-line,
+#app .left-panels .preview-phase,
+#app .left-panels .setup-title,
+#app .left-panels .day-ability-title {
+  color: $grimoire-brass-light;
+}
+
+#app .left-panels .game-header-line,
+#app .left-panels .setup-block,
+#app .left-panels .day-ability-block,
+#app .left-panels .optional-picker,
+#app .left-panels .manual-recorded-card,
+#app .left-panels .pending-block {
+  background: rgba(18, 14, 11, 0.58);
+  border-color: rgba($grimoire-brass, 0.24);
+}
+
+#app .left-panels .role-action-card {
+  background:
+    linear-gradient(180deg, rgba(255, 244, 219, 0.018), transparent 45%),
+    rgba(8, 8, 9, 0.55);
+  border-color: rgba($grimoire-brass, 0.22);
+  box-shadow: inset 3px 0 0 rgba($grimoire-brass, 0.12);
+}
+
+#app .left-panels .role-action-card.townsfolk,
+#app .left-panels .role-action-card.outsider {
+  box-shadow: inset 3px 0 0 rgba(76, 125, 177, 0.38);
+}
+
+#app .left-panels .role-action-card.minion,
+#app .left-panels .role-action-card.demon {
+  box-shadow: inset 3px 0 0 rgba($grimoire-blood-bright, 0.42);
+}
+
+#app .left-panels .role-action-card .icon {
+  border-radius: 50%;
+  background-size: 82%;
+  background-repeat: no-repeat;
+  background-position: center;
+  border: 1px solid rgba($grimoire-brass, 0.24);
+  background-color: rgba(0, 0, 0, 0.32);
+}
+
+#app .left-panels .role-action-card .role-name {
+  color: $grimoire-text;
+}
+
+#app .left-panels .role-action-card .player-name {
+  color: $grimoire-muted;
+}
+
+#app .left-panels .toggle-chip,
+#app .left-panels .add-manual-btn,
+#app .left-panels .optional-pick-btn,
+#app .left-panels .new-game-btn {
+  border-color: rgba($grimoire-brass, 0.26);
+  background: rgba(0, 0, 0, 0.26);
+  color: rgba($grimoire-text, 0.82);
+}
+
+#app .left-panels .toggle-chip.on,
+#app .left-panels .pending-action.primary {
+  color: $grimoire-brass-light;
+  border-color: rgba($grimoire-brass, 0.55);
+  background: rgba($grimoire-brass, 0.1);
+}
+
+#app .left-panels .sortable-card.drag-over {
+  outline-color: rgba($grimoire-brass-light, 0.72);
+}
+
+// -----------------------------------------------------------------------------
+// Night order
+// -----------------------------------------------------------------------------
+#app .night-reference .toggle,
+#app .characters .toggle {
+  color: rgba($grimoire-muted, 0.78);
+}
+
+#app .night-reference .toggle:hover,
+#app .characters .toggle:hover {
+  color: $grimoire-brass-light;
+}
+
+#app .night-reference .night {
+  gap: 12px;
+}
+
+#app .night-reference .night > *:first-child {
+  margin-right: 0;
+}
+
+#app .night-reference .night > ul {
+  padding: 8px;
+  border: 1px solid rgba($grimoire-brass, 0.16);
+  border-radius: 7px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+#app .night-reference .night .headline {
+  margin-bottom: 5px;
+  padding: 7px 10px;
+  color: $grimoire-brass-light;
+  border: 0;
+  border-bottom: 1px solid rgba($grimoire-brass, 0.26);
+  background: linear-gradient(to right, transparent, rgba($grimoire-brass, 0.08), transparent);
+  font-family: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  letter-spacing: 0.08em;
+}
+
+#app .night-reference ul li:not(.headline) {
+  min-height: 44px;
+  margin: 0;
+  padding: 3px 4px;
+  border-bottom: 1px solid rgba($grimoire-brass, 0.075);
+  border-radius: 4px;
+  transition: background 140ms ease;
+}
+
+#app .night-reference ul li:not(.headline):hover,
+#app .night-reference ul li:not(.headline):focus-within {
+  background: rgba($grimoire-brass, 0.055);
+}
+
+#app .night-reference ul li .icon {
+  width: clamp(34px, 5vh, 52px);
+  background-size: 82%;
+  background-repeat: no-repeat;
+  background-position: center;
+  border-radius: 50%;
+}
+
+#app .night-reference ul li .name {
+  width: 28%;
+  min-width: 110px;
+  padding: 6px 8px;
+  border-color: rgba($grimoire-brass, 0.12);
+  background: none;
+  color: $grimoire-text;
+}
+
+#app .night-reference ul li.townsfolk .name,
+#app .night-reference ul li.outsider .name {
+  box-shadow: inset 3px 0 0 rgba(76, 125, 177, 0.48);
+}
+
+#app .night-reference ul li.minion .name,
+#app .night-reference ul li.demon .name {
+  box-shadow: inset 3px 0 0 rgba($grimoire-blood-bright, 0.52);
+}
+
+#app .night-reference .night .other li .name {
+  box-shadow: inset -3px 0 0 rgba($grimoire-brass, 0.18);
+}
+
+#app .night-reference ul li .name small {
+  color: rgba($grimoire-muted, 0.66);
+}
+
+#app .night-reference ul li .reminder {
+  padding: 10px 12px;
+  color: $grimoire-text;
+  background: rgba(10, 8, 7, 0.97);
+  border: 1px solid rgba($grimoire-brass, 0.5);
+  border-radius: 6px;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.62);
+}
+
+// -----------------------------------------------------------------------------
+// Reference sheet / character catalogue
+// -----------------------------------------------------------------------------
+#app .characters .team {
+  padding: 4px 0;
+}
+
+#app .characters .team:not(:last-child):after {
+  background: linear-gradient(90deg, rgba($grimoire-brass, 0.34), transparent);
+}
+
+#app .characters .team aside {
+  width: 34px;
+  color: rgba($grimoire-text, 0.82);
+  background: rgba(0, 0, 0, 0.2);
+  border-right: 1px solid rgba($grimoire-brass, 0.12);
+}
+
+#app .characters .team.townsfolk aside,
+#app .characters .team.outsider aside {
+  box-shadow: inset 3px 0 0 rgba(76, 125, 177, 0.46);
+}
+
+#app .characters .team.minion aside,
+#app .characters .team.demon aside {
+  box-shadow: inset 3px 0 0 rgba($grimoire-blood-bright, 0.5);
+}
+
+#app .characters .team ul {
+  padding: 4px 0;
+}
+
+#app .characters .team ul li {
+  margin: 2px;
+  padding: 5px 7px;
+  border: 1px solid rgba($grimoire-brass, 0.08);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.012);
+  transition: background 140ms ease, border-color 140ms ease;
+}
+
+#app .characters .team ul li:hover {
+  background: rgba($grimoire-brass, 0.04);
+  border-color: rgba($grimoire-brass, 0.16);
+}
+
+#app .characters .team ul li .icon {
+  width: clamp(38px, 6vh, 62px);
+  background-size: 84%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+#app .characters .team ul li .role {
+  line-height: 1.05;
+}
+
+#app .characters .team ul li .name {
+  color: $grimoire-text;
+  font-size: 0.8em;
+}
+
+#app .characters .team ul li.townsfolk .name,
+#app .characters .team ul li.outsider .name {
+  color: #9bbcdf;
+}
+
+#app .characters .team ul li.minion .name,
+#app .characters .team ul li.demon .name {
+  color: #d5888c;
+}
+
+#app .characters .team ul li .ability {
+  color: rgba($grimoire-text, 0.78);
+}
+
+#app .characters .team ul li .player {
+  color: rgba($grimoire-brass-light, 0.62);
+}
+
+// -----------------------------------------------------------------------------
+// Role / reminder selection density
+// -----------------------------------------------------------------------------
+#app .modal ul.tokens {
+  gap: clamp(4px, 0.5vw, 8px);
+  padding: 8px 4px;
+}
+
+#app .modal ul.tokens > li {
+  width: clamp(56px, 6.4vw, 92px);
+  margin: 0;
+  border: 1px solid rgba($grimoire-brass, 0.12);
+  box-shadow: none;
+  opacity: 0.78;
+  transition:
+    transform 150ms ease,
+    opacity 150ms ease,
+    border-color 150ms ease,
+    background 150ms ease;
+}
+
+#app .modal ul.tokens > li:hover {
+  transform: translateY(-2px) scale(1.04);
+  opacity: 1;
+  z-index: 10;
+  border-color: rgba($grimoire-brass-light, 0.5);
+  background: rgba($grimoire-brass, 0.045);
+}
+
+#app .roles .modal ul.tokens > li.selected {
+  opacity: 1;
+  border-color: rgba($grimoire-brass-light, 0.72);
+  background: rgba($grimoire-brass, 0.055);
+}
+
+#app .roles .modal ul.tokens .count {
+  width: 4.3%;
+  min-width: 32px;
+  color: $grimoire-brass-light;
+  border: 0;
+  background: none;
+}
+
+#app .modal ul.reminders {
+  gap: 8px;
+  padding: 8px;
+}
+
+#app .modal ul.reminders .reminder {
+  width: clamp(66px, 10vh, 96px);
+  height: clamp(66px, 10vh, 96px);
+  margin: 0;
+  border: 1px solid rgba($grimoire-brass, 0.4);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.38);
+  transition: transform 150ms ease, border-color 150ms ease;
+}
+
+#app .modal ul.reminders .reminder:hover {
+  transform: translateY(-2px) scale(1.05);
+  border-color: rgba($grimoire-brass-light, 0.72);
+}
+
+// -----------------------------------------------------------------------------
+// Battle log / vote history
+// -----------------------------------------------------------------------------
+#app .battle-log .game-header {
+  color: $grimoire-brass-light;
+  font-weight: 600;
+}
+
+#app .battle-log .phase-current {
+  color: $grimoire-muted;
+}
+
+#app .battle-log .filters,
+#app .battle-log .manual-note,
+#app .battle-log .actions {
+  padding: 7px;
+  border: 1px solid rgba($grimoire-brass, 0.1);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+#app .battle-log .timeline {
+  padding: 6px 8px;
+  border: 1px solid rgba($grimoire-brass, 0.14);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.16);
+  scrollbar-color: rgba($grimoire-brass, 0.38) rgba(0, 0, 0, 0.18);
+}
+
+#app .battle-log .timeline li {
+  padding: 7px 4px;
+  border-bottom: 1px solid rgba($grimoire-brass, 0.08);
+}
+
+#app .battle-log .timeline .time {
+  color: rgba($grimoire-muted, 0.62);
+}
+
+#app .battle-log .timeline li.day .phase {
+  color: #98b9d7;
+}
+
+#app .battle-log .timeline li.night .phase {
+  color: #d18488;
+}
+
+#app .battle-log .timeline .detail {
+  color: rgba($grimoire-muted, 0.72);
+}
+
+#app .vote-history table {
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border: 1px solid rgba($grimoire-brass, 0.16);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.16);
+}
+
+#app .vote-history thead td {
+  padding: 8px 10px;
+  color: $grimoire-brass-light;
+  border-bottom: 1px solid rgba($grimoire-brass, 0.28);
+  background: rgba($grimoire-brass, 0.055);
+}
+
+#app .vote-history tbody td {
+  padding: 7px 10px;
+  border-bottom: 1px solid rgba($grimoire-brass, 0.07);
+}
+
+#app .vote-history tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+#app .vote-history tbody tr:hover td {
+  background: rgba($grimoire-brass, 0.035);
+}
+
+#app .vote-history .option {
+  color: rgba($grimoire-text, 0.8);
+}
+
+#app .vote-history .option:hover {
+  color: $grimoire-brass-light;
+}
+
+// -----------------------------------------------------------------------------
+// Bluff / fabled corner trays
+// -----------------------------------------------------------------------------
+#app #townsquare > .bluffs,
+#app #townsquare > .fabled {
+  color: $grimoire-text;
+  border: 1px solid rgba($grimoire-brass, 0.34);
+  border-radius: 7px;
+  background:
+    linear-gradient(180deg, rgba(255, 241, 211, 0.025), transparent 45%),
+    rgba(10, 8, 7, 0.82);
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.42),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.48);
+  backdrop-filter: blur(7px);
+}
+
+#app #townsquare > .bluffs h3,
+#app #townsquare > .fabled h3 {
+  min-height: 30px;
+  color: $grimoire-brass-light;
+  font-family: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  font-size: 0.9em;
+  letter-spacing: 0.06em;
+}
+
+#app #townsquare > .bluffs h3 svg,
+#app #townsquare > .fabled h3 svg {
+  color: rgba($grimoire-muted, 0.76);
+}
+
+#app #townsquare > .bluffs h3 svg:hover,
+#app #townsquare > .fabled h3 svg:hover {
+  color: $grimoire-brass-light;
+}
+
+// -----------------------------------------------------------------------------
+// Mobile / compact viewport
+// -----------------------------------------------------------------------------
+@media screen and (max-width: 991.98px) {
+  #app .info {
+    width: min(188px, 38vw);
+    min-height: 0;
+    padding: 34px 8px 9px;
+    font-size: 78%;
+  }
+
+  #app .info li.edition {
+    width: clamp(58px, 22vw, 120px);
+    height: clamp(52px, 20vw, 110px);
+    top: -38%;
+  }
+
+  #app #vote {
+    width: min(38vw, 300px);
+    min-width: 190px;
+    padding: 12px;
+  }
+
+  #app #vote .overlay {
+    width: 94%;
+    font-size: 82%;
+  }
+
+  #app .night-reference .night {
+    gap: 6px;
+  }
+
+  #app .night-reference .night > ul {
+    padding: 4px;
+  }
+
+  #app .night-reference ul li .name {
+    min-width: 84px;
+    width: 36%;
+  }
+}
+
+@media screen and (max-width: 767.98px) {
+  #app .info {
+    width: min(150px, 42vw);
+    padding: 26px 6px 7px;
+    font-size: 68%;
+    border-color: rgba($grimoire-brass, 0.22);
+  }
+
+  #app .info li span {
+    padding: 1px 3px;
+  }
+
+  #app #vote {
+    min-width: 0;
+    width: min(48vw, 260px);
+  }
+
+  #app #vote .overlay {
+    padding: 10px 8px;
+  }
+
+  #app #vote .arrows {
+    height: 148%;
+  }
+
+  #app .characters .team aside {
+    width: 26px;
+  }
+
+  #app .characters .team ul li {
+    padding: 4px;
+  }
+
+  #app .modal ul.tokens > li {
+    width: clamp(52px, 15vw, 76px);
+  }
+
+  #app .modal ul.reminders .reminder {
+    width: clamp(62px, 20vw, 84px);
+    height: clamp(62px, 20vw, 84px);
+  }
+
+  #app .vote-history table {
+    font-size: 0.72em;
+  }
+
+  #app .vote-history thead td,
+  #app .vote-history tbody td {
+    padding: 5px 6px;
+  }
+}

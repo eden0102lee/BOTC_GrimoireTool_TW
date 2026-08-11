@@ -1,0 +1,325 @@
+@import "vars";
+
+// -----------------------------------------------------------------------------
+// Viewport / board centering
+// -----------------------------------------------------------------------------
+// The original layout relied on the static position of absolutely-positioned
+// flex children. That is fragile once the center panels get different widths.
+// Make the board and all center overlays use one explicit viewport origin.
+html,
+body,
+#app {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+html,
+body {
+  min-height: 100%;
+  min-height: 100dvh;
+  overscroll-behavior: none;
+}
+
+#app {
+  --board-gutter: 20px;
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+// Day / night: opacity crossfade ~1s (gradients stay fixed per layer).
+#app:before {
+  transition: opacity 1s ease;
+}
+
+#app:not(.night):before {
+  background: radial-gradient(
+    ellipse at 50% 36%,
+    rgba(255, 228, 190, 0.22) 0%,
+    rgba(255, 210, 160, 0.08) 42%,
+    transparent 70%
+  );
+  mix-blend-mode: soft-light;
+  opacity: 0.55;
+}
+
+#app.night:before {
+  opacity: 0;
+}
+
+#app > .backdrop {
+  background:
+    radial-gradient(
+      circle at 22% 16%,
+      rgba(200, 220, 255, 0.14) 0%,
+      rgba(140, 170, 230, 0.05) 18%,
+      transparent 38%
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      transparent 0 36%,
+      rgba(8, 18, 40, 0.28) 72%,
+      rgba(4, 10, 24, 0.42) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(10, 24, 48, 0.22) 0%,
+      rgba(6, 14, 32, 0.16) 50%,
+      rgba(4, 10, 22, 0.3) 100%
+    );
+  mix-blend-mode: multiply;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+#app.night > .backdrop {
+  opacity: 0.55;
+}
+
+// The actual grimoire table always occupies the entire visual viewport.
+#app > #townsquare {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  transform: none;
+  transform-origin: 50% 50%;
+  z-index: 2;
+}
+
+// Give the player circle an explicit centered rectangle. This removes the last
+// dependency on TownSquare's flex layout and keeps the same center at every
+// aspect ratio. Existing portrait rules can still override individual seat arms.
+#app > #townsquare > .circle {
+  position: absolute;
+  inset: var(--board-gutter);
+  width: auto;
+  height: auto;
+  margin: 0;
+  z-index: 2;
+}
+
+#app > #townsquare > .circle > li {
+  top: 0;
+}
+
+// Intro, town status, and voting are independent overlays over the same exact
+// center point. Explicit positioning avoids browser-dependent flex static
+// positioning and prevents the left storyteller panel from shifting the table.
+#app > .intro,
+#app > .info,
+#app > #vote {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  margin: 0 !important;
+  transform: translate3d(-50%, -50%, 0) !important;
+  transform-origin: 50% 50%;
+}
+
+#app > .intro {
+  z-index: 12;
+}
+
+#app > .info {
+  z-index: 12;
+}
+
+#app > #vote {
+  z-index: 24;
+}
+
+// The intro's ritual and content card share the same local center rather than
+// relying on their own static absolute position.
+#app > .intro > .ritual {
+  left: 50%;
+  top: 50%;
+  transform: translate3d(-50%, -50%, 0);
+}
+
+#app > .intro > .intro-card {
+  margin: 0 auto;
+}
+
+// -----------------------------------------------------------------------------
+// Center-table visual anchor
+// -----------------------------------------------------------------------------
+// A very faint clock seal makes the optical center readable even when the
+// storyteller panels are open. It is decorative only and never captures input.
+#app > #townsquare:before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(46vmin, 500px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba($grimoire-brass, 0.07);
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle,
+      transparent 0 46%,
+      rgba($grimoire-brass, 0.035) 46.5% 47%,
+      transparent 47.5%
+    ),
+    radial-gradient(
+      circle,
+      transparent 0 64%,
+      rgba($grimoire-brass, 0.028) 64.5% 65%,
+      transparent 65.5%
+    ),
+    conic-gradient(
+      from -0.5deg,
+      rgba($grimoire-brass, 0.06) 0deg 1deg,
+      transparent 1deg 29deg,
+      rgba($grimoire-brass, 0.06) 29deg 30deg,
+      transparent 30deg 59deg,
+      rgba($grimoire-brass, 0.06) 59deg 60deg,
+      transparent 60deg 89deg,
+      rgba($grimoire-brass, 0.06) 89deg 90deg,
+      transparent 90deg 119deg,
+      rgba($grimoire-brass, 0.06) 119deg 120deg,
+      transparent 120deg 149deg,
+      rgba($grimoire-brass, 0.06) 149deg 150deg,
+      transparent 150deg 179deg,
+      rgba($grimoire-brass, 0.06) 179deg 180deg,
+      transparent 180deg 209deg,
+      rgba($grimoire-brass, 0.06) 209deg 210deg,
+      transparent 210deg 239deg,
+      rgba($grimoire-brass, 0.06) 239deg 240deg,
+      transparent 240deg 269deg,
+      rgba($grimoire-brass, 0.06) 269deg 270deg,
+      transparent 270deg 299deg,
+      rgba($grimoire-brass, 0.06) 299deg 300deg,
+      transparent 300deg 329deg,
+      rgba($grimoire-brass, 0.06) 329deg 330deg,
+      transparent 330deg 360deg
+    );
+  box-shadow:
+    inset 0 0 60px rgba($grimoire-blood, 0.018),
+    0 0 60px rgba(0, 0, 0, 0.08);
+  opacity: 0.72;
+  pointer-events: none;
+  z-index: 0;
+}
+
+// -----------------------------------------------------------------------------
+// Optical balance / density polish
+// -----------------------------------------------------------------------------
+#app > .info {
+  max-width: min(310px, calc(100vw - 40px));
+}
+
+#app > #vote {
+  max-width: min(360px, calc(100vw - 28px));
+}
+
+// The fixed storyteller panel floats above the canvas; it never reserves layout
+// width, so opening/collapsing it cannot change the board center.
+#app > .left-panels {
+  contain: layout paint;
+}
+
+#version {
+  z-index: 96;
+  color: rgba($grimoire-muted, 0.76);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+// -----------------------------------------------------------------------------
+// Compact and short viewports
+// -----------------------------------------------------------------------------
+@media screen and (max-width: 991.98px) {
+  #app {
+    --board-gutter: 10px;
+  }
+
+  #app > #townsquare:before {
+    width: min(43vmin, 390px);
+    opacity: 0.58;
+  }
+}
+
+@media screen and (max-width: 767.98px) {
+  #app {
+    --board-gutter: 5px;
+  }
+
+  #app > .intro {
+    width: min(94vw, 720px);
+  }
+
+  #app > .info {
+    max-width: min(154px, calc(100vw - 24px));
+  }
+
+  #app > #vote {
+    max-width: min(270px, calc(100vw - 20px));
+  }
+
+  #app > #townsquare:before {
+    width: min(52vmin, 320px);
+    opacity: 0.45;
+  }
+}
+
+@media screen and (max-height: 620px) {
+  #app {
+    --board-gutter: 8px;
+  }
+
+  #app > .intro {
+    height: calc(100dvh - 16px);
+    min-height: 0;
+  }
+
+  #app > .intro > .ritual {
+    width: min(78vmin, 520px);
+    height: min(78vmin, 520px);
+  }
+
+  #app > .info {
+    transform: translate3d(-50%, -50%, 0) scale(0.9) !important;
+  }
+
+  #app > #vote {
+    transform: translate3d(-50%, -50%, 0) scale(0.9) !important;
+  }
+}
+
+@media screen and (max-height: 480px) {
+  #app {
+    --board-gutter: 4px;
+  }
+
+  #app > .info {
+    transform: translate3d(-50%, -50%, 0) scale(0.78) !important;
+  }
+
+  #app > #vote {
+    transform: translate3d(-50%, -50%, 0) scale(0.78) !important;
+  }
+
+  #app > #townsquare:before {
+    width: min(60vmin, 270px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #app > .intro,
+  #app > .info,
+  #app > #vote {
+    transition-property: opacity, filter !important;
+  }
+}

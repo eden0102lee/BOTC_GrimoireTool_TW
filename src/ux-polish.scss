@@ -1,0 +1,531 @@
+@import "vars";
+
+// -----------------------------------------------------------------------------
+// Fourth-pass UX polish
+// -----------------------------------------------------------------------------
+// This layer only refines density, hierarchy, safe areas, and interaction
+// feedback. Player placement math and gameplay state remain untouched.
+
+// -----------------------------------------------------------------------------
+// Player-ring density by player count
+// -----------------------------------------------------------------------------
+// At high player counts, token size is already handled by seatBaseSize(). The
+// clutter comes mostly from labels and reminder tokens, so compact those first.
+#townsquare .circle.size-11 > li .player > .name,
+#townsquare .circle.size-12 > li .player > .name {
+  width: 116%;
+  right: 8%;
+  font-size: 108%;
+}
+
+#townsquare .circle.size-13 > li .player > .name,
+#townsquare .circle.size-14 > li .player > .name,
+#townsquare .circle.size-15 > li .player > .name {
+  width: 112%;
+  right: 6%;
+  min-height: 1.35em;
+  padding: 1px 6px 2px;
+  font-size: 98%;
+  letter-spacing: 0;
+}
+
+#townsquare .circle.size-16 > li .player > .name,
+#townsquare .circle.size-17 > li .player > .name,
+#townsquare .circle.size-18 > li .player > .name,
+#townsquare .circle.size-19 > li .player > .name,
+#townsquare .circle.size-20 > li .player > .name {
+  width: 108%;
+  right: 4%;
+  min-height: 1.25em;
+  padding: 1px 4px;
+  font-size: 88%;
+  letter-spacing: 0;
+}
+
+#townsquare .circle.size-13 > li .player > .name:before,
+#townsquare .circle.size-13 > li .player > .name:after,
+#townsquare .circle.size-14 > li .player > .name:before,
+#townsquare .circle.size-14 > li .player > .name:after,
+#townsquare .circle.size-15 > li .player > .name:before,
+#townsquare .circle.size-15 > li .player > .name:after,
+#townsquare .circle.size-16 > li .player > .name:before,
+#townsquare .circle.size-16 > li .player > .name:after,
+#townsquare .circle.size-17 > li .player > .name:before,
+#townsquare .circle.size-17 > li .player > .name:after,
+#townsquare .circle.size-18 > li .player > .name:before,
+#townsquare .circle.size-18 > li .player > .name:after,
+#townsquare .circle.size-19 > li .player > .name:before,
+#townsquare .circle.size-19 > li .player > .name:after,
+#townsquare .circle.size-20 > li .player > .name:before,
+#townsquare .circle.size-20 > li .player > .name:after {
+  display: none;
+}
+
+// Reminder tokens are reduced before the role token itself so the character
+// icon remains the dominant gameplay object.
+#townsquare .circle.size-13 > li > .reminder,
+#townsquare .circle.size-14 > li > .reminder,
+#townsquare .circle.size-15 > li > .reminder {
+  width: 45%;
+  padding-bottom: 45%;
+  margin-left: -22.5%;
+}
+
+#townsquare .circle.size-16 > li > .reminder,
+#townsquare .circle.size-17 > li > .reminder,
+#townsquare .circle.size-18 > li > .reminder,
+#townsquare .circle.size-19 > li > .reminder,
+#townsquare .circle.size-20 > li > .reminder {
+  width: 40%;
+  padding-bottom: 40%;
+  margin-left: -20%;
+}
+
+#townsquare .circle.size-16 .reminder .text,
+#townsquare .circle.size-17 .reminder .text,
+#townsquare .circle.size-18 .reminder .text,
+#townsquare .circle.size-19 .reminder .text,
+#townsquare .circle.size-20 .reminder .text {
+  font-size: 46%;
+}
+
+// De-emphasize seat metadata as the circle becomes crowded.
+#townsquare .circle.size-16 .player .seat,
+#townsquare .circle.size-16 .player .has-vote,
+#townsquare .circle.size-17 .player .seat,
+#townsquare .circle.size-17 .player .has-vote,
+#townsquare .circle.size-18 .player .seat,
+#townsquare .circle.size-18 .player .has-vote,
+#townsquare .circle.size-19 .player .seat,
+#townsquare .circle.size-19 .player .has-vote,
+#townsquare .circle.size-20 .player .seat,
+#townsquare .circle.size-20 .player .has-vote {
+  font-size: 82%;
+}
+
+// Tooltips/menus should always float above neighboring seats.
+#townsquare .circle > li:focus-within,
+#townsquare .circle > li:hover {
+  z-index: 70 !important;
+}
+
+#townsquare .circle .player > .menu {
+  max-height: min(70dvh, 430px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+// -----------------------------------------------------------------------------
+// Center information hierarchy
+// -----------------------------------------------------------------------------
+#app > .info {
+  width: clamp(168px, 18vw, 248px);
+  min-height: 0;
+  padding: 39px 12px 11px;
+}
+
+#app > .info li {
+  line-height: 1.16;
+}
+
+#app > .info li.edition {
+  width: clamp(66px, 13vmin, 132px);
+  height: clamp(58px, 12vmin, 118px);
+  top: -36%;
+  opacity: 0.92;
+}
+
+// A small group has more empty center space; let TownInfo breathe a little.
+#app:has(#townsquare .circle.size-1) > .info,
+#app:has(#townsquare .circle.size-2) > .info,
+#app:has(#townsquare .circle.size-3) > .info,
+#app:has(#townsquare .circle.size-4) > .info,
+#app:has(#townsquare .circle.size-5) > .info,
+#app:has(#townsquare .circle.size-6) > .info {
+  width: clamp(184px, 22vw, 270px);
+}
+
+// Large groups need the center to stay quiet so labels around the ring remain
+// legible.
+#app:has(#townsquare .circle.size-13) > .info,
+#app:has(#townsquare .circle.size-14) > .info,
+#app:has(#townsquare .circle.size-15) > .info,
+#app:has(#townsquare .circle.size-16) > .info,
+#app:has(#townsquare .circle.size-17) > .info,
+#app:has(#townsquare .circle.size-18) > .info,
+#app:has(#townsquare .circle.size-19) > .info,
+#app:has(#townsquare .circle.size-20) > .info {
+  width: clamp(148px, 15vw, 205px);
+  padding: 34px 9px 9px;
+  font-size: 86%;
+  background:
+    radial-gradient(
+      circle at 50% -18%,
+      rgba($grimoire-brass, 0.065),
+      transparent 48%
+    ),
+    rgba(9, 8, 7, 0.66);
+}
+
+// -----------------------------------------------------------------------------
+// Vote readability / touch priority
+// -----------------------------------------------------------------------------
+#app > #vote {
+  width: clamp(238px, 22vw, 330px);
+  padding: 16px;
+}
+
+#app > #vote:before {
+  inset: 2%;
+  border-color: rgba($grimoire-brass, 0.42);
+  box-shadow:
+    0 20px 54px rgba(0, 0, 0, 0.52),
+    inset 0 0 52px rgba($grimoire-blood, 0.14),
+    inset 0 0 0 8px rgba(0, 0, 0, 0.14);
+}
+
+#app > #vote .overlay {
+  width: 92%;
+  padding: 14px 11px 12px;
+  line-height: 1.25;
+}
+
+#app > #vote .overlay > em {
+  min-width: 44%;
+  margin: 5px 2px 3px;
+  padding: 3px 7px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+#app > #vote .button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 9px;
+}
+
+#app > #vote .button-group .button {
+  flex: 1 1 auto;
+  min-width: 72px;
+  min-height: 38px;
+  margin: 0;
+  border-radius: 5px;
+}
+
+#app > #vote .button-group.mark {
+  margin-top: 5px;
+  padding-top: 6px;
+  border-top: 1px solid rgba($grimoire-brass, 0.12);
+  opacity: 0.78;
+}
+
+#app > #vote .button-group.mark .button {
+  min-height: 32px;
+  font-size: 0.8em;
+}
+
+#app > #vote .countdown {
+  z-index: 8;
+}
+
+#app > #vote .countdown span {
+  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.85));
+}
+
+// -----------------------------------------------------------------------------
+// Bluff / Fabled trays
+// -----------------------------------------------------------------------------
+#app #townsquare > .bluffs,
+#app #townsquare > .fabled {
+  max-width: min(34vw, 360px);
+  padding: 3px 5px 5px;
+  overflow: visible;
+}
+
+#app #townsquare > .bluffs ul,
+#app #townsquare > .fabled ul {
+  gap: 2px;
+}
+
+#app #townsquare > .bluffs ul li,
+#app #townsquare > .fabled ul li {
+  width: clamp(50px, 8.2vh, 82px);
+  height: clamp(50px, 8.2vh, 82px);
+  margin: 0;
+}
+
+// In crowded games, protect the outer player ring by shrinking corner trays.
+#app:has(#townsquare .circle.size-13) #townsquare > .bluffs ul li,
+#app:has(#townsquare .circle.size-13) #townsquare > .fabled ul li,
+#app:has(#townsquare .circle.size-14) #townsquare > .bluffs ul li,
+#app:has(#townsquare .circle.size-14) #townsquare > .fabled ul li,
+#app:has(#townsquare .circle.size-15) #townsquare > .bluffs ul li,
+#app:has(#townsquare .circle.size-15) #townsquare > .fabled ul li,
+#app:has(#townsquare .circle.size-16) #townsquare > .bluffs ul li,
+#app:has(#townsquare .circle.size-16) #townsquare > .fabled ul li,
+#app:has(#townsquare .circle.size-17) #townsquare > .bluffs ul li,
+#app:has(#townsquare .circle.size-17) #townsquare > .fabled ul li,
+#app:has(#townsquare .circle.size-18) #townsquare > .bluffs ul li,
+#app:has(#townsquare .circle.size-18) #townsquare > .fabled ul li,
+#app:has(#townsquare .circle.size-19) #townsquare > .bluffs ul li,
+#app:has(#townsquare .circle.size-19) #townsquare > .fabled ul li,
+#app:has(#townsquare .circle.size-20) #townsquare > .bluffs ul li,
+#app:has(#townsquare .circle.size-20) #townsquare > .fabled ul li {
+  width: clamp(44px, 6.8vh, 66px);
+  height: clamp(44px, 6.8vh, 66px);
+}
+
+#app #townsquare > .bluffs h3,
+#app #townsquare > .fabled h3 {
+  min-height: 26px;
+  margin: 2px 5px 1px;
+  font-size: 0.78em;
+}
+
+// On desktop, the expanded storyteller panel occupies the lower-left corner.
+// Shift demon bluffs just outside that panel instead of letting both layers sit
+// on top of one another. :has() is enhancement-only; older browsers keep the
+// safe compact fallback above.
+@supports selector(:has(*)) {
+  @media screen and (min-width: 992px) {
+    #app:has(> .left-panels:not(.left-panels--collapsed))
+      #townsquare
+      > .bluffs {
+      left: clamp(270px, 29vw, 360px);
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Focus / keyboard / accessibility feedback
+// -----------------------------------------------------------------------------
+#app .button:focus-visible,
+#app input:focus-visible,
+#app select:focus-visible,
+#app textarea:focus-visible,
+#controls .menu > svg:focus-visible,
+#townsquare .player > .name:focus-visible {
+  outline: 2px solid rgba($grimoire-brass-light, 0.82);
+  outline-offset: 2px;
+}
+
+#app .button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+// Do not rely on hover scaling on touch screens; keep targets stable under the
+// finger and use border/brightness feedback instead.
+@media (hover: none) {
+  #app .modal ul.tokens > li:hover,
+  #app .modal ul.reminders .reminder:hover {
+    transform: none;
+  }
+
+  #app .button:active:not(.disabled) {
+    border-color: rgba($grimoire-brass-light, 0.82);
+    filter: brightness(1.08);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Tablet / mobile safe areas
+// -----------------------------------------------------------------------------
+@media screen and (max-width: 991.98px) {
+  #app > .info {
+    width: clamp(146px, 28vw, 188px);
+    padding: 31px 8px 8px;
+  }
+
+  #app > .info li.edition {
+    width: clamp(54px, 14vmin, 94px);
+    height: clamp(48px, 13vmin, 86px);
+    top: -32%;
+  }
+
+  #app > #vote {
+    width: clamp(220px, 40vw, 292px);
+  }
+
+  #app #townsquare > .bluffs,
+  #app #townsquare > .fabled {
+    max-width: min(42vw, 260px);
+    bottom: max(8px, env(safe-area-inset-bottom, 0px));
+  }
+
+  #app #townsquare > .bluffs ul li,
+  #app #townsquare > .fabled ul li {
+    width: clamp(44px, 7vh, 64px);
+    height: clamp(44px, 7vh, 64px);
+  }
+}
+
+@media screen and (max-width: 767.98px) {
+  #app > .info {
+    width: clamp(128px, 34vw, 152px);
+    padding: 26px 6px 7px;
+    border-radius: 6px;
+    font-size: 70%;
+  }
+
+  #app > .info li + li {
+    margin-top: 3px;
+    padding-top: 3px;
+  }
+
+  #app > #vote {
+    width: min(74vw, 260px);
+    max-width: calc(100vw - 26px);
+    padding: 10px;
+  }
+
+  #app > #vote .overlay {
+    width: 96%;
+    padding: 10px 8px 9px;
+    font-size: 78%;
+  }
+
+  #app > #vote .button-group .button {
+    min-width: 64px;
+    min-height: 42px;
+  }
+
+  #app #townsquare > .bluffs,
+  #app #townsquare > .fabled {
+    max-width: 45vw;
+    padding: 2px 3px 3px;
+    bottom: max(36px, calc(env(safe-area-inset-bottom, 0px) + 8px));
+    backdrop-filter: blur(10px);
+  }
+
+  #app #townsquare > .bluffs {
+    left: max(5px, env(safe-area-inset-left, 0px));
+  }
+
+  #app #townsquare > .fabled {
+    right: max(5px, env(safe-area-inset-right, 0px));
+  }
+
+  #app #townsquare > .bluffs h3,
+  #app #townsquare > .fabled h3 {
+    min-height: 22px;
+    font-size: 0.68em;
+  }
+
+  #app #townsquare > .bluffs ul li,
+  #app #townsquare > .fabled ul li {
+    width: clamp(38px, 11vw, 52px);
+    height: clamp(38px, 11vw, 52px);
+  }
+
+  #townsquare .circle.size-13 > li .player > .name,
+  #townsquare .circle.size-14 > li .player > .name,
+  #townsquare .circle.size-15 > li .player > .name,
+  #townsquare .circle.size-16 > li .player > .name,
+  #townsquare .circle.size-17 > li .player > .name,
+  #townsquare .circle.size-18 > li .player > .name,
+  #townsquare .circle.size-19 > li .player > .name,
+  #townsquare .circle.size-20 > li .player > .name {
+    width: 104%;
+    right: 2%;
+    font-size: 80%;
+    padding-inline: 2px;
+  }
+}
+
+// Portrait phones have vertical room but limited horizontal density. Demon
+// bluffs are a primary Storyteller reference (normally three roles), so keep
+// those tokens substantially larger than Fabled/support trays in this layout.
+@media screen and (max-width: 767.98px) and (orientation: portrait) {
+  #app #townsquare > .bluffs {
+    max-width: min(78vw, 292px);
+    padding: 4px 6px 6px;
+    bottom: max(42px, calc(env(safe-area-inset-bottom, 0px) + 12px));
+  }
+
+  #app #townsquare > .bluffs ul {
+    gap: 4px;
+  }
+
+  #app #townsquare > .bluffs ul li {
+    width: clamp(62px, 18vw, 78px);
+    height: clamp(62px, 18vw, 78px);
+  }
+
+  #app #townsquare > .bluffs h3 {
+    min-height: 28px;
+    margin: 3px 6px 2px;
+    font-size: 0.8em;
+  }
+
+  // Don't let the compact-seat name shrink override portrait readability.
+  #townsquare .circle.size-13 > li .player > .name,
+  #townsquare .circle.size-14 > li .player > .name,
+  #townsquare .circle.size-15 > li .player > .name,
+  #townsquare .circle.size-16 > li .player > .name,
+  #townsquare .circle.size-17 > li .player > .name,
+  #townsquare .circle.size-18 > li .player > .name,
+  #townsquare .circle.size-19 > li .player > .name,
+  #townsquare .circle.size-20 > li .player > .name {
+    font-size: max(13px, 0.98rem);
+    width: 110%;
+    right: 5%;
+    padding-inline: 4px;
+  }
+
+  // The high-player-count compact rule above has intentionally higher
+  // specificity. Match it here so portrait phones still retain readable bluffs.
+  @supports selector(:has(*)) {
+    #app:has(#townsquare .circle[class*="size-"])
+      #townsquare
+      > .bluffs
+      ul
+      li {
+      width: clamp(62px, 18vw, 78px);
+      height: clamp(62px, 18vw, 78px);
+    }
+  }
+}
+
+// Short landscape phones are the most constrained case: protect the actual
+// player ring first, then reduce decorative/support UI.
+@media screen and (max-height: 540px) and (min-aspect-ratio: 4/3) {
+  #app > .info {
+    width: 132px;
+    padding: 23px 5px 5px;
+    font-size: 64%;
+  }
+
+  #app > .info li.edition {
+    width: 56px;
+    height: 50px;
+    top: -31%;
+  }
+
+  #app > #vote {
+    width: 220px;
+    padding: 8px;
+  }
+
+  #app > #vote .overlay {
+    font-size: 72%;
+  }
+
+  #app #townsquare > .bluffs,
+  #app #townsquare > .fabled {
+    max-width: 34vw;
+    bottom: 5px;
+  }
+
+  #app #townsquare > .bluffs ul li,
+  #app #townsquare > .fabled ul li {
+    width: 38px;
+    height: 38px;
+  }
+
+  #app #townsquare > .bluffs h3,
+  #app #townsquare > .fabled h3 {
+    min-height: 18px;
+    font-size: 0.6em;
+  }
+}

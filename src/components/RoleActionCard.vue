@@ -668,12 +668,18 @@ export default {
     },
     deleteRecord() {
       if (this.abilityLost) return;
-      if (!window.confirm(this.$t("recorder.confirmCancelRecord"))) return;
-      const key =
-        (this.recordedEntry && this.recordedEntry.roleCardKey) ||
-        this.roleCardKey;
-      this.editing = false;
-      this.$emit("delete", key);
+      this.$store
+        .dispatch("dialog/confirm", {
+          message: this.$t("recorder.confirmCancelRecord"),
+        })
+        .then(ok => {
+          if (!ok) return;
+          const key =
+            (this.recordedEntry && this.recordedEntry.roleCardKey) ||
+            this.roleCardKey;
+          this.editing = false;
+          this.$emit("delete", key);
+        });
     },
     ensureDisguiseSetupFormData() {
       if (!this.setupMode || this.disguiseSetupVariant !== "disguise") return;

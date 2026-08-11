@@ -1,0 +1,217 @@
+@import "vars";
+
+// Shared visual layer for the digital-grimoire art direction.
+// Functional team colors remain untouched; this file only styles chrome and ambience.
+
+#app {
+  color: $grimoire-text;
+  isolation: isolate;
+
+  &:before,
+  &:after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  // Day / night ambience via opacity crossfade (~1s).
+  // Gradients stay fixed per layer so the transition doesn't snap.
+  &:before {
+    // Day lift layer — fades out at night
+    background: radial-gradient(
+      ellipse at 50% 36%,
+      rgba(255, 228, 190, 0.22) 0%,
+      rgba(255, 210, 160, 0.08) 42%,
+      transparent 70%
+    );
+    mix-blend-mode: soft-light;
+    opacity: 0.55;
+    transition: opacity 1s ease;
+  }
+
+  &.night:before {
+    opacity: 0;
+  }
+
+  // Fine engraved/noise texture made entirely with CSS.
+  &:after {
+    opacity: 0.12;
+    transition: opacity 1s ease;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.018) 0, rgba(255,255,255,.018) 1px, transparent 1px, transparent 4px),
+      repeating-linear-gradient(90deg, rgba(0,0,0,.025) 0, rgba(0,0,0,.025) 1px, transparent 1px, transparent 5px);
+  }
+
+  &.night:after {
+    opacity: 0.16;
+  }
+
+  // Night: faint brass rim fades in over 1s
+  box-shadow: none;
+  transition: box-shadow 1s ease;
+
+  &.night {
+    box-shadow:
+      inset 0 0 0 1px rgba($grimoire-brass, 0.18),
+      inset 0 0 48px rgba($grimoire-brass, 0.07),
+      inset 0 0 120px rgba(0, 8, 24, 0.28);
+  }
+}
+
+// Root-layer ordering is intentionally NOT assigned here. Applying z-index to
+// every direct child of #app creates independent stacking contexts and traps
+// modal/menu descendants under unrelated UI. stacking-system.scss owns all
+// application-level layers explicitly.
+
+// Night cool veil + moon pocket — opacity 0 by day, fades in over 1s.
+#app > .backdrop {
+  z-index: 0;
+  background:
+    radial-gradient(
+      circle at 22% 16%,
+      rgba(200, 220, 255, 0.14) 0%,
+      rgba(140, 170, 230, 0.05) 18%,
+      transparent 38%
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      transparent 0 36%,
+      rgba(8, 18, 40, 0.28) 72%,
+      rgba(4, 10, 24, 0.42) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(10, 24, 48, 0.22) 0%,
+      rgba(6, 14, 32, 0.16) 50%,
+      rgba(4, 10, 22, 0.3) 100%
+    );
+  mix-blend-mode: multiply;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+#app.night > .backdrop {
+  opacity: 0.55;
+}
+
+// Modern engraved-button language.
+.button {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid rgba($grimoire-brass, 0.5);
+  border-radius: 6px;
+  background:
+    linear-gradient(180deg, rgba(255, 244, 217, 0.045), transparent 45%),
+    rgba(13, 11, 10, 0.9);
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.34),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.65);
+  color: $grimoire-text;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+  line-height: 1.25;
+  transition:
+    border-color 160ms ease,
+    color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+
+  &:before,
+  &:after {
+    display: none;
+  }
+
+  &:hover:not(.disabled) {
+    color: $grimoire-brass-light;
+    border-color: rgba($grimoire-brass-light, 0.9);
+    background:
+      linear-gradient(180deg, rgba(255, 244, 217, 0.07), transparent 48%),
+      rgba(25, 18, 14, 0.96);
+    box-shadow:
+      0 8px 24px rgba(0, 0, 0, 0.42),
+      0 0 16px rgba($grimoire-brass, 0.08),
+      inset 0 0 0 1px rgba(0, 0, 0, 0.65);
+  }
+
+  &:active:not(.disabled) {
+    transform: translateY(1px);
+  }
+
+  &.disabled {
+    color: rgba($grimoire-muted, 0.5);
+    border-color: rgba($grimoire-brass, 0.16);
+    background: rgba(8, 8, 8, 0.72);
+  }
+
+  &.townsfolk {
+    border-color: rgba(72, 120, 174, 0.7);
+    background:
+      linear-gradient(180deg, rgba(79, 129, 190, 0.12), transparent 58%),
+      rgba(10, 19, 30, 0.94);
+    box-shadow: 0 6px 18px rgba(0,0,0,.34), inset 0 0 0 1px rgba(0,0,0,.65);
+
+    &:hover:not(.disabled) {
+      color: #b7d8ff;
+      border-color: rgba(105, 164, 226, 0.92);
+    }
+  }
+
+  &.demon {
+    border-color: rgba($grimoire-blood-bright, 0.78);
+    background:
+      linear-gradient(180deg, rgba($grimoire-blood-bright, 0.14), transparent 58%),
+      rgba(30, 9, 10, 0.94);
+    box-shadow: 0 6px 18px rgba(0,0,0,.34), inset 0 0 0 1px rgba(0,0,0,.65);
+
+    &:hover:not(.disabled) {
+      color: #ffc8c1;
+      border-color: rgba(196, 70, 76, 0.95);
+    }
+  }
+}
+
+.button-group .button {
+  border-radius: 0;
+  margin-left: -1px;
+
+  &:first-child {
+    margin-left: 0;
+    border-radius: 6px 0 0 6px;
+  }
+
+  &:last-child {
+    border-radius: 0 6px 6px 0;
+  }
+}
+
+// Unify generic modal/panel chrome without changing component layout.
+.modal,
+.menu,
+.panel {
+  scrollbar-color: rgba($grimoire-brass, 0.42) rgba(0, 0, 0, 0.18);
+}
+
+::selection {
+  color: #fff7e9;
+  background: rgba($grimoire-blood-bright, 0.72);
+}
+
+#version {
+  color: $grimoire-muted;
+  letter-spacing: 0.08em;
+  opacity: 0.42;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #app *,
+  #app *:before,
+  #app *:after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

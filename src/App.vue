@@ -37,6 +37,7 @@
     <GameStateModal />
     <BattleLogModal />
     <InteractionRulesModal />
+    <DialogModal />
     <Gradients />
     <LeftPanels />
     <span id="version">v{{ version }}</span>
@@ -61,6 +62,7 @@ import VoteHistoryModal from "@/components/modals/VoteHistoryModal";
 import GameStateModal from "@/components/modals/GameStateModal";
 import BattleLogModal from "@/components/modals/BattleLogModal";
 import InteractionRulesModal from "@/components/modals/InteractionRulesModal";
+import DialogModal from "@/components/modals/DialogModal";
 import LeftPanels from "@/components/LeftPanels";
 import { bindViewportUnitSync } from "./store/viewportLayout";
 
@@ -70,6 +72,7 @@ export default {
     GameStateModal,
     BattleLogModal,
     InteractionRulesModal,
+    DialogModal,
     VoteHistoryModal,
     FabledModal,
     NightOrderModal,
@@ -86,21 +89,22 @@ export default {
   computed: {
     ...mapState(["grimoire", "session"]),
     ...mapState("players", ["players"]),
+    ...mapState("dialog", { dialogOpen: "open" }),
   },
   data() {
     return {
       version: pkg.version,
-      _unbindViewport: null,
+      unbindViewport: null,
     };
   },
   mounted() {
-    this._unbindViewport = bindViewportUnitSync(this.$store);
+    this.unbindViewport = bindViewportUnitSync(this.$store);
     this.openModalFromQuery();
   },
   beforeDestroy() {
-    if (this._unbindViewport) {
-      this._unbindViewport();
-      this._unbindViewport = null;
+    if (this.unbindViewport) {
+      this.unbindViewport();
+      this.unbindViewport = null;
     }
   },
   methods: {
@@ -132,6 +136,7 @@ export default {
     keyup(event) {
       const { key, ctrlKey, metaKey, target } = event;
       if (ctrlKey || metaKey) return;
+      if (this.dialogOpen) return;
       // Disable shortcuts while typing / using form controls
       const tag = target && target.tagName;
       if (
@@ -230,7 +235,7 @@ html,
 body {
   font-size: 1.2em;
   line-height: 1.4;
-  background: url("assets/background.jpg") center center;
+  background: #09090b url("assets/grimoire-altar.png") center center;
   background-size: cover;
   color: white;
   height: 100%;
@@ -278,6 +283,8 @@ ul {
 #app {
   height: 100%;
   height: 100dvh;
+  background-color: #09090b;
+  background-image: url("assets/grimoire-altar.png");
   background-position: center center;
   background-size: cover;
   display: flex;
@@ -410,7 +417,7 @@ video#background {
   object-fit: cover;
 }
 
-/* Night phase backdrop */
+/* Night cool veil fades in/out over 1s; day lift is on #app:before. */
 #app > .backdrop {
   position: absolute;
   left: 0;
@@ -418,15 +425,28 @@ video#background {
   bottom: 0;
   top: 0;
   pointer-events: none;
-  background: black;
-  background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 1) 0%,
-    rgba(1, 22, 46, 1) 50%,
-    rgba(0, 39, 70, 1) 100%
-  );
+  background:
+    radial-gradient(
+      circle at 22% 16%,
+      rgba(200, 220, 255, 0.14) 0%,
+      rgba(140, 170, 230, 0.05) 18%,
+      transparent 38%
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      transparent 0 36%,
+      rgba(8, 18, 40, 0.28) 72%,
+      rgba(4, 10, 24, 0.42) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(10, 24, 48, 0.22) 0%,
+      rgba(6, 14, 32, 0.16) 50%,
+      rgba(4, 10, 22, 0.3) 100%
+    );
+  mix-blend-mode: multiply;
   opacity: 0;
-  transition: opacity 1s ease-in-out;
+  transition: opacity 1s ease;
   &:after {
     content: " ";
     display: block;
@@ -436,7 +456,7 @@ video#background {
     background: url("assets/clouds.png") repeat;
     background-size: 2000px auto;
     animation: move-background 120s linear infinite;
-    opacity: 0.18;
+    opacity: 0.08;
   }
 }
 
@@ -454,6 +474,6 @@ video#background {
 }
 
 #app.night > .backdrop {
-  opacity: 0.38;
+  opacity: 0.55;
 }
 </style>

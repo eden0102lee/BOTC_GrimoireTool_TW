@@ -140,7 +140,9 @@ export default {
             const roles = JSON.parse(reader.result);
             this.parseRoles(roles);
           } catch (e) {
-            alert(this.$t("edition.loadError", { error: e.message }));
+            this.$store.dispatch("dialog/alert", {
+              message: this.$t("edition.loadError", { error: e.message }),
+            });
           }
           this.$refs.upload.value = "";
         });
@@ -148,10 +150,13 @@ export default {
       }
     },
     promptURL() {
-      const url = prompt(this.$t("prompt.customScriptUrl"));
-      if (url) {
-        this.handleURL(url);
-      }
+      this.$store
+        .dispatch("dialog/prompt", {
+          message: this.$t("prompt.customScriptUrl"),
+        })
+        .then(url => {
+          if (url) this.handleURL(url);
+        });
     },
     async handleURL(url) {
       const res = await fetch(url);
@@ -160,7 +165,9 @@ export default {
           const script = await res.json();
           this.parseRoles(script);
         } catch (e) {
-          alert(this.$t("edition.loadError", { error: e.message }));
+          this.$store.dispatch("dialog/alert", {
+            message: this.$t("edition.loadError", { error: e.message }),
+          });
         }
       }
     },
@@ -170,7 +177,9 @@ export default {
         const roles = JSON.parse(text);
         this.parseRoles(roles);
       } catch (e) {
-        alert(this.$t("edition.loadError", { error: e.message }));
+        this.$store.dispatch("dialog/alert", {
+          message: this.$t("edition.loadError", { error: e.message }),
+        });
       }
     },
     parseRoles(roles) {

@@ -295,6 +295,17 @@
                 :icon="['fas', grimoire.isMuted ? 'volume-mute' : 'volume-up']"
             /></em>
           </li>
+          <li class="headline">{{ $t("menu.layoutSection") }}</li>
+          <li @click="toggleCompactToken">
+            {{ $t("menu.compactToken") }}
+            <em
+              ><font-awesome-icon
+                :icon="[
+                  'fas',
+                  grimoire.isCompactToken ? 'check-square' : 'square'
+                ]"
+            /></em>
+          </li>
           <li @click="toggleModal('battleLog')">
             {{ $t("menu.battleLog") }}
             <em>[B]</em>
@@ -353,33 +364,55 @@ export default {
   },
   methods: {
     clearBattleLog() {
-      if (!window.confirm(this.$t("confirm.deleteBattleLog"))) return;
-      this.$store.dispatch("battleLog/resetForNewGame");
+      this.$store
+        .dispatch("dialog/confirm", {
+          title: this.$t("menu.deleteBattleLog"),
+          message: this.$t("confirm.deleteBattleLog"),
+        })
+        .then(ok => {
+          if (!ok) return;
+          this.$store.dispatch("battleLog/resetForNewGame");
+        });
     },
     restartNewGame() {
-      if (!window.confirm(this.$t("confirm.restartNewGame"))) return;
-      this.$store.dispatch("players/clearRoles");
-      this.$store.dispatch("battleLog/resetForNewGame");
+      this.$store
+        .dispatch("dialog/confirm", {
+          message: this.$t("confirm.restartNewGame"),
+        })
+        .then(ok => {
+          if (!ok) return;
+          this.$store.dispatch("players/clearRoles");
+          this.$store.dispatch("battleLog/resetForNewGame");
+        });
     },
     setBackground() {
-      const background = prompt(this.$t("prompt.backgroundUrl"));
-      if (background || background === "") {
-        this.$store.commit("setBackground", background);
-      }
+      this.$store
+        .dispatch("dialog/prompt", {
+          message: this.$t("prompt.backgroundUrl"),
+          defaultValue: this.grimoire.background || "",
+        })
+        .then(background => {
+          if (background || background === "") {
+            this.$store.commit("setBackground", background);
+          }
+        });
     },
     hostSession() {
       if (this.session.sessionId) return;
-      const sessionId = prompt(
-        this.$t("prompt.sessionIdHost"),
-        Math.round(Math.random() * 10000)
-      );
-      if (sessionId) {
-        this.$store.commit("session/clearVoteHistory");
-        this.$store.commit("session/setSpectator", false);
-        this.$store.commit("session/setSessionId", sessionId);
-        this.updateLanUrl();
-        this.copySessionUrl();
-      }
+      this.$store
+        .dispatch("dialog/prompt", {
+          title: this.$t("menu.createTown"),
+          message: this.$t("prompt.sessionIdHost"),
+          defaultValue: String(Math.round(Math.random() * 10000)),
+        })
+        .then(sessionId => {
+          if (!sessionId) return;
+          this.$store.commit("session/clearVoteHistory");
+          this.$store.commit("session/setSpectator", false);
+          this.$store.commit("session/setSessionId", sessionId);
+          this.updateLanUrl();
+          this.copySessionUrl();
+        });
     },
     async fetchHostInfo() {
       try {
@@ -409,39 +442,64 @@ export default {
     },
     distributeRoles() {
       if (this.session.isSpectator) return;
-      if (confirm(this.$t("confirm.distributeRoles"))) {
-        this.$store.commit("session/distributeRoles", true);
-        setTimeout(
-          (() => {
-            this.$store.commit("session/distributeRoles", false);
-          }).bind(this),
-          2000
-        );
-      }
+      this.$store
+        .dispatch("dialog/confirm", {
+          message: this.$t("confirm.distributeRoles"),
+        })
+        .then(ok => {
+          if (!ok) return;
+          this.$store.commit("session/distributeRoles", true);
+          setTimeout(
+            (() => {
+              this.$store.commit("session/distributeRoles", false);
+            }).bind(this),
+            2000
+          );
+        });
     },
     imageOptIn() {
-      if (this.grimoire.isImageOptIn || confirm(this.$t("confirm.customImages"))) {
+      if (this.grimoire.isImageOptIn) {
         this.toggleImageOptIn();
+        return;
       }
+      this.$store
+        .dispatch("dialog/confirm", {
+          message: this.$t("confirm.customImages"),
+        })
+        .then(ok => {
+          if (ok) this.toggleImageOptIn();
+        });
     },
     joinSession() {
       if (this.session.sessionId) return this.leaveSession();
-      let sessionId = prompt(this.$t("prompt.sessionIdJoin"));
-      if (sessionId.match(/^https?:\/\//i)) {
-        sessionId = sessionId.split("#").pop();
-      }
-      if (sessionId) {
-        this.$store.commit("session/clearVoteHistory");
-        this.$store.commit("session/setSpectator", true);
-        this.$store.commit("session/setSessionId", sessionId);
-        this.updateLanUrl();
-      }
+      this.$store
+        .dispatch("dialog/prompt", {
+          title: this.$t("menu.joinTown"),
+          message: this.$t("prompt.sessionIdJoin"),
+        })
+        .then(raw => {
+          if (!raw) return;
+          let sessionId = raw;
+          if (/^https?:\/\//i.test(sessionId)) {
+            sessionId = sessionId.split("#").pop();
+          }
+          if (!sessionId) return;
+          this.$store.commit("session/clearVoteHistory");
+          this.$store.commit("session/setSpectator", true);
+          this.$store.commit("session/setSessionId", sessionId);
+          this.updateLanUrl();
+        });
     },
     leaveSession() {
-      if (confirm(this.$t("confirm.leaveSession"))) {
-        this.$store.commit("session/setSpectator", false);
-        this.$store.commit("session/setSessionId", "");
-      }
+      this.$store
+        .dispatch("dialog/confirm", {
+          message: this.$t("confirm.leaveSession"),
+        })
+        .then(ok => {
+          if (!ok) return;
+          this.$store.commit("session/setSpectator", false);
+          this.$store.commit("session/setSessionId", "");
+        });
     },
     addPlayer() {
       if (this.session.isSpectator) return;
@@ -450,28 +508,45 @@ export default {
     },
     randomizeSeatings() {
       if (this.session.isSpectator) return;
-      if (confirm(this.$t("confirm.randomizeSeatings"))) {
-        this.$store.dispatch("players/randomize");
-      }
+      this.$store
+        .dispatch("dialog/confirm", {
+          message: this.$t("confirm.randomizeSeatings"),
+        })
+        .then(ok => {
+          if (ok) this.$store.dispatch("players/randomize");
+        });
     },
     clearPlayers() {
       if (this.session.isSpectator) return;
-      if (confirm(this.$t("confirm.removeAllPlayers"))) {
-        if (this.session.nomination) {
-          this.$store.commit("session/nomination");
-        }
-        this.$store.commit("players/clear");
-      }
+      this.$store
+        .dispatch("dialog/confirm", {
+          message: this.$t("confirm.removeAllPlayers"),
+        })
+        .then(ok => {
+          if (!ok) return;
+          if (this.session.nomination) {
+            this.$store.commit("session/nomination");
+          }
+          this.$store.commit("players/clear");
+        });
     },
     clearRoles() {
-      if (confirm(this.$t("confirm.removeAllRoles"))) {
-        this.$store.dispatch("players/clearRoles");
-      }
+      this.$store
+        .dispatch("dialog/confirm", {
+          message: this.$t("confirm.removeAllRoles"),
+        })
+        .then(ok => {
+          if (ok) this.$store.dispatch("players/clearRoles");
+        });
     },
     clearReminders() {
-      if (confirm(this.$t("confirm.removeAllReminders"))) {
-        this.$store.dispatch("players/clearReminders");
-      }
+      this.$store
+        .dispatch("dialog/confirm", {
+          message: this.$t("confirm.removeAllReminders"),
+        })
+        .then(ok => {
+          if (ok) this.$store.dispatch("players/clearReminders");
+        });
     },
     advancePhase() {
       this.$store.dispatch("gamePhase/advance");
@@ -483,6 +558,7 @@ export default {
     ...mapMutations([
       "toggleMenu",
       "toggleImageOptIn",
+      "toggleCompactToken",
       "toggleMuted",
       "toggleNightOrder",
       "toggleRolesHidden",

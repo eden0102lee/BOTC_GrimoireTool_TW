@@ -7,6 +7,7 @@ import session from "./modules/session";
 import battleLog from "./modules/battleLog";
 import gamePhase from "./modules/gamePhase";
 import interactionRules from "./modules/interactionRules";
+import dialog from "./modules/dialog";
 import battleLogPlugin from "./battleLogPlugin";
 import gamePhaseSync from "./gamePhaseSync";
 import { resolveViewportUnit } from "./viewportLayout";
@@ -108,6 +109,7 @@ export default new Vuex.Store({
     battleLog,
     gamePhase,
     interactionRules,
+    dialog,
   },
   state: {
     grimoire: {
@@ -117,6 +119,7 @@ export default new Vuex.Store({
       isStatic: false,
       isMuted: false,
       isImageOptIn: false,
+      isCompactToken: false,
       rolesHidden: false,
       showCenterMark: true,
       zoom: 0,
@@ -190,6 +193,7 @@ export default new Vuex.Store({
     toggleStatic: toggle("isStatic"),
     toggleNight: toggle("isNight"),
     toggleImageOptIn: toggle("isImageOptIn"),
+    toggleCompactToken: toggle("isCompactToken"),
     toggleRolesHidden: toggle("rolesHidden"),
     setShowCenterMark: set("showCenterMark"),
     toggleModal({ modals }, name) {

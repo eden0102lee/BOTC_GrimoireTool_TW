@@ -1282,9 +1282,15 @@ export default {
       this.loadRuleForSelected();
     },
     resetAllBuiltin() {
-      if (!window.confirm(this.$t("interactionRules.confirmResetAll"))) return;
-      this.$store.dispatch("interactionRules/clearOverlay");
-      this.loadRuleForSelected();
+      this.$store
+        .dispatch("dialog/confirm", {
+          message: this.$t("interactionRules.confirmResetAll"),
+        })
+        .then(ok => {
+          if (!ok) return;
+          this.$store.dispatch("interactionRules/clearOverlay");
+          this.loadRuleForSelected();
+        });
     },
     exportRules() {
       const text = this.$store.dispatch("interactionRules/exportOverlay");
@@ -1311,7 +1317,9 @@ export default {
           this.$store.dispatch("interactionRules/importOverlay", reader.result);
           this.loadRuleForSelected();
         } catch (e) {
-          window.alert(this.$t("interactionRules.importFailed"));
+          this.$store.dispatch("dialog/alert", {
+            message: this.$t("interactionRules.importFailed"),
+          });
         }
         event.target.value = "";
       };

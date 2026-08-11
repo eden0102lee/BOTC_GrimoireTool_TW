@@ -1,5 +1,9 @@
 <template>
-  <div class="token" @click="setRole" :class="[role.id]">
+  <div
+    class="token"
+    @click="setRole"
+    :class="[role.id, { compact: isCompact }]"
+  >
     <span
       class="icon"
       v-if="role.id"
@@ -17,7 +21,12 @@
     ></span>
     <span v-if="reminderLeaves" :class="['leaf-top' + reminderLeaves]"></span>
     <span class="leaf-orange" v-if="role.setup"></span>
-    <svg viewBox="0 0 150 150" class="name">
+    <span
+      v-if="isCompact && shortName"
+      class="short-name"
+      :class="role.team"
+    >{{ shortName }}</span>
+    <svg v-else-if="!isCompact" viewBox="0 0 150 150" class="name">
       <path
         d="M 13 75 C 13 160, 138 160, 138 75"
         id="curve"
@@ -60,6 +69,13 @@ export default {
         (this.role.remindersGlobal || []).length
       );
     },
+    isCompact() {
+      return !!(this.grimoire && this.grimoire.isCompactToken);
+    },
+    shortName() {
+      const name = (this.role && this.role.name) || "";
+      return name.slice(0, 2);
+    },
     iconUrl() {
       if (this.role.image && this.grimoire.isImageOptIn) {
         return this.role.image;
@@ -94,7 +110,14 @@ export default {
     return {};
   },
   filters: {
-    nameToFontSize: name => (name && name.length > 10 ? "90%" : "110%")
+    // CJK role names need a bit more size than Latin to stay crisp on the arc.
+    nameToFontSize: name => {
+      if (!name) return "130%";
+      const len = name.length;
+      if (len > 8) return "108%";
+      if (len > 5) return "120%";
+      return "132%";
+    }
   },
   methods: {
     setRole() {
@@ -121,6 +144,12 @@ export default {
   justify-content: center;
   transition: border-color 250ms;
 
+  // Classic tokens get height from the curved-name SVG.
+  // Compact mode removes that SVG, so keep a square disc explicitly.
+  &.compact {
+    aspect-ratio: 1 / 1;
+  }
+
   &:hover .name .label {
     stroke: black;
     fill: white;
@@ -143,6 +172,13 @@ export default {
     width: 100%;
     height: 100%;
     margin-top: 3%;
+  }
+
+  // Compact: keep classic icon size; name overlays the lower icon
+  &.compact .icon,
+  &.compact:before {
+    filter: drop-shadow(0 0 0.6px #fff) drop-shadow(0 0 1.2px rgba(255, 255, 255, 0.85))
+      drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.35));
   }
 
   span {
@@ -185,28 +221,95 @@ export default {
     }
   }
 
+  span.short-name {
+    position: absolute;
+    left: 50%;
+    top: 58%;
+    bottom: auto;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    pointer-events: none;
+    padding: 0.18em 0.42em;
+    background: none;
+    font-family: "Noto Serif TC", "Source Han Serif TC", "Songti TC", "PMingLiU",
+      serif;
+    font-weight: 800;
+    font-size: clamp(12px, 30%, 22px);
+    line-height: 1;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    color: #f7ecd4;
+    -webkit-text-stroke: 0.07em rgba(10, 6, 2, 0.92);
+    paint-order: stroke fill;
+    text-shadow:
+      0 0 3px rgba(0, 0, 0, 0.75),
+      0 1px 2px rgba(0, 0, 0, 0.7);
+
+    // Soft dark bar behind text for readability on busy parchment
+    &::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: -1;
+      width: 128%;
+      height: 118%;
+      transform: translate(-50%, -50%);
+      border-radius: 999px;
+      background: rgba(18, 10, 4, 0.48);
+      box-shadow: 0 0 6px 2px rgba(18, 10, 4, 0.28);
+      pointer-events: none;
+    }
+
+    &.townsfolk {
+      color: lighten($townsfolk, 28%);
+    }
+    &.outsider {
+      color: lighten($outsider, 12%);
+    }
+    &.minion {
+      color: lighten($minion, 16%);
+    }
+    &.demon {
+      color: lighten($demon, 22%);
+    }
+    &.traveler {
+      color: lighten($traveler, 18%);
+    }
+    &.fabled {
+      color: lighten($fabled, 4%);
+    }
+    &.loric {
+      color: lighten($loric, 8%);
+    }
+  }
+
   .name {
     width: 100%;
     height: 100%;
-    font-size: 24px; // svg fonts are relative to document font size
+    font-size: 30px; // svg fonts are relative to document font size
     .label {
-      fill: black;
-      stroke: white;
-      stroke-width: 2px;
-      paint-order: stroke;
-      font-family: "Papyrus", serif;
-      font-weight: bold;
-      text-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-      letter-spacing: 1px;
+      fill: #0a0705;
+      stroke: rgba(255, 246, 220, 0.98);
+      stroke-width: 2.35px;
+      paint-order: stroke fill;
+      font-family: "Noto Serif TC", "Source Han Serif TC", "Songti TC", "PMingLiU",
+        "Papyrus", serif;
+      font-weight: 800;
+      text-shadow: none;
+      letter-spacing: 0.2px;
 
       @-moz-document url-prefix() {
         &.mozilla {
           // Vue doesn't support scoped media queries, so we have to use a second css class
           stroke: none;
           text-shadow: none;
-          filter: drop-shadow(0 1.5px 0 white) drop-shadow(0 -1.5px 0 white)
-            drop-shadow(1.5px 0 0 white) drop-shadow(-1.5px 0 0 white)
-            drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5));
+          filter: drop-shadow(0 1.75px 0 #fff6dc)
+            drop-shadow(0 -1.75px 0 #fff6dc) drop-shadow(1.75px 0 0 #fff6dc)
+            drop-shadow(-1.75px 0 0 #fff6dc)
+            drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55));
         }
       }
     }
