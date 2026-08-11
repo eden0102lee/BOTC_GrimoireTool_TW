@@ -21,7 +21,17 @@ export default (store) => {
 
   // initialize data
   if (localStorage.getItem("background")) {
-    store.commit("setBackground", localStorage.background);
+    const saved = localStorage.background;
+    // Drop ephemeral ChatGPT / estuary URLs that break offline and override the
+    // bundled default altar art.
+    const isEphemeral =
+      /chatgpt\.com\/backend-api\/estuary/i.test(saved) ||
+      /oaidalleapiprodscus/i.test(saved);
+    if (isEphemeral) {
+      localStorage.removeItem("background");
+    } else {
+      store.commit("setBackground", saved);
+    }
   }
   if (localStorage.getItem("muted")) {
     store.commit("toggleMuted", true);
@@ -31,6 +41,9 @@ export default (store) => {
   }
   if (localStorage.getItem("imageOptIn")) {
     store.commit("toggleImageOptIn", true);
+  }
+  if (localStorage.getItem("compactToken")) {
+    store.commit("toggleCompactToken", true);
   }
   if (localStorage.getItem("zoom")) {
     store.commit("setZoom", parseFloat(localStorage.getItem("zoom")));
@@ -175,6 +188,13 @@ export default (store) => {
           localStorage.setItem("imageOptIn", 1);
         } else {
           localStorage.removeItem("imageOptIn");
+        }
+        break;
+      case "toggleCompactToken":
+        if (state.grimoire.isCompactToken) {
+          localStorage.setItem("compactToken", 1);
+        } else {
+          localStorage.removeItem("compactToken");
         }
         break;
       case "setZoom":

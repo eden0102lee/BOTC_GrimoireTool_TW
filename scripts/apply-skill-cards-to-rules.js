@@ -4,11 +4,13 @@
  *
  * Updates sentence.action / sentence.template / notes from cards,
  * plus structured effect/input fixes for known mismatches.
+ * SNV roles with full card docs (scripts/snv-role-card-docs.js) replace cards[].
  *
  * Usage: node scripts/apply-skill-cards-to-rules.js
  */
 const fs = require("fs");
 const path = require("path");
+const { SNV_ROLE_DOCS } = require("./snv-role-card-docs");
 
 const ROOT = path.join(__dirname, "..");
 const RULES_PATH = path.join(ROOT, "src", "store", "roleInteractionRules.json");
@@ -32,6 +34,10 @@ function parseSkillCards(md) {
     const verb = field("動詞");
     const notes = field("備註");
     const timing = field("時機");
+    const ruleField = field("規則");
+    let enabled = null;
+    if (/enabled\s*=\s*是/.test(ruleField)) enabled = true;
+    else if (/enabled\s*=\s*\(?無規則\)?/.test(ruleField)) enabled = false;
     const exampleMatch = part.match(/```\n([\s\S]*?)\n```/);
     cards.set(id, {
       id,
@@ -40,6 +46,7 @@ function parseSkillCards(md) {
       template: templateRaw,
       notes,
       timing,
+      enabled,
       example: exampleMatch ? exampleMatch[1].trim() : "",
       effectsLabel: field("effects"),
       inputsLabel: field("輸入"),
@@ -902,6 +909,8 @@ function deepMergeRule(base, patch) {
   Object.keys(patch).forEach((k) => {
     if (k === "sentence") {
       out.sentence = { ...(base.sentence || {}), ...patch.sentence };
+    } else if (k === "cards" && Array.isArray(patch.cards)) {
+      out.cards = patch.cards;
     } else if (patch[k] === null) {
       delete out[k];
     } else {
@@ -911,12 +920,32 @@ function deepMergeRule(base, patch) {
   return out;
 }
 
+/** Pick primary runnable card index (skip setup-only when others exist). */
+function primaryCardIndex(cards) {
+  if (!Array.isArray(cards) || !cards.length) return -1;
+  const nonSetup = cards.findIndex(
+    (c) => c && c.key !== "setup" && c.activation !== "setup",
+  );
+  return nonSetup >= 0 ? nonSetup : 0;
+}
+
+/** Apply MD verb/template/notes onto cards[] (primary card) and legacy top-level. */
 function applyCardSentence(rule, card) {
   const next = { ...rule, sentence: { ...(rule.sentence || {}) } };
+  const skipSentence =
+    STRUCTURAL[card.id] && STRUCTURAL[card.id].sentence != null;
+  const skipNotes =
+    STRUCTURAL[card.id] && STRUCTURAL[card.id].notes != null;
+  // Full SNV docs own sentence/notes — do not clobber from multi-card MD labels
+  if (SNV_ROLE_DOCS[card.id]) {
+    return next;
+  }
+
+  let action = null;
+  let template = null;
   if (card.verb && card.verb !== "(無)" && card.verb !== "（無）") {
-    // Prefer structural patch action if present later; here set from card
-    if (!STRUCTURAL[card.id] || !STRUCTURAL[card.id].sentence) {
-      next.sentence.action = card.verb.includes("／")
+    if (!skipSentence && !card.verb.includes("；") && !card.verb.includes("卡")) {
+      action = card.verb.includes("／")
         ? card.verb.split("／")[0]
         : card.verb;
     }
@@ -924,20 +953,68 @@ function applyCardSentence(rule, card) {
   if (
     card.template &&
     card.template !== "``" &&
-    (!STRUCTURAL[card.id] || !STRUCTURAL[card.id].sentence)
+    !skipSentence &&
+    !card.template.includes("主卡") &&
+    !card.template.includes("；")
   ) {
-    next.sentence.template = card.template;
+    template = card.template;
   }
-  if (card.notes && !card.notes.startsWith("sheet:")) {
-    if (!STRUCTURAL[card.id] || STRUCTURAL[card.id].notes == null) {
-      next.notes = card.notes;
-    }
+
+  if (action) next.sentence.action = action;
+  if (template) next.sentence.template = template;
+
+  if (card.notes && !card.notes.startsWith("sheet:") && !skipNotes) {
+    next.notes = card.notes;
   } else if (next.notes && String(next.notes).startsWith("sheet:")) {
     next.notes = card.notes && !card.notes.startsWith("sheet:")
       ? card.notes
       : "";
   }
+
+  if (Array.isArray(next.cards) && next.cards.length) {
+    const idx = primaryCardIndex(next.cards);
+    if (idx >= 0) {
+      const cards = next.cards.map((c, i) => {
+        if (i !== idx) return c;
+        const merged = {
+          ...c,
+          sentence: { ...(c.sentence || {}) },
+        };
+        if (action) merged.sentence.action = action;
+        if (template) merged.sentence.template = template;
+        if (card.notes && !card.notes.startsWith("sheet:") && !skipNotes) {
+          merged.notes = card.notes;
+        }
+        return merged;
+      });
+      next.cards = cards;
+    }
+  }
   return next;
+}
+
+function stripLegacyFlatFields(rule) {
+  const next = { ...rule };
+  delete next.activation;
+  delete next.once;
+  delete next.when;
+  delete next.inputs;
+  delete next.sentence;
+  delete next.effects;
+  delete next.notes;
+  delete next.sentenceFixed;
+  return next;
+}
+
+function applySnvDoc(existing, doc) {
+  const base = existing ? stripLegacyFlatFields(existing) : {};
+  return {
+    ...base,
+    id: doc.id,
+    name: doc.name || (existing && existing.name) || doc.id,
+    enabled: doc.enabled !== false,
+    cards: Array.isArray(doc.cards) ? doc.cards : [],
+  };
 }
 
 function main() {
@@ -962,14 +1039,37 @@ function main() {
 
   // 1) Apply card sentence/notes for all known cards that have rules
   allCards.forEach((card, id) => {
+    if (SNV_ROLE_DOCS[id]) return; // handled in step 1b
     const idx = byId.get(id);
     if (idx == null) return;
     const before = JSON.stringify(data.rules[idx]);
     let rule = applyCardSentence(data.rules[idx], card);
     if (STRUCTURAL[id]) {
       rule = deepMergeRule(rule, STRUCTURAL[id]);
+      // If STRUCTURAL patches flat fields and rule has cards, also merge into primary card
+      if (Array.isArray(rule.cards) && rule.cards.length) {
+        const pIdx = primaryCardIndex(rule.cards);
+        if (pIdx >= 0) {
+          const patch = STRUCTURAL[id];
+          const card0 = { ...rule.cards[pIdx] };
+          if (patch.sentence) {
+            card0.sentence = { ...(card0.sentence || {}), ...patch.sentence };
+          }
+          if (patch.inputs) card0.inputs = patch.inputs;
+          if (patch.effects) card0.effects = patch.effects;
+          if (patch.notes != null) card0.notes = patch.notes;
+          if (patch.once != null) card0.once = patch.once;
+          if (patch.activation != null) card0.activation = patch.activation;
+          if (patch.when) card0.when = patch.when;
+          rule.cards = rule.cards.map((c, i) => (i === pIdx ? card0 : c));
+        }
+      }
     }
-    // Clear leftover sheet URLs when we have notes from cards/structural
+    if (card.enabled === false) {
+      rule.enabled = false;
+    } else if (card.enabled === true) {
+      rule.enabled = true;
+    }
     if (rule.notes && String(rule.notes).startsWith("sheet:")) {
       rule.notes = (STRUCTURAL[id] && STRUCTURAL[id].notes) || card.notes || "";
       if (String(rule.notes).startsWith("sheet:")) rule.notes = "";
@@ -978,29 +1078,97 @@ function main() {
     if (JSON.stringify(rule) !== before) updated.push(id);
   });
 
+  // 1b) Replace SNV role documents from example-aligned card specs
+  Object.keys(SNV_ROLE_DOCS).forEach((id) => {
+    const doc = SNV_ROLE_DOCS[id];
+    const idx = byId.get(id);
+    if (idx == null) {
+      data.rules.push(applySnvDoc(null, doc));
+      byId.set(id, data.rules.length - 1);
+      added.push(id);
+      return;
+    }
+    const before = JSON.stringify(data.rules[idx]);
+    data.rules[idx] = applySnvDoc(data.rules[idx], doc);
+    if (JSON.stringify(data.rules[idx]) !== before) updated.push(id);
+  });
+
   // 2) Structural-only for roles without cards parsed? already covered
 
-  // 3) Add / merge new rules (incl. TB optional triggers)
+  // 3) Add / merge new rules (incl. TB optional triggers) — skip SNV full docs
   NEW_RULES.forEach((rule) => {
     const id = String(rule.id).toLowerCase();
+    if (SNV_ROLE_DOCS[id]) return;
     const clean = { ...rule };
     delete clean.sentenceFixed;
     if (byId.has(id)) {
       const idx = byId.get(id);
-      data.rules[idx] = deepMergeRule(data.rules[idx], clean);
+      let merged = deepMergeRule(data.rules[idx], clean);
+      // Prefer cards[] shape: if existing has cards and NEW_RULES is flat, wrap
+      if (
+        Array.isArray(data.rules[idx].cards) &&
+        data.rules[idx].cards.length &&
+        !clean.cards
+      ) {
+        // leave cards; only update enabled/name/notes at doc level if provided
+        merged = { ...data.rules[idx] };
+        if (clean.enabled != null) merged.enabled = clean.enabled;
+        if (clean.name) merged.name = clean.name;
+      } else if (!merged.cards && (clean.inputs || clean.sentence)) {
+        merged = {
+          id: clean.id,
+          name: clean.name,
+          enabled: clean.enabled !== false,
+          cards: [
+            {
+              key: "trigger",
+              label: "trigger",
+              enabled: true,
+              activation: clean.activation || "optional",
+              once: !!clean.once,
+              when: clean.when || { nights: [], days: [] },
+              inputs: clean.inputs || [],
+              sentence: clean.sentence || { action: "", template: "{actor}" },
+              effects: clean.effects || [],
+              notes: clean.notes || "",
+            },
+          ],
+        };
+      }
+      data.rules[idx] = merged;
       updated.push(id);
       return;
     }
-    data.rules.push(clean);
+    const asCards = {
+      id: clean.id,
+      name: clean.name,
+      enabled: clean.enabled !== false,
+      cards: clean.cards || [
+        {
+          key: "trigger",
+          label: "trigger",
+          enabled: true,
+          activation: clean.activation || "optional",
+          once: !!clean.once,
+          when: clean.when || { nights: [], days: [] },
+          inputs: clean.inputs || [],
+          sentence: clean.sentence || { action: "", template: "{actor}" },
+          effects: clean.effects || [],
+          notes: clean.notes || "",
+        },
+      ],
+    };
+    data.rules.push(asCards);
     byId.set(id, data.rules.length - 1);
     added.push(id);
   });
 
   data.generatedAt = new Date().toISOString();
   data.sourceNote =
-    "Skill-card patches applied via scripts/apply-skill-cards-to-rules.js (docs/official-skill-cards-*.md)";
+    "Skill-card patches applied via scripts/apply-skill-cards-to-rules.js (docs/official-skill-cards-*.md); SNV cards from scripts/snv-role-card-docs.js";
   fs.writeFileSync(RULES_PATH, `${JSON.stringify(data, null, 2)}\n`, "utf8");
   console.log(`cards parsed: ${allCards.size}`);
+  console.log(`SNV docs applied: ${Object.keys(SNV_ROLE_DOCS).length}`);
   console.log(`updated: ${[...new Set(updated)].sort().join(", ") || "(none)"}`);
   console.log(`added: ${[...new Set(added)].join(", ") || "(none)"}`);
   console.log(`total rules: ${data.rules.length}`);
@@ -1010,4 +1178,10 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { parseSkillCards, STRUCTURAL, NEW_RULES, main };
+module.exports = {
+  parseSkillCards,
+  STRUCTURAL,
+  NEW_RULES,
+  SNV_ROLE_DOCS,
+  main,
+};

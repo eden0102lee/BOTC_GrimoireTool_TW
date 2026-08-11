@@ -193,11 +193,16 @@ export default {
       );
     },
     clearLog() {
-      if (confirm(this.$t("confirm.clearBattleLog"))) {
-        this.$store.commit("battleLog/clearLog");
-        this.$store.commit("gamePhase/reset");
-        this.filterPhaseId = null;
-      }
+      this.$store
+        .dispatch("dialog/confirm", {
+          message: this.$t("confirm.clearBattleLog"),
+        })
+        .then(ok => {
+          if (!ok) return;
+          this.$store.commit("battleLog/clearLog");
+          this.$store.commit("gamePhase/reset");
+          this.filterPhaseId = null;
+        });
     },
     formatTime(ts) {
       return new Date(ts).toLocaleTimeString([], {

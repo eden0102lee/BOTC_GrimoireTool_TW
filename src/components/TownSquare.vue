@@ -163,31 +163,32 @@ export default {
     },
     removePlayer(playerIndex) {
       if (this.session.isSpectator || this.session.lockedVote) return;
-      if (
-        confirm(
-          this.$t("confirm.removePlayer", {
-            name: this.players[playerIndex].name
-          })
-        )
-      ) {
-        const { nomination } = this.session;
-        if (nomination) {
-          if (nomination.includes(playerIndex)) {
-            // abort vote if removed player is either nominator or nominee
-            this.$store.commit("session/nomination");
-          } else if (
-            nomination[0] > playerIndex ||
-            nomination[1] > playerIndex
-          ) {
-            // update nomination array if removed player has lower index
-            this.$store.commit("session/setNomination", [
-              nomination[0] > playerIndex ? nomination[0] - 1 : nomination[0],
-              nomination[1] > playerIndex ? nomination[1] - 1 : nomination[1]
-            ]);
+      this.$store
+        .dispatch("dialog/confirm", {
+          message: this.$t("confirm.removePlayer", {
+            name: this.players[playerIndex].name,
+          }),
+        })
+        .then(ok => {
+          if (!ok) return;
+          const { nomination } = this.session;
+          if (nomination) {
+            if (nomination.includes(playerIndex)) {
+              // abort vote if removed player is either nominator or nominee
+              this.$store.commit("session/nomination");
+            } else if (
+              nomination[0] > playerIndex ||
+              nomination[1] > playerIndex
+            ) {
+              // update nomination array if removed player has lower index
+              this.$store.commit("session/setNomination", [
+                nomination[0] > playerIndex ? nomination[0] - 1 : nomination[0],
+                nomination[1] > playerIndex ? nomination[1] - 1 : nomination[1],
+              ]);
+            }
           }
-        }
-        this.$store.commit("players/remove", playerIndex);
-      }
+          this.$store.commit("players/remove", playerIndex);
+        });
     },
     swapPlayer(from, to) {
       if (this.session.isSpectator || this.session.lockedVote) return;

@@ -88,31 +88,43 @@
 }
 
 // -----------------------------------------------------------------------------
-// Curved role name inside token
+// Curved role name inside token — high-contrast outline for CJK readability
 // -----------------------------------------------------------------------------
 #townsquare .circle .player .token > svg.name {
-  opacity: 0.92;
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.18));
+  opacity: 1;
+  // Sharp outline stack beats a soft drop-shadow that reads as blur.
+  filter: none;
 }
 
 #townsquare .circle .player .token > svg.name .label {
-  fill: #17110c;
-  stroke: rgba(247, 234, 207, 0.9);
-  stroke-width: 1.45px;
-  paint-order: stroke;
-  font-family: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
-  font-weight: 700;
-  letter-spacing: 0.45px;
+  fill: #0a0705;
+  stroke: rgba(255, 246, 220, 0.98);
+  stroke-width: 2.35px;
+  paint-order: stroke fill;
+  font-family: "Noto Serif TC", "Source Han Serif TC", "Songti TC", "PMingLiU", serif;
+  font-weight: 800;
+  letter-spacing: 0.2px;
   text-shadow: none;
 }
 
-// Override the original white-on-black hover inversion. A slight ink lift is
-// easier to read and does not turn every hovered token into a bright badge.
+// Keep the name readable under the gentle night token grade.
+#app.night #townsquare .circle .player:not(.dead) .token > svg.name .label {
+  fill: #050403;
+  stroke: rgba(255, 248, 228, 1);
+  stroke-width: 2.55px;
+}
+
 #townsquare .circle .player .token:hover > svg.name .label,
 #townsquare .circle > li:focus-within .player .token > svg.name .label {
-  fill: #0d0a07;
-  stroke: rgba(255, 244, 218, 0.98);
-  stroke-width: 1.7px;
+  fill: #050403;
+  stroke: #fff8e6;
+  stroke-width: 2.7px;
+}
+
+#townsquare .circle.size-11 .player .token > svg.name,
+#townsquare .circle.size-12 .player .token > svg.name,
+#townsquare .circle.size-13 .player .token > svg.name {
+  font-size: 108%;
 }
 
 #townsquare .circle.size-14 .player .token > svg.name,
@@ -122,7 +134,55 @@
 #townsquare .circle.size-18 .player .token > svg.name,
 #townsquare .circle.size-19 .player .token > svg.name,
 #townsquare .circle.size-20 .player .token > svg.name {
-  font-size: 92%;
+  font-size: 102%;
+}
+
+// -----------------------------------------------------------------------------
+// Compact role token — full-size icon; 2-char name overlays lower icon
+// -----------------------------------------------------------------------------
+#townsquare .circle .player .token.compact > .icon {
+  // Keep the same art scale as classic tokens (see rules above).
+  filter:
+    drop-shadow(0 0 0.6px #fff)
+    drop-shadow(0 0 1.2px rgba(255, 255, 255, 0.85))
+    drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.35));
+}
+
+#townsquare .circle .player .token.compact > .short-name {
+  top: 58%;
+  bottom: auto;
+  font-size: clamp(12px, 2.9vmin, 19px);
+}
+
+#townsquare .circle.size-14 .player .token.compact > .short-name,
+#townsquare .circle.size-15 .player .token.compact > .short-name,
+#townsquare .circle.size-16 .player .token.compact > .short-name,
+#townsquare .circle.size-17 .player .token.compact > .short-name,
+#townsquare .circle.size-18 .player .token.compact > .short-name,
+#townsquare .circle.size-19 .player .token.compact > .short-name,
+#townsquare .circle.size-20 .player .token.compact > .short-name {
+  top: 56%;
+  font-size: clamp(11px, 2.4vmin, 15px);
+}
+
+html.layout-portrait #townsquare .circle .player .token.compact > .short-name {
+  top: 57%;
+  font-size: clamp(11px, 3.1vw, 17px);
+}
+
+#townsquare > .bluffs .token.compact > .icon,
+#townsquare > .fabled .token.compact > .icon {
+  filter:
+    drop-shadow(0 0 0.6px #fff)
+    drop-shadow(0 0 1.2px rgba(255, 255, 255, 0.85))
+    drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.35));
+}
+
+#townsquare > .bluffs .token.compact > .short-name,
+#townsquare > .fabled .token.compact > .short-name {
+  top: 58%;
+  bottom: auto;
+  font-size: clamp(10px, 2.3vmin, 14px);
 }
 
 // -----------------------------------------------------------------------------
@@ -180,7 +240,8 @@
   padding: 1px 7px 2px;
   line-height: 1.12;
   border-radius: 4px;
-  backdrop-filter: blur(5px);
+  // Avoid backdrop blur on the label itself — it softens CJK glyphs.
+  backdrop-filter: none;
 }
 
 #townsquare .circle.size-12 .player > .name,
@@ -191,7 +252,7 @@
   width: 108%;
   right: 4%;
   padding-inline: 5px;
-  font-size: 94%;
+  font-size: 104%;
 }
 
 #townsquare .circle.size-16 .player > .name,
@@ -204,7 +265,7 @@
   right: 2%;
   min-height: 1.2em;
   padding: 0 4px 1px;
-  font-size: 84%;
+  font-size: 96%;
 }
 
 // Preserve slightly more visual separation for the inspected seat.
@@ -372,7 +433,7 @@
 // -----------------------------------------------------------------------------
 // Compact / touch displays
 // -----------------------------------------------------------------------------
-@media screen and (max-width: 767.98px) {
+@media screen and (max-width: 767.98px) and (orientation: landscape) {
   #townsquare .circle .player .token > .icon {
     background-size: 87%;
     background-position: center 32%;
@@ -393,6 +454,13 @@
   #townsquare .circle .player .seat,
   #townsquare .circle .player .has-vote {
     font-size: 0.82em;
+  }
+}
+
+@media screen and (max-width: 767.98px) and (orientation: portrait) {
+  #townsquare .circle .player .token > .icon {
+    background-size: 90%;
+    background-position: center 30%;
   }
 }
 

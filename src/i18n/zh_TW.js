@@ -30,6 +30,8 @@ export default {
   "menu.showCustomImages": "允許自訂圖示",
   "menu.disableAnimations": "關閉動畫",
   "menu.muteSounds": "靜音",
+  "menu.layoutSection": "版面",
+  "menu.compactToken": "精簡角色 Token",
 
   // Session / room (shown under 遊戲 when connected)
   "menu.hosting": "說書人",
@@ -78,6 +80,11 @@ export default {
   "menu.gameStateJson": "遊戲狀態 JSON",
   "menu.joinDiscord": "加入 Discord",
   "menu.sourceCode": "原始碼",
+
+  // In-game dialogs
+  "dialog.ok": "確定",
+  "dialog.cancel": "取消",
+  "dialog.confirm": "確認",
 
   // Prompts / confirms
   "prompt.backgroundUrl": "輸入自訂背景圖片網址",

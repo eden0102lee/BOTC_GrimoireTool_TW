@@ -1902,32 +1902,47 @@ export default {
       if (!file) return;
       const reader = new FileReader();
       reader.onload = () => {
-        try {
-          const hasEntries = this.entries && this.entries.length > 0;
-          if (
-            hasEntries &&
-            !window.confirm(this.$t("recorder.confirmImportReplace"))
-          ) {
-            return;
+        const hasEntries = this.entries && this.entries.length > 0;
+        const runImport = () => {
+          try {
+            this.$store.dispatch("battleLog/importBattleLog", reader.result);
+          } catch (e) {
+            this.$store.dispatch("dialog/alert", {
+              message: this.$t("recorder.importFailed"),
+            });
+            console.warn("import battle log failed", e);
           }
-          this.$store.dispatch("battleLog/importBattleLog", reader.result);
-        } catch (e) {
-          window.alert(this.$t("recorder.importFailed"));
-          console.warn("import battle log failed", e);
+        };
+        if (!hasEntries) {
+          runImport();
+          return;
         }
+        this.$store
+          .dispatch("dialog/confirm", {
+            message: this.$t("recorder.confirmImportReplace"),
+          })
+          .then(ok => {
+            if (ok) runImport();
+          });
       };
       reader.readAsText(file, "utf-8");
     },
     deleteBattleLog() {
-      if (!window.confirm(this.$t("recorder.confirmDeleteBattleLog"))) return;
-      this.$store.dispatch("battleLog/resetForNewGame");
-      this.manualFormOpen = false;
-      this.voteFormOpen = false;
-      this.deadVoteFormOpen = false;
-      this.executionFormOpen = false;
-      this.editingManualId = null;
-      this.manualPrefillTokens = null;
-      this.deadVotePrefill = null;
+      this.$store
+        .dispatch("dialog/confirm", {
+          message: this.$t("recorder.confirmDeleteBattleLog"),
+        })
+        .then(ok => {
+          if (!ok) return;
+          this.$store.dispatch("battleLog/resetForNewGame");
+          this.manualFormOpen = false;
+          this.voteFormOpen = false;
+          this.deadVoteFormOpen = false;
+          this.executionFormOpen = false;
+          this.editingManualId = null;
+          this.manualPrefillTokens = null;
+          this.deadVotePrefill = null;
+        });
     },
     pendingLabel(fact) {
       const key = pendingLabelKey(fact.factType);
@@ -2256,8 +2271,13 @@ export default {
     },
     confirmDeleteRecord(entry) {
       if (!entry || !entry.id) return;
-      if (!window.confirm(this.$t("recorder.confirmCancelRecord"))) return;
-      this.onDeleteManual(entry.id);
+      this.$store
+        .dispatch("dialog/confirm", {
+          message: this.$t("recorder.confirmCancelRecord"),
+        })
+        .then(ok => {
+          if (ok) this.onDeleteManual(entry.id);
+        });
     },
     formatTime(ts) {
       if (!ts) return "";

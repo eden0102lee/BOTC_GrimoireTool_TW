@@ -106,8 +106,59 @@
   }
 }
 
-// Small devices (landscape phones, less than 768px)
-@media screen and (max-width: 767.98px) {
+// Portrait typography — keep role / seat labels as readable as landscape.
+// (html.layout-portrait is toggled by viewportLayout.js)
+html.layout-portrait {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+
+  body {
+    font-size: 1rem;
+  }
+
+  #townsquare .circle .player > .name {
+    font-size: max(14px, 1.05rem) !important;
+    line-height: 1.2;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+
+    span {
+      max-width: 22vw;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+    }
+  }
+
+  // Curved role names: portrait tokens are vw-sized, so bump CSS px so glyphs
+  // stay readable — slightly under the landscape optical size.
+  #townsquare .circle .player .token > svg.name {
+    font-size: 34px !important;
+  }
+
+  #townsquare .circle.size-11 .player .token > svg.name,
+  #townsquare .circle.size-12 .player .token > svg.name,
+  #townsquare .circle.size-13 .player .token > svg.name,
+  #townsquare .circle.size-14 .player .token > svg.name,
+  #townsquare .circle.size-15 .player .token > svg.name {
+    font-size: 32px !important;
+  }
+
+  #townsquare .circle.size-16 .player .token > svg.name,
+  #townsquare .circle.size-17 .player .token > svg.name,
+  #townsquare .circle.size-18 .player .token > svg.name,
+  #townsquare .circle.size-19 .player .token > svg.name,
+  #townsquare .circle.size-20 .player .token > svg.name {
+    font-size: 30px !important;
+  }
+
+  #townsquare .circle .player .reminder .text {
+    font-size: 55%;
+    font-weight: 700;
+  }
+}
+
+// Small devices — landscape phones only (portrait uses html.layout-portrait)
+@media screen and (max-width: 767.98px) and (min-aspect-ratio: 1/1) {
   html,
   body {
     font-size: 0.9em;
@@ -158,8 +209,8 @@
   }
 }
 
-// Old phones
-@media screen and (max-width: 575.98px) {
+// Old phones — landscape only; portrait keeps layout-portrait rem floor
+@media screen and (max-width: 575.98px) and (min-aspect-ratio: 1/1) {
   html,
   body {
     font-size: 0.8em;

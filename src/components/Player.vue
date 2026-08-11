@@ -351,8 +351,14 @@ export default {
     },
     changeName() {
       if (this.session.isSpectator) return;
-      const name = prompt(this.$t("prompt.playerName"), this.player.name) || this.player.name;
-      this.updatePlayer("name", name, true);
+      this.$store
+        .dispatch("dialog/prompt", {
+          message: this.$t("prompt.playerName"),
+          defaultValue: this.player.name,
+        })
+        .then(name => {
+          this.updatePlayer("name", name || this.player.name, true);
+        });
     },
     removeReminder(reminder) {
       const reminders = [...this.player.reminders];
@@ -767,7 +773,7 @@ li.move:not(.from) .player .overlay svg.move {
   right: 10%;
   display: flex;
   justify-content: center;
-  font-size: 120%;
+  font-size: 128%;
   line-height: 120%;
   cursor: pointer;
   white-space: nowrap;

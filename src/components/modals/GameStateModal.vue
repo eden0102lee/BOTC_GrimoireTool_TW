@@ -103,7 +103,9 @@ export default {
         }
         this.toggleModal("gameState");
       } catch (e) {
-        alert(this.$t("error.parseJson", { error: e }));
+        this.$store.dispatch("dialog/alert", {
+          message: this.$t("error.parseJson", { error: e }),
+        });
       }
     },
     ...mapMutations(["toggleModal"])

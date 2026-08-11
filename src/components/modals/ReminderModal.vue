@@ -93,18 +93,26 @@ export default {
   methods: {
     addReminder(reminder) {
       const player = this.$store.state.players.players[this.playerIndex];
-      let value;
       if (reminder.role === "custom") {
-        const name = prompt(this.$t("prompt.customReminder"));
-        if (!name) return;
-        value = [...player.reminders, { role: "custom", name }];
-      } else {
-        value = [...player.reminders, reminder];
+        this.$store
+          .dispatch("dialog/prompt", {
+            message: this.$t("prompt.customReminder"),
+          })
+          .then(name => {
+            if (!name) return;
+            this.$store.commit("players/update", {
+              player,
+              property: "reminders",
+              value: [...player.reminders, { role: "custom", name }],
+            });
+            this.$store.commit("toggleModal", "reminder");
+          });
+        return;
       }
       this.$store.commit("players/update", {
         player,
         property: "reminders",
-        value
+        value: [...player.reminders, reminder],
       });
       this.$store.commit("toggleModal", "reminder");
     },

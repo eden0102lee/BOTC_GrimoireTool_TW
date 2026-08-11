@@ -57,7 +57,9 @@ class LiveSession {
         );
       } else {
         this._store.commit("session/setSessionId", "");
-        if (err.reason) alert(err.reason);
+        if (err.reason) {
+          this._store.dispatch("dialog/alert", { message: err.reason });
+        }
       }
     };
   }
@@ -411,9 +413,9 @@ class LiveSession {
             missing.push(id);
           }
         });
-        alert(
-          t("socket.missingRoles", { roles: missing.join(", ") })
-        );
+        this._store.dispatch("dialog/alert", {
+          message: t("socket.missingRoles", { roles: missing.join(", ") }),
+        });
         this.disconnect();
         this._store.commit("toggleModal", "edition");
       }
@@ -661,7 +663,9 @@ class LiveSession {
       this._send("direct", message);
       return true;
     }
-    alert(t("socket.noRolesToDistribute"));
+    this._store.dispatch("dialog/alert", {
+      message: t("socket.noRolesToDistribute"),
+    });
     return false;
   }
 

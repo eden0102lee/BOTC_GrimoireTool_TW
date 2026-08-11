@@ -33,38 +33,53 @@ body {
   isolation: isolate;
 }
 
-// Keep both geometry and lighting centered on the exact same viewport point.
-// The previous ambience used Y=44% (day) and Y=32% (night), which made the
-// composition feel visually top-heavy even when the DOM itself was centered.
+// Day / night: opacity crossfade ~1s (gradients stay fixed per layer).
 #app:before {
-  background:
-    radial-gradient(
-      circle at 50% 50%,
-      transparent 0 25%,
-      rgba(0, 0, 0, 0.16) 62%,
-      rgba(0, 0, 0, 0.62) 100%
-    ),
-    linear-gradient(
-      115deg,
-      rgba(80, 28, 22, 0.12),
-      transparent 38%,
-      rgba(2, 3, 5, 0.26)
-    );
+  transition: opacity 1s ease;
+}
+
+#app:not(.night):before {
+  background: radial-gradient(
+    ellipse at 50% 36%,
+    rgba(255, 228, 190, 0.22) 0%,
+    rgba(255, 210, 160, 0.08) 42%,
+    transparent 70%
+  );
+  mix-blend-mode: soft-light;
+  opacity: 0.55;
+}
+
+#app.night:before {
+  opacity: 0;
 }
 
 #app > .backdrop {
   background:
     radial-gradient(
+      circle at 22% 16%,
+      rgba(200, 220, 255, 0.14) 0%,
+      rgba(140, 170, 230, 0.05) 18%,
+      transparent 38%
+    ),
+    radial-gradient(
       circle at 50% 50%,
-      rgba(25, 51, 77, 0.16),
-      transparent 54%
+      transparent 0 36%,
+      rgba(8, 18, 40, 0.28) 72%,
+      rgba(4, 10, 24, 0.42) 100%
     ),
     linear-gradient(
       180deg,
-      rgba(2, 7, 13, 0.96) 0%,
-      rgba(4, 18, 31, 0.96) 52%,
-      rgba(2, 28, 43, 0.98) 100%
+      rgba(10, 24, 48, 0.22) 0%,
+      rgba(6, 14, 32, 0.16) 50%,
+      rgba(4, 10, 22, 0.3) 100%
     );
+  mix-blend-mode: multiply;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+#app.night > .backdrop {
+  opacity: 0.55;
 }
 
 // The actual grimoire table always occupies the entire visual viewport.

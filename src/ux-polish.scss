@@ -458,6 +458,21 @@
     font-size: 0.8em;
   }
 
+  // Don't let the compact-seat name shrink override portrait readability.
+  #townsquare .circle.size-13 > li .player > .name,
+  #townsquare .circle.size-14 > li .player > .name,
+  #townsquare .circle.size-15 > li .player > .name,
+  #townsquare .circle.size-16 > li .player > .name,
+  #townsquare .circle.size-17 > li .player > .name,
+  #townsquare .circle.size-18 > li .player > .name,
+  #townsquare .circle.size-19 > li .player > .name,
+  #townsquare .circle.size-20 > li .player > .name {
+    font-size: max(13px, 0.98rem);
+    width: 110%;
+    right: 5%;
+    padding-inline: 4px;
+  }
+
   // The high-player-count compact rule above has intentionally higher
   // specificity. Match it here so portrait phones still retain readable bluffs.
   @supports selector(:has(*)) {
