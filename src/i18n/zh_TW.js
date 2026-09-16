@@ -404,7 +404,6 @@ export default {
   "recorder.writeSource": "寫入來源",
   "recorder.dismissPending": "移除提醒",
   "recorder.writeDeadVote": "寫入遺言票",
-  "recorder.pendingSeatHint": "此座位有尚未寫入戰報的操作",
   "recorder.addRole": "+角色",
   "recorder.pickRole": "選擇角色",
   "recorder.pendingDeath": "{name} 死亡？",
