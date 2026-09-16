@@ -229,6 +229,8 @@ import Token from "./Token";
 import { mapGetters, mapState } from "vuex";
 import { seatBaseSize } from "../store/viewportLayout";
 
+const SEAT_FONT_RATIO = 0.13;
+
 export default {
   components: {
     Token
@@ -287,7 +289,12 @@ export default {
       const unit = this.grimoire.unit;
       const count = this.players.length;
       const size = Math.max(8, seatBaseSize(count) + this.grimoire.zoom);
-      return { width: size + unit };
+      return {
+        width: size + unit,
+        fontSize: size * SEAT_FONT_RATIO + unit,
+        "--seat-size": size + unit,
+        "--seat-size-y": size + "vh"
+      };
     },
   },
   data() {
@@ -672,8 +679,11 @@ li.move:not(.from) .player .overlay svg.move {
 
 .has-vote {
   position: absolute;
-  margin-top: -15%;
-  right: 2px;
+  margin-top: -18%;
+  right: 1%;
+  font-size: calc(var(--seat-size, 14vh) * 0.22);
+  width: 1em;
+  height: 1em;
 }
 
 /****** Session seat glow *****/
@@ -779,12 +789,12 @@ li.move:not(.from) .player .overlay svg.move {
   white-space: nowrap;
   width: 120%;
   @include nameplate-chrome;
-  top: 5px;
-  padding: 0 4px;
+  top: 0.26em;
+  padding: 0 0.2em;
 
   svg {
-    top: 3px;
-    margin-right: 2px;
+    top: 0.15em;
+    margin-right: 0.1em;
   }
 
   span {
@@ -895,70 +905,41 @@ li.move:not(.from) .player .overlay svg.move {
   margin: 5px 0 0 -25%;
   border-radius: 50%;
   @include gstone-token-shadow;
+  @include reminder-role-face;
   transition: all 200ms;
   cursor: pointer;
 
-  .text {
-    line-height: 90%;
-    color: black;
-    font-size: 50%;
-    font-weight: bold;
-    text-align: center;
-    margin-top: 50%;
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    top: 15%;
-    text-shadow: 0 1px 1px #f6dfbd, 0 -1px 1px #f6dfbd, 1px 0 1px #f6dfbd,
-      -1px 0 1px #f6dfbd;
-  }
-
   .icon,
   &:after {
-    content: " ";
-    position: absolute;
-    top: 0;
-    width: 90%;
-    height: 90%;
-    background-size: 100%;
-    background-position: center 0;
-    background-repeat: no-repeat;
-    background-image: url($gstone-icon-plus);
     transition: opacity 200ms;
   }
 
   &:after {
+    content: " ";
+    position: absolute;
+    top: 5%;
+    width: 90%;
+    height: 90%;
+    background-size: 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
     background-image: url($gstone-icon-x);
     opacity: 0;
-    top: 5%;
   }
 
   &.add {
     opacity: 0;
-    top: 30px;
+    top: 18%;
     &:after {
       display: none;
     }
     .icon {
-      top: 5%;
+      background-image: url($gstone-icon-plus);
     }
   }
 
-  &.custom {
-    .icon {
-      display: none;
-    }
-    .text {
-      font-size: 70%;
-      word-break: break-word;
-      margin-top: 0;
-      display: flex;
-      align-items: center;
-      align-content: center;
-      justify-content: center;
-      border-radius: 50%;
-      top: 0;
-    }
+  &.custom .icon {
+    display: none;
   }
 
   &:hover:before {
@@ -1012,17 +993,20 @@ li.move:not(.from) .player .overlay svg.move {
 
 .circle .pending-badge {
   position: absolute;
-  top: -4px;
-  right: -4px;
+  top: -2%;
+  right: -2%;
   z-index: 5;
-  width: 18px;
-  height: 18px;
+  width: calc(var(--seat-size, 14vh) * 0.216);
+  height: calc(var(--seat-size, 14vh) * 0.216);
   border-radius: 50%;
   background: rgba(200, 80, 0, 0.95);
   color: #fff;
-  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(var(--seat-size, 14vh) * 0.14);
   font-weight: bold;
-  line-height: 18px;
+  line-height: 1;
   text-align: center;
   pointer-events: none;
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);

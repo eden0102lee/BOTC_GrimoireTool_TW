@@ -132,7 +132,9 @@ body {
 }
 
 #app > .info {
-  z-index: 12;
+  z-index: 1;
+  transform: translate3d(-50%, 0, 0) !important;
+  transform-origin: 50% 0;
 }
 
 #app > #vote {
@@ -218,7 +220,7 @@ body {
 // Optical balance / density polish
 // -----------------------------------------------------------------------------
 #app > .info {
-  max-width: min(310px, calc(100vw - 40px));
+  max-width: none;
 }
 
 #app > #vote {
@@ -260,10 +262,6 @@ body {
     width: min(94vw, 720px);
   }
 
-  #app > .info {
-    max-width: min(154px, calc(100vw - 24px));
-  }
-
   #app > #vote {
     max-width: min(270px, calc(100vw - 20px));
   }
@@ -289,10 +287,6 @@ body {
     height: min(78vmin, 520px);
   }
 
-  #app > .info {
-    transform: translate3d(-50%, -50%, 0) scale(0.9) !important;
-  }
-
   #app > #vote {
     transform: translate3d(-50%, -50%, 0) scale(0.9) !important;
   }
@@ -301,10 +295,6 @@ body {
 @media screen and (max-height: 480px) {
   #app {
     --board-gutter: 4px;
-  }
-
-  #app > .info {
-    transform: translate3d(-50%, -50%, 0) scale(0.78) !important;
   }
 
   #app > #vote {

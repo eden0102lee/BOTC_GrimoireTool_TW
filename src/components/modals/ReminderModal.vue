@@ -122,6 +122,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
+@import "../../vars.scss";
 @import "../../gstone-assets.scss";
 
 ul.reminders .reminder {
@@ -135,36 +136,19 @@ ul.reminders .reminder {
   justify-content: center;
   align-items: center;
   margin: 1%;
-
   border-radius: 50%;
-  border: 3px solid black;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba($grimoire-brass, 0.42);
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.44),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.3);
+  @include reminder-role-face;
   cursor: pointer;
   line-height: 100%;
-  transition: transform 500ms ease;
-
-  .icon {
-    position: absolute;
-    top: 0;
-    width: 90%;
-    height: 90%;
-    background-size: 100%;
-    background-position: center center;
-    background-repeat: no-repeat;
-  }
-
-  .text {
-    color: black;
-    font-size: 65%;
-    font-weight: bold;
-    text-align: center;
-    top: 28%;
-    width: 80%;
-    line-height: 1;
-  }
+  transition: all 200ms;
 
   &:hover {
-    transform: scale(1.2);
+    transform: scale(1.05);
+    border-color: rgba($grimoire-blood-bright, 0.78);
   }
 }
 </style>

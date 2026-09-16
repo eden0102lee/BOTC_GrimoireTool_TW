@@ -92,7 +92,8 @@
 // -----------------------------------------------------------------------------
 #townsquare .circle .player .token > svg.name {
   opacity: 1;
-  // Sharp outline stack beats a soft drop-shadow that reads as blur.
+  // Lock to viewport height so a narrow window keeps the square-window name size.
+  font-size: calc(var(--seat-size-y, 14vh) * 0.16);
   filter: none;
 }
 
@@ -124,7 +125,7 @@
 #townsquare .circle.size-11 .player .token > svg.name,
 #townsquare .circle.size-12 .player .token > svg.name,
 #townsquare .circle.size-13 .player .token > svg.name {
-  font-size: 108%;
+  font-size: calc(var(--seat-size-y, 14vh) * 0.17);
 }
 
 #townsquare .circle.size-14 .player .token > svg.name,
@@ -134,7 +135,7 @@
 #townsquare .circle.size-18 .player .token > svg.name,
 #townsquare .circle.size-19 .player .token > svg.name,
 #townsquare .circle.size-20 .player .token > svg.name {
-  font-size: 102%;
+  font-size: calc(var(--seat-size-y, 14vh) * 0.155);
 }
 
 // -----------------------------------------------------------------------------
@@ -151,7 +152,7 @@
 #townsquare .circle .player .token.compact > .short-name {
   top: 58%;
   bottom: auto;
-  font-size: clamp(12px, 2.9vmin, 19px);
+  font-size: 0.72em;
 }
 
 #townsquare .circle.size-14 .player .token.compact > .short-name,
@@ -162,12 +163,12 @@
 #townsquare .circle.size-19 .player .token.compact > .short-name,
 #townsquare .circle.size-20 .player .token.compact > .short-name {
   top: 56%;
-  font-size: clamp(11px, 2.4vmin, 15px);
+  font-size: 0.64em;
 }
 
 html.layout-portrait #townsquare .circle .player .token.compact > .short-name {
   top: 57%;
-  font-size: clamp(11px, 3.1vw, 17px);
+  font-size: 0.68em;
 }
 
 #townsquare > .bluffs .token.compact > .icon,
@@ -182,7 +183,7 @@ html.layout-portrait #townsquare .circle .player .token.compact > .short-name {
 #townsquare > .fabled .token.compact > .short-name {
   top: 58%;
   bottom: auto;
-  font-size: clamp(10px, 2.3vmin, 14px);
+  font-size: 0.62em;
 }
 
 // -----------------------------------------------------------------------------
@@ -233,11 +234,11 @@ html.layout-portrait #townsquare .circle .player .token.compact > .short-name {
 // Player nameplate relationship to token
 // -----------------------------------------------------------------------------
 #townsquare .circle .player > .name {
-  top: 3px;
+  top: 0.16em;
   width: 114%;
   right: 7%;
   min-height: 1.38em;
-  padding: 1px 7px 2px;
+  padding: 0.05em 0.35em 0.1em;
   line-height: 1.12;
   border-radius: 4px;
   // Avoid backdrop blur on the label itself — it softens CJK glyphs.
@@ -248,10 +249,10 @@ html.layout-portrait #townsquare .circle .player .token.compact > .short-name {
 #townsquare .circle.size-13 .player > .name,
 #townsquare .circle.size-14 .player > .name,
 #townsquare .circle.size-15 .player > .name {
-  top: 2px;
+  top: 0.1em;
   width: 108%;
   right: 4%;
-  padding-inline: 5px;
+  padding-inline: 0.26em;
   font-size: 104%;
 }
 
@@ -260,11 +261,11 @@ html.layout-portrait #townsquare .circle .player .token.compact > .short-name {
 #townsquare .circle.size-18 .player > .name,
 #townsquare .circle.size-19 .player > .name,
 #townsquare .circle.size-20 .player > .name {
-  top: 1px;
+  top: 0.05em;
   width: 104%;
   right: 2%;
   min-height: 1.2em;
-  padding: 0 4px 1px;
+  padding: 0 0.2em 0.05em;
   font-size: 96%;
 }
 
@@ -325,17 +326,25 @@ html.layout-portrait #townsquare .circle .player .token.compact > .short-name {
 }
 
 #townsquare .circle > li > .reminder .icon {
-  width: 86%;
-  height: 86%;
-  top: 2%;
-  background-size: 98%;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  margin-top: 1.5%;
+  background-size: 84%;
+  background-position: center 31%;
 }
 
 #townsquare .circle > li > .reminder .text {
-  top: 13%;
-  margin-top: 48%;
-  line-height: 0.88;
-  font-size: 48%;
+  top: auto;
+  bottom: 12%;
+  left: 50%;
+  margin: 0;
+  width: 78%;
+  height: auto;
+  transform: translateX(-50%);
+  line-height: 1.08;
+  font-size: 0.65em;
+  font-size: 16cqi;
 }
 
 #townsquare .circle.size-12 > li > .reminder {
@@ -367,7 +376,7 @@ html.layout-portrait #townsquare .circle .player .token.compact > .short-name {
 #townsquare .circle.size-18 > li > .reminder .text,
 #townsquare .circle.size-19 > li > .reminder .text,
 #townsquare .circle.size-20 > li > .reminder .text {
-  font-size: 43%;
+  font-size: 15cqi;
 }
 
 // The add-reminder token must remain exactly aligned with existing reminders so
@@ -382,15 +391,18 @@ html.layout-portrait #townsquare .circle .player .token.compact > .short-name {
 #townsquare .circle .player .seat,
 #townsquare .circle .player .has-vote {
   margin-top: -12%;
-  font-size: 0.9em;
 }
 
 #townsquare .circle .player .seat {
   left: 3px;
+  font-size: 0.9em;
 }
 
 #townsquare .circle .player .has-vote {
-  right: 3px;
+  right: 1%;
+  margin-top: -18%;
+  font-size: calc(var(--seat-size, 14vh) * 0.22);
+  transform: none;
 }
 
 #townsquare .circle .player .marked svg {
@@ -440,19 +452,18 @@ html.layout-portrait #townsquare .circle .player .token.compact > .short-name {
   }
 
   #townsquare .circle .player > .name {
-    top: 1px;
+    top: 0.05em;
     width: 106%;
     right: 3%;
     min-height: 1.22em;
-    padding: 0 4px 1px;
+    padding: 0 0.2em 0.05em;
   }
 
   #townsquare .circle > li > .reminder {
     margin-top: 1px;
   }
 
-  #townsquare .circle .player .seat,
-  #townsquare .circle .player .has-vote {
+  #townsquare .circle .player .seat {
     font-size: 0.82em;
   }
 }

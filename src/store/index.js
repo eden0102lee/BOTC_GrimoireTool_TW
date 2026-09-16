@@ -118,7 +118,7 @@ export default new Vuex.Store({
       isMenuOpen: false,
       isStatic: false,
       isMuted: false,
-      isImageOptIn: false,
+      isImageOptIn: true,
       isCompactToken: false,
       rolesHidden: false,
       showCenterMark: true,

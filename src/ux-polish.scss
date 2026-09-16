@@ -24,7 +24,7 @@
   width: 112%;
   right: 6%;
   min-height: 1.35em;
-  padding: 1px 6px 2px;
+  padding: 0.05em 0.3em 0.1em;
   font-size: 98%;
   letter-spacing: 0;
 }
@@ -37,7 +37,7 @@
   width: 108%;
   right: 4%;
   min-height: 1.25em;
-  padding: 1px 4px;
+  padding: 0.05em 0.2em;
   font-size: 88%;
   letter-spacing: 0;
 }
@@ -86,20 +86,15 @@
 #townsquare .circle.size-18 .reminder .text,
 #townsquare .circle.size-19 .reminder .text,
 #townsquare .circle.size-20 .reminder .text {
-  font-size: 46%;
+  font-size: 15cqi;
 }
 
 // De-emphasize seat metadata as the circle becomes crowded.
 #townsquare .circle.size-16 .player .seat,
-#townsquare .circle.size-16 .player .has-vote,
 #townsquare .circle.size-17 .player .seat,
-#townsquare .circle.size-17 .player .has-vote,
 #townsquare .circle.size-18 .player .seat,
-#townsquare .circle.size-18 .player .has-vote,
 #townsquare .circle.size-19 .player .seat,
-#townsquare .circle.size-19 .player .has-vote,
-#townsquare .circle.size-20 .player .seat,
-#townsquare .circle.size-20 .player .has-vote {
+#townsquare .circle.size-20 .player .seat {
   font-size: 82%;
 }
 
@@ -119,9 +114,12 @@
 // Center information hierarchy
 // -----------------------------------------------------------------------------
 #app > .info {
-  width: clamp(168px, 18vw, 248px);
+  width: var(--info-width, 35vh);
+  max-width: none;
   min-height: 0;
-  padding: 39px 12px 11px;
+  padding: 0 var(--info-pad, 1.2vh) var(--info-pad, 1.2vh);
+  font-size: var(--info-font, 1.2vh);
+  overflow: visible;
 }
 
 #app > .info li {
@@ -129,42 +127,14 @@
 }
 
 #app > .info li.edition {
-  width: clamp(66px, 13vmin, 132px);
-  height: clamp(58px, 12vmin, 118px);
-  top: -36%;
-  opacity: 0.92;
-}
-
-// A small group has more empty center space; let TownInfo breathe a little.
-#app:has(#townsquare .circle.size-1) > .info,
-#app:has(#townsquare .circle.size-2) > .info,
-#app:has(#townsquare .circle.size-3) > .info,
-#app:has(#townsquare .circle.size-4) > .info,
-#app:has(#townsquare .circle.size-5) > .info,
-#app:has(#townsquare .circle.size-6) > .info {
-  width: clamp(184px, 22vw, 270px);
-}
-
-// Large groups need the center to stay quiet so labels around the ring remain
-// legible.
-#app:has(#townsquare .circle.size-13) > .info,
-#app:has(#townsquare .circle.size-14) > .info,
-#app:has(#townsquare .circle.size-15) > .info,
-#app:has(#townsquare .circle.size-16) > .info,
-#app:has(#townsquare .circle.size-17) > .info,
-#app:has(#townsquare .circle.size-18) > .info,
-#app:has(#townsquare .circle.size-19) > .info,
-#app:has(#townsquare .circle.size-20) > .info {
-  width: clamp(148px, 15vw, 205px);
-  padding: 34px 9px 9px;
-  font-size: 86%;
-  background:
-    radial-gradient(
-      circle at 50% -18%,
-      rgba($grimoire-brass, 0.065),
-      transparent 48%
-    ),
-    rgba(9, 8, 7, 0.66);
+  position: relative;
+  top: auto;
+  width: 100%;
+  height: 0;
+  max-width: 100%;
+  max-height: none;
+  overflow: visible;
+  opacity: 1;
 }
 
 // -----------------------------------------------------------------------------
@@ -238,9 +208,13 @@
 // -----------------------------------------------------------------------------
 #app #townsquare > .bluffs,
 #app #townsquare > .fabled {
-  max-width: min(34vw, 360px);
+  max-width: min(42vw, 420px);
   padding: 3px 5px 5px;
   overflow: visible;
+}
+
+#app #townsquare > .bluffs {
+  max-width: max-content;
 }
 
 #app #townsquare > .bluffs ul,
@@ -248,32 +222,39 @@
   gap: 2px;
 }
 
-#app #townsquare > .bluffs ul li,
-#app #townsquare > .fabled ul li {
-  width: clamp(50px, 8.2vh, 82px);
-  height: clamp(50px, 8.2vh, 82px);
+#app #townsquare > .bluffs ul li {
+  flex: 0 0 var(--bluff-token-size, 12.6vh);
+  width: var(--bluff-token-size, 12.6vh);
+  height: var(--bluff-token-size, 12.6vh);
+  min-width: var(--bluff-token-size, 12.6vh);
+  min-height: var(--bluff-token-size, 12.6vh);
+  max-width: var(--bluff-token-size, 12.6vh);
+  max-height: var(--bluff-token-size, 12.6vh);
   margin: 0;
 }
 
-// In crowded games, protect the outer player ring by shrinking corner trays.
-#app:has(#townsquare .circle.size-13) #townsquare > .bluffs ul li,
-#app:has(#townsquare .circle.size-13) #townsquare > .fabled ul li,
-#app:has(#townsquare .circle.size-14) #townsquare > .bluffs ul li,
-#app:has(#townsquare .circle.size-14) #townsquare > .fabled ul li,
-#app:has(#townsquare .circle.size-15) #townsquare > .bluffs ul li,
-#app:has(#townsquare .circle.size-15) #townsquare > .fabled ul li,
-#app:has(#townsquare .circle.size-16) #townsquare > .bluffs ul li,
-#app:has(#townsquare .circle.size-16) #townsquare > .fabled ul li,
-#app:has(#townsquare .circle.size-17) #townsquare > .bluffs ul li,
-#app:has(#townsquare .circle.size-17) #townsquare > .fabled ul li,
-#app:has(#townsquare .circle.size-18) #townsquare > .bluffs ul li,
-#app:has(#townsquare .circle.size-18) #townsquare > .fabled ul li,
-#app:has(#townsquare .circle.size-19) #townsquare > .bluffs ul li,
-#app:has(#townsquare .circle.size-19) #townsquare > .fabled ul li,
-#app:has(#townsquare .circle.size-20) #townsquare > .bluffs ul li,
-#app:has(#townsquare .circle.size-20) #townsquare > .fabled ul li {
-  width: clamp(44px, 6.8vh, 66px);
-  height: clamp(44px, 6.8vh, 66px);
+#app #townsquare > .bluffs.closed ul li {
+  flex: 0 0 0;
+  width: 0;
+  height: 0;
+  min-width: 0;
+  min-height: 0;
+  max-width: 0;
+  max-height: 0;
+  margin: 0;
+}
+
+#app #townsquare > .bluffs.closed ul li .token {
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+#app #townsquare > .fabled ul li {
+  width: var(--seat-size, 14vh);
+  height: var(--seat-size, 14vh);
+  font-size: var(--seat-font, 1.82vh);
+  margin: 0;
 }
 
 #app #townsquare > .bluffs h3,
@@ -332,17 +313,6 @@
 // Tablet / mobile safe areas
 // -----------------------------------------------------------------------------
 @media screen and (max-width: 991.98px) {
-  #app > .info {
-    width: clamp(146px, 28vw, 188px);
-    padding: 31px 8px 8px;
-  }
-
-  #app > .info li.edition {
-    width: clamp(54px, 14vmin, 94px);
-    height: clamp(48px, 13vmin, 86px);
-    top: -32%;
-  }
-
   #app > #vote {
     width: clamp(220px, 40vw, 292px);
   }
@@ -353,24 +323,24 @@
     bottom: max(8px, env(safe-area-inset-bottom, 0px));
   }
 
-  #app #townsquare > .bluffs ul li,
+  #app #townsquare > .bluffs {
+    max-width: max-content;
+  }
+
   #app #townsquare > .fabled ul li {
-    width: clamp(44px, 7vh, 64px);
-    height: clamp(44px, 7vh, 64px);
+    width: var(--seat-size, 14vh);
+    height: var(--seat-size, 14vh);
   }
 }
 
 @media screen and (max-width: 767.98px) {
   #app > .info {
-    width: clamp(128px, 34vw, 152px);
-    padding: 26px 6px 7px;
     border-radius: 6px;
-    font-size: 70%;
   }
 
   #app > .info li + li {
-    margin-top: 3px;
-    padding-top: 3px;
+    margin-top: var(--info-gap, 0.35vh);
+    padding-top: var(--info-gap, 0.35vh);
   }
 
   #app > #vote {
@@ -399,6 +369,10 @@
   }
 
   #app #townsquare > .bluffs {
+    max-width: max-content;
+  }
+
+  #app #townsquare > .bluffs {
     left: max(5px, env(safe-area-inset-left, 0px));
   }
 
@@ -412,10 +386,9 @@
     font-size: 0.68em;
   }
 
-  #app #townsquare > .bluffs ul li,
   #app #townsquare > .fabled ul li {
-    width: clamp(38px, 11vw, 52px);
-    height: clamp(38px, 11vw, 52px);
+    width: var(--seat-size, 14vh);
+    height: var(--seat-size, 14vh);
   }
 
   #townsquare .circle.size-13 > li .player > .name,
@@ -438,7 +411,7 @@
 // those tokens substantially larger than Fabled/support trays in this layout.
 @media screen and (max-width: 767.98px) and (orientation: portrait) {
   #app #townsquare > .bluffs {
-    max-width: min(78vw, 292px);
+    max-width: min(90vw, max-content);
     padding: 4px 6px 6px;
     bottom: max(42px, calc(env(safe-area-inset-bottom, 0px) + 12px));
   }
@@ -448,8 +421,8 @@
   }
 
   #app #townsquare > .bluffs ul li {
-    width: clamp(62px, 18vw, 78px);
-    height: clamp(62px, 18vw, 78px);
+    width: var(--bluff-token-size, 12.6vw);
+    height: var(--bluff-token-size, 12.6vw);
   }
 
   #app #townsquare > .bluffs h3 {
@@ -467,10 +440,9 @@
   #townsquare .circle.size-18 > li .player > .name,
   #townsquare .circle.size-19 > li .player > .name,
   #townsquare .circle.size-20 > li .player > .name {
-    font-size: max(13px, 0.98rem);
     width: 110%;
     right: 5%;
-    padding-inline: 4px;
+    padding-inline: 0.2em;
   }
 
   // The high-player-count compact rule above has intentionally higher
@@ -481,8 +453,8 @@
       > .bluffs
       ul
       li {
-      width: clamp(62px, 18vw, 78px);
-      height: clamp(62px, 18vw, 78px);
+      width: var(--bluff-token-size, 12.6vw);
+      height: var(--bluff-token-size, 12.6vw);
     }
   }
 }
@@ -490,18 +462,6 @@
 // Short landscape phones are the most constrained case: protect the actual
 // player ring first, then reduce decorative/support UI.
 @media screen and (max-height: 540px) and (min-aspect-ratio: 4/3) {
-  #app > .info {
-    width: 132px;
-    padding: 23px 5px 5px;
-    font-size: 64%;
-  }
-
-  #app > .info li.edition {
-    width: 56px;
-    height: 50px;
-    top: -31%;
-  }
-
   #app > #vote {
     width: 220px;
     padding: 8px;
@@ -517,10 +477,18 @@
     bottom: 5px;
   }
 
-  #app #townsquare > .bluffs ul li,
+  #app #townsquare > .bluffs {
+    max-width: max-content;
+  }
+
+  #app #townsquare > .bluffs ul li {
+    width: var(--bluff-token-size, 12.6vh);
+    height: var(--bluff-token-size, 12.6vh);
+  }
+
   #app #townsquare > .fabled ul li {
-    width: 38px;
-    height: 38px;
+    width: var(--seat-size, 14vh);
+    height: var(--seat-size, 14vh);
   }
 
   #app #townsquare > .bluffs h3,

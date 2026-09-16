@@ -12,11 +12,124 @@ $play-line-strong: rgba($grimoire-brass, 0.58);
 // Center town information
 // -----------------------------------------------------------------------------
 #app .info {
-  width: min(22%, 310px);
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+  width: var(--info-width, 35vh);
+  max-width: none;
   height: auto;
-  min-height: 150px;
-  padding: 46px 14px 13px;
+  min-height: 0;
+  padding: 0 var(--info-pad, 1.2vh) var(--info-pad, 1.2vh);
+  font-size: var(--info-font, 1.2vh);
+  overflow: visible;
   color: $grimoire-text;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+#app .info:before,
+#app .info:after {
+  content: "◆";
+  position: absolute;
+  top: 0.45em;
+  z-index: 2;
+  color: rgba($grimoire-brass-light, 0.34);
+  font-size: 0.45em;
+}
+
+#app .info:before { left: 0.55em; }
+#app .info:after { right: 0.55em; }
+
+#app .info li {
+  width: 100%;
+  max-width: 100%;
+  font-weight: 600;
+  filter: none;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  overflow: hidden;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  gap: 3px 7px;
+}
+
+#app .info li + li {
+  margin-top: var(--info-gap, 0.45vh);
+  padding-top: var(--info-gap, 0.45vh);
+  border-top: 1px solid rgba($grimoire-brass, 0.11);
+}
+
+#app .info li span {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 0;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+}
+
+#app .info li svg {
+  margin-right: 0;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.8));
+}
+
+#app .info li .players { color: #9fbd8f; }
+#app .info li .alive { color: #c98079; }
+#app .info li .votes { color: $grimoire-brass-light; }
+
+#app .info li.edition {
+  position: relative;
+  top: auto;
+  width: 100%;
+  height: 0;
+  max-width: 100%;
+  max-height: none;
+  flex: 0 0 auto;
+  align-self: stretch;
+  overflow: visible;
+  background: none;
+  filter: none;
+}
+
+#app .info li.edition img {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  filter:
+    saturate(0.82)
+    drop-shadow(0 8px 12px rgba(0, 0, 0, 0.55));
+}
+
+#app .info li.script {
+  position: relative;
+  z-index: 2;
+  width: max-content;
+  max-width: none;
+  overflow: visible;
+  align-self: center;
+  white-space: nowrap;
+}
+
+#app .info li.info-frame {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: auto;
+  max-width: none;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  pointer-events: none;
+  overflow: hidden;
   background:
     radial-gradient(circle at 50% -18%, rgba($grimoire-brass, 0.09), transparent 48%),
     linear-gradient(180deg, rgba(255, 241, 211, 0.025), transparent 44%),
@@ -29,72 +142,22 @@ $play-line-strong: rgba($grimoire-brass, 0.58);
   backdrop-filter: blur(6px);
 }
 
-#app .info:before,
-#app .info:after {
-  content: "◆";
-  position: absolute;
-  top: 7px;
-  color: rgba($grimoire-brass-light, 0.34);
-  font-size: 7px;
+#app .info li.edition,
+#app .info li.counts,
+#app .info li.setup,
+#app .info li.phase {
+  position: relative;
+  z-index: 1;
 }
 
-#app .info:before { left: 9px; }
-#app .info:after { right: 9px; }
-
-#app .info li {
-  width: 100%;
-  font-weight: 600;
-  filter: none;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
-  gap: 3px 7px;
+#app .info li + li.info-frame {
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
-#app .info li + li {
-  margin-top: 5px;
-  padding-top: 5px;
-  border-top: 1px solid rgba($grimoire-brass, 0.11);
-}
-
-#app .info li span {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 2px 4px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.015);
-}
-
-#app .info li .meta {
-  flex-basis: 100%;
-  justify-content: center;
-  color: $grimoire-muted;
-  font-family: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
-  letter-spacing: 0.04em;
-}
-
-#app .info li svg {
-  margin-right: 0;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.8));
-}
-
-#app .info li .players { color: #9fbd8f; }
-#app .info li .alive { color: #c98079; }
-#app .info li .votes { color: $grimoire-brass-light; }
-
-#app .info li span:has(.fa-cloud-moon) {
-  margin-top: 2px;
-  color: #b7cde1;
-  border: 1px solid rgba(102, 143, 177, 0.22);
-  background: rgba(31, 56, 78, 0.24);
-}
-
-#app .info li.edition {
-  width: clamp(72px, 17vmin, 170px);
-  height: clamp(64px, 15vmin, 150px);
-  top: -42%;
-  filter:
-    saturate(0.82)
-    drop-shadow(0 8px 12px rgba(0, 0, 0, 0.55));
+#app .info li.counts span {
+  gap: 0.22em;
 }
 
 // -----------------------------------------------------------------------------
@@ -597,14 +660,57 @@ $play-line-strong: rgba($grimoire-brass, 0.58);
   width: clamp(66px, 10vh, 96px);
   height: clamp(66px, 10vh, 96px);
   margin: 0;
-  border: 1px solid rgba($grimoire-brass, 0.4);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.38);
+  border: 1px solid rgba($grimoire-brass, 0.42);
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.44),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.3);
   transition: transform 150ms ease, border-color 150ms ease;
+}
+
+#app .modal ul.reminders .reminder .icon {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin-top: 1.5%;
+  background-size: 84%;
+  background-position: center 31%;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
+}
+
+#app .modal ul.reminders .reminder .text {
+  position: absolute;
+  left: 50%;
+  top: auto;
+  bottom: 12%;
+  margin: 0;
+  width: 78%;
+  height: auto;
+  transform: translateX(-50%);
+  line-height: 1.08;
+  font-family: "Noto Serif TC", "Source Han Serif TC", "Songti TC", "PMingLiU",
+    serif;
+  font-weight: 800;
+  font-size: 0.65em;
+  font-size: 16cqi;
+  text-align: center;
+  color: #0a0705;
+  -webkit-text-stroke: 0.07em rgba(255, 246, 220, 0.98);
+  paint-order: stroke fill;
+  text-shadow: none;
+}
+
+#app .modal ul.reminders .reminder.custom .text {
+  top: 50%;
+  bottom: auto;
+  transform: translate(-50%, -50%);
+  font-size: 18cqi;
+  width: 70%;
 }
 
 #app .modal ul.reminders .reminder:hover {
   transform: translateY(-2px) scale(1.05);
-  border-color: rgba($grimoire-brass-light, 0.72);
+  border-color: rgba($grimoire-blood-bright, 0.78);
 }
 
 // -----------------------------------------------------------------------------
@@ -734,19 +840,6 @@ $play-line-strong: rgba($grimoire-brass, 0.58);
 // Mobile / compact viewport
 // -----------------------------------------------------------------------------
 @media screen and (max-width: 991.98px) {
-  #app .info {
-    width: min(188px, 38vw);
-    min-height: 0;
-    padding: 34px 8px 9px;
-    font-size: 78%;
-  }
-
-  #app .info li.edition {
-    width: clamp(58px, 22vw, 120px);
-    height: clamp(52px, 20vw, 110px);
-    top: -38%;
-  }
-
   #app #vote {
     width: min(38vw, 300px);
     min-width: 190px;
@@ -773,17 +866,6 @@ $play-line-strong: rgba($grimoire-brass, 0.58);
 }
 
 @media screen and (max-width: 767.98px) {
-  #app .info {
-    width: min(150px, 42vw);
-    padding: 26px 6px 7px;
-    font-size: 68%;
-    border-color: rgba($grimoire-brass, 0.22);
-  }
-
-  #app .info li span {
-    padding: 1px 3px;
-  }
-
   #app #vote {
     min-width: 0;
     width: min(48vw, 260px);

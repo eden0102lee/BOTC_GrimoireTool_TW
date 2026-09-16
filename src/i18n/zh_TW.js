@@ -110,6 +110,12 @@ export default {
   "town.addMorePlayers": "請新增更多玩家！",
   "town.nightPhase": "夜晚階段",
   "town.by": "作者",
+  "town.countsTitle": "玩家數／存活／有效票",
+  "town.teamTownsfolkShort": "民",
+  "town.teamOutsiderShort": "外",
+  "town.teamMinionShort": "爪",
+  "town.teamDemonShort": "惡",
+  "town.teamTravelerShort": "旅",
 
   // Town square
   "square.otherCharacters": "其他角色",

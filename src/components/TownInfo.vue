@@ -1,83 +1,85 @@
 <template>
-  <ul class="info">
-    <li
-      class="edition"
-      :class="['edition-' + edition.id]"
-      :style="{
-        backgroundImage: `url(${editionLogo})`
-      }"
-    ></li>
-    <li v-if="players.length - teams.traveler < 5">
-      {{ $t("town.addMorePlayers") }}
+  <ul class="info" :style="infoScaleVars">
+    <li class="edition" :class="['edition-' + edition.id]" aria-hidden="true">
+      <img :src="editionLogo" alt="" />
     </li>
-    <li>
-      <span class="meta" v-if="!edition.isOfficial">
-        {{ $editionName(edition) }}
-        {{ edition.author ? $t("town.by") + " " + edition.author : "" }}
-      </span>
+    <li class="script">
+      <span class="script-name">{{ $editionName(edition) }}</span>
+      <span v-if="editionAuthor" class="script-author">{{
+        editionAuthor
+      }}</span>
+    </li>
+    <li class="counts" :title="$t('town.countsTitle')">
       <span>
-        {{ players.length }} <font-awesome-icon class="players" icon="users" />
+        {{ players.length }}
+        <font-awesome-icon class="players" icon="users" />
       </span>
       <span>
         {{ teams.alive }}
         <font-awesome-icon class="alive" icon="heartbeat" />
       </span>
       <span>
-        {{ teams.votes }} <font-awesome-icon class="votes" icon="vote-yea" />
+        {{ teams.votes }}
+        <font-awesome-icon class="votes" icon="vote-yea" />
       </span>
     </li>
-    <li v-if="players.length - teams.traveler >= 5">
-      <span>
-        {{ teams.townsfolk }}
-        <font-awesome-icon class="townsfolk" icon="user-friends" />
-      </span>
-      <span>
-        {{ teams.outsider }}
-        <font-awesome-icon
-          class="outsider"
-          :icon="teams.outsider > 1 ? 'user-friends' : 'user'"
-        />
-      </span>
-      <span>
-        {{ teams.minion }}
-        <font-awesome-icon
-          class="minion"
-          :icon="teams.minion > 1 ? 'user-friends' : 'user'"
-        />
-      </span>
-      <span>
-        {{ teams.demon }}
-        <font-awesome-icon
-          class="demon"
-          :icon="teams.demon > 1 ? 'user-friends' : 'user'"
-        />
-      </span>
-      <span v-if="teams.traveler">
-        {{ teams.traveler }}
-        <font-awesome-icon
-          class="traveler"
-          :icon="teams.traveler > 1 ? 'user-friends' : 'user'"
-        />
-      </span>
-      <span v-if="grimoire.isNight">
-        {{ $t("town.nightPhase") }}
-        <font-awesome-icon :icon="['fas', 'cloud-moon']" />
-      </span>
+    <li class="setup">
+      <span class="townsfolk">{{ setupCounts.townsfolk }}{{ $t("town.teamTownsfolkShort") }}</span>
+      <span class="outsider">{{ setupCounts.outsider }}{{ $t("town.teamOutsiderShort") }}</span>
+      <span class="minion">{{ setupCounts.minion }}{{ $t("town.teamMinionShort") }}</span>
+      <span class="demon">{{ setupCounts.demon }}{{ $t("town.teamDemonShort") }}</span>
+      <span v-if="teams.traveler" class="traveler"
+        >{{ teams.traveler }}{{ $t("town.teamTravelerShort") }}</span
+      >
     </li>
+    <li class="phase">{{ currentPhaseLabel }}</li>
+    <li class="info-frame" aria-hidden="true"></li>
   </ul>
 </template>
 
 <script>
 import gameJSON from "./../game";
-import { mapState } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import { editionLogoUrl } from "../edition-logos";
+import { seatBaseSize } from "../store/viewportLayout";
+
+const INFO_TO_SEAT = 2.5;
 
 export default {
   computed: {
+    infoScaleVars() {
+      const unit = this.grimoire.unit || "vh";
+      const zoom = this.grimoire.zoom || 0;
+      const count = (this.players && this.players.length) || 12;
+      const seat = Math.max(8, seatBaseSize(count) + zoom);
+      const width = seat * INFO_TO_SEAT;
+      return {
+        "--info-width": width + unit,
+        "--info-pad": width * 0.05 + unit,
+        "--info-font": width * 0.048 + unit,
+        "--info-gap": width * 0.018 + unit
+      };
+    },
     editionLogo() {
       return editionLogoUrl(this.edition, {
         imageOptIn: this.grimoire.isImageOptIn
       });
+    },
+    editionAuthor() {
+      return (this.edition && this.edition.author) || "";
+    },
+    currentPhaseLabel() {
+      return this.displayLabel || this.$t("town.nightPhase");
+    },
+    setupCounts() {
+      const nonTravelers = this.$store.getters["players/nonTravelers"];
+      const row = gameJSON[nonTravelers - 5];
+      return {
+        townsfolk: (row && row.townsfolk) || 0,
+        outsider: (row && row.outsider) || 0,
+        minion: (row && row.minion) || 0,
+        demon: (row && row.demon) || 0
+      };
     },
     teams: function() {
       const { players } = this.$store.state.players;
@@ -94,6 +96,7 @@ export default {
           ).length
       };
     },
+    ...mapGetters("gamePhase", ["displayLabel"]),
     ...mapState(["edition", "grimoire"]),
     ...mapState("players", ["players"])
   }
@@ -106,37 +109,35 @@ export default {
 .info {
   position: absolute;
   display: flex;
-  width: 20%;
-  height: 20%;
-  padding: 50px 0 0;
+  flex-direction: column;
+  flex-wrap: nowrap;
   align-items: center;
-  align-content: center;
   justify-content: center;
-  flex-wrap: wrap;
+  width: var(--info-width, 35vh);
+  max-width: none;
+  height: auto;
+  padding: 0 var(--info-pad, 1.2vh) var(--info-pad, 1.2vh);
+  font-size: var(--info-font, 1.2vh);
+  overflow: visible;
+  text-align: center;
 
   li {
     font-weight: bold;
     width: 100%;
+    max-width: 100%;
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+    overflow: visible;
     text-shadow: 0 1px 1px rgba(0, 0, 0, 0.8), 0 -1px 1px rgba(0, 0, 0, 0.8),
       1px 0 1px rgba(0, 0, 0, 0.8), -1px 0 1px rgba(0, 0, 0, 0.8);
 
     span {
       white-space: nowrap;
-    }
-
-    .meta {
-      text-align: center;
-      flex-basis: 100%;
-      font-family: PiratesBay, sans-serif;
-      font-weight: normal;
-    }
-
-    svg {
-      margin-right: 10px;
+      flex: 0 0 auto;
     }
 
     .players {
@@ -166,58 +167,80 @@ export default {
   }
 
   li.edition {
-    width: clamp(72px, 22vmin, 220px);
-    height: clamp(66px, 20vmin, 200px);
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
     max-width: 100%;
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    position: absolute;
-    top: -25%;
-  }
-}
+    height: 0;
+    max-height: none;
+    flex: 0 0 auto;
+    align-self: stretch;
+    overflow: visible;
+    line-height: 0;
+    background: none;
 
-@media screen and (max-width: 991.98px) {
-  .info {
-    width: min(180px, 36vw);
-    height: auto;
-    padding: 28px 0 0;
-    font-size: 90%;
+    img {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      display: block;
+      width: 100%;
+      height: auto;
+      max-width: none;
+      max-height: none;
+      object-fit: contain;
+      object-position: center bottom;
+      pointer-events: none;
+    }
   }
-  .info li.edition {
-    width: clamp(64px, 28vw, 160px);
-    height: clamp(58px, 25vw, 145px);
-    top: -18%;
-  }
-}
 
-@media screen and (max-width: 767.98px) {
-  .info {
-    width: min(140px, 44vw);
-    padding: 16px 0 0;
-    font-size: 78%;
-    pointer-events: none;
+  li.script {
+    position: relative;
+    z-index: 2;
+    width: max-content;
+    max-width: none;
+    overflow: visible;
+    align-self: center;
+    gap: 0.6em;
+    font-weight: 600;
+    font-size: 1em;
   }
-  .info li {
+
+  .script-name {
+    font-family: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+    color: #f2e6d1;
+  }
+
+  .script-author {
+    font-weight: 500;
+    color: $grimoire-muted;
+  }
+
+  li.counts {
+    gap: 0.55em;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+
     span {
-      margin: 0 4px;
+      gap: 0.22em;
     }
-    svg {
-      margin-right: 4px;
-    }
-  }
-  .info li.edition {
-    width: clamp(56px, 30vw, 130px);
-    height: clamp(50px, 27vw, 118px);
-    top: -14%;
-  }
-}
 
-@media screen and (max-height: 600px) {
-  .info li.edition {
-    width: clamp(48px, 18vmin, 120px);
-    height: clamp(44px, 16vmin, 110px);
-    top: -12%;
+    svg {
+      margin: 0;
+    }
+  }
+
+  li.setup {
+    gap: 0.45em;
+    font-weight: 800;
+    font-size: 1.08em;
+  }
+
+  li.phase {
+    font-weight: 600;
+    font-size: 0.88em;
+    color: $grimoire-brass-light;
   }
 }
 </style>

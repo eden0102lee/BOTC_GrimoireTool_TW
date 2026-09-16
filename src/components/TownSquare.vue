@@ -7,6 +7,7 @@
       spectator: session.isSpectator,
       vote: session.nomination,
     }"
+    :style="seatScaleVars"
   >
     <ul class="circle" :class="['size-' + players.length]">
       <Player
@@ -27,6 +28,7 @@
       class="bluffs fabled_bluffs"
       v-if="players.length"
       :class="{ closed: !isBluffsOpen }"
+      :style="bluffTokenVars"
     >
       <h3>
         <span v-if="session.isSpectator">{{ $t("square.otherCharacters") }}</span>
@@ -99,6 +101,9 @@ import Player from "./Player";
 import Token from "./Token";
 import ReminderModal from "./modals/ReminderModal";
 import RoleModal from "./modals/RoleModal";
+import { seatBaseSize } from "../store/viewportLayout";
+
+const BLUFF_TO_TWELVE_PLAYER_SCALE = 0.9;
 
 export default {
   components: {
@@ -114,6 +119,33 @@ export default {
     }),
     ...mapState(["grimoire", "roles", "session"]),
     ...mapState("players", ["players", "bluffs", "fabled"]),
+    bluffTokenSize() {
+      const unit = this.grimoire.unit || "vh";
+      const twelvePlayer =
+        Math.max(8, seatBaseSize(12) + (this.grimoire.zoom || 0));
+      return {
+        unit,
+        twelvePlayer,
+        size: twelvePlayer * BLUFF_TO_TWELVE_PLAYER_SCALE
+      };
+    },
+    seatScaleVars() {
+      const unit = this.grimoire.unit || "vh";
+      const count = this.players.length || 12;
+      const size = Math.max(8, seatBaseSize(count) + (this.grimoire.zoom || 0));
+      return {
+        "--seat-size": size + unit,
+        "--seat-size-y": size + "vh",
+        "--seat-font": size * 0.13 + unit
+      };
+    },
+    bluffTokenVars() {
+      const { size, unit } = this.bluffTokenSize;
+      return {
+        "--bluff-token-size": size + unit,
+        "--seat-size": size + unit
+      };
+    }
   },
   data() {
     return {
@@ -298,10 +330,6 @@ export default {
     transform-origin: 0 100%;
     pointer-events: none;
 
-    &:hover {
-      z-index: 25 !important;
-    }
-
     > .player {
       margin-left: -50%;
       width: 100%;
@@ -472,18 +500,40 @@ export default {
     justify-content: center;
 
     li {
-      width: 14vh;
-      height: 14vh;
+      width: var(--seat-size, 14vh);
+      height: var(--seat-size, 14vh);
+      font-size: var(--seat-font, 1.82vh);
       margin: 0 0.5%;
       display: inline-block;
       transition: all 250ms;
     }
   }
 
+  &.bluffs ul li {
+    flex: 0 0 var(--bluff-token-size, 12.6vh);
+    width: var(--bluff-token-size, 12.6vh);
+    height: var(--bluff-token-size, 12.6vh);
+    min-width: var(--bluff-token-size, 12.6vh);
+    min-height: var(--bluff-token-size, 12.6vh);
+    max-width: var(--bluff-token-size, 12.6vh);
+    max-height: var(--bluff-token-size, 12.6vh);
+  }
+
+  &.bluffs ul li .token {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 1 / 1;
+  }
+
   &.closed {
     ul li {
       width: 0;
       height: 0;
+      min-width: 0;
+      min-height: 0;
+      max-width: 0;
+      max-height: 0;
+      flex-basis: 0;
       margin: 0;
 
       .night-order {
@@ -492,6 +542,9 @@ export default {
 
       .token {
         border-width: 0;
+        width: 0;
+        height: 0;
+        overflow: hidden;
       }
     }
 
@@ -639,8 +692,11 @@ export default {
   em {
     font-style: normal;
     position: absolute;
-    width: 40px;
-    height: 40px;
+    width: calc(var(--seat-size, 14vh) * 0.27);
+    height: calc(var(--seat-size, 14vh) * 0.27);
+    font-size: calc(var(--seat-size, 14vh) * 0.155);
+    padding-left: 0.12em;
+    box-sizing: border-box;
     border-radius: 50%;
     border: $chrome-border-width solid $chrome-border;
     box-shadow: $chrome-shadow;

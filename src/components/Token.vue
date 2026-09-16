@@ -236,7 +236,7 @@ export default {
     font-family: "Noto Serif TC", "Source Han Serif TC", "Songti TC", "PMingLiU",
       serif;
     font-weight: 800;
-    font-size: clamp(12px, 30%, 22px);
+    font-size: 0.72em;
     line-height: 1;
     letter-spacing: 0.06em;
     white-space: nowrap;
@@ -289,7 +289,7 @@ export default {
   .name {
     width: 100%;
     height: 100%;
-    font-size: 30px; // svg fonts are relative to document font size
+    font-size: calc(var(--seat-size-y, 14vh) * 0.16);
     .label {
       fill: #0a0705;
       stroke: rgba(255, 246, 220, 0.98);

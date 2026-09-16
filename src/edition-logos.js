@@ -10,7 +10,7 @@ export const OFFICIAL_EDITION_LOGOS = {
 // Fallback for custom scripts / unknown editions in the town center.
 export const CUSTOM_EDITION_LOGO = require("./assets/editions/custom.png");
 
-export function editionLogoUrl(edition, { imageOptIn = false } = {}) {
+export function editionLogoUrl(edition, { imageOptIn = true } = {}) {
   if (edition && OFFICIAL_EDITION_LOGOS[edition.id]) {
     return OFFICIAL_EDITION_LOGOS[edition.id];
   }

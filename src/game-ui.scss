@@ -97,8 +97,8 @@ $ui-hover: rgba($grimoire-brass, 0.1);
 // -----------------------------------------------------------------------------
 .circle .player > .name {
   min-height: 1.5em;
-  top: 7px;
-  padding: 2px 9px 3px;
+  top: 0.36em;
+  padding: 0.1em 0.45em 0.15em;
   color: $grimoire-text;
   background:
     linear-gradient(180deg, rgba(255, 242, 214, 0.035), transparent 54%),
@@ -129,11 +129,11 @@ $ui-hover: rgba($grimoire-brass, 0.1);
 }
 
 .circle .player > .name:before {
-  left: 3px;
+  left: 0.15em;
 }
 
 .circle .player > .name:after {
-  right: 3px;
+  right: 0.15em;
 }
 
 #townsquare:not(.spectator) .circle .player > .name:hover,
@@ -213,16 +213,12 @@ $ui-hover: rgba($grimoire-brass, 0.1);
 }
 
 .circle .reminder .icon {
-  filter: saturate(0.86) contrast(1.03);
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
 }
 
 .circle .reminder .text {
-  color: #18120d;
-  text-shadow:
-    0 1px 1px rgba(245, 227, 194, 0.92),
-    0 -1px 1px rgba(245, 227, 194, 0.72),
-    1px 0 1px rgba(245, 227, 194, 0.72),
-    -1px 0 1px rgba(245, 227, 194, 0.72);
+  color: #0a0705;
+  text-shadow: none;
 }
 
 .circle .reminder:hover {
@@ -573,8 +569,8 @@ $ui-hover: rgba($grimoire-brass, 0.1);
 // -----------------------------------------------------------------------------
 @media screen and (max-width: 767.98px) {
   .circle .player > .name {
-    top: 4px;
-    padding: 2px 6px;
+    top: 0.2em;
+    padding: 0.1em 0.3em;
     border-radius: 3px;
   }
 

@@ -39,7 +39,9 @@ export default (store) => {
   if (localStorage.getItem("static")) {
     store.commit("toggleStatic", true);
   }
-  if (localStorage.getItem("imageOptIn")) {
+  if (localStorage.getItem("imageOptIn") === "0") {
+    store.commit("toggleImageOptIn", false);
+  } else if (localStorage.getItem("imageOptIn")) {
     store.commit("toggleImageOptIn", true);
   }
   if (localStorage.getItem("compactToken")) {
@@ -184,11 +186,10 @@ export default (store) => {
         }
         break;
       case "toggleImageOptIn":
-        if (state.grimoire.isImageOptIn) {
-          localStorage.setItem("imageOptIn", 1);
-        } else {
-          localStorage.removeItem("imageOptIn");
-        }
+        localStorage.setItem(
+          "imageOptIn",
+          state.grimoire.isImageOptIn ? "1" : "0"
+        );
         break;
       case "toggleCompactToken":
         if (state.grimoire.isCompactToken) {
