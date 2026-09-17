@@ -33,10 +33,14 @@
         {{ $t("intro.addPlayers") }}
       </p>
 
-      <button type="button" class="button intro-action" @click="toggleMenu">
-        <font-awesome-icon icon="cog" />
-        <span>開啟魔典選單</span>
-      </button>
+      <div class="intro-actions">
+        <button type="button" class="button intro-action" @click="$emit('join-town')">
+          {{ $t("menu.joinTown") }}
+        </button>
+        <button type="button" class="button intro-action intro-action--primary" @click="$emit('create-town')">
+          {{ $t("menu.createTown") }}
+        </button>
+      </div>
 
       <div class="disclaimer">{{ $t("menu.disclaimer") }}</div>
     </div>
@@ -44,8 +48,6 @@
 </template>
 
 <script>
-import { mapMutations } from "vuex";
-
 const icons = require.context("../assets/icons", false, /\.png$/);
 const roleIcon = id => icons(`./${id}.png`);
 
@@ -63,8 +65,7 @@ export default {
         { id: "imp", team: "demon", position: "p8", icon: roleIcon("imp") }
       ]
     };
-  },
-  methods: mapMutations(["toggleMenu"])
+  }
 };
 </script>
 
@@ -276,6 +277,14 @@ h1 {
   line-height: 1.55;
 }
 
+.intro-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: 1px auto 3px;
+}
+
 .intro-action {
   width: min(100%, 290px);
   min-height: 46px;
@@ -283,7 +292,13 @@ h1 {
   justify-content: center;
   align-items: center;
   gap: 9px;
-  margin: 1px auto 3px;
+}
+
+.intro-action--primary {
+  border-color: rgba($grimoire-brass-light, 0.72);
+  box-shadow:
+    0 0 18px rgba($grimoire-blood, 0.12),
+    inset 0 0 0 1px rgba($grimoire-brass, 0.18);
 }
 
 .disclaimer {

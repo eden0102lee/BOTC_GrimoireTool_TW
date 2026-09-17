@@ -2,7 +2,7 @@ export default {
   // Intro
   "intro.welcome": "歡迎使用 Blood on the Clocktower 的（非官方）線上魔典！",
   "intro.addPlayers":
-    "請透過右上角的選單或按 [A] 新增座位；按 [C] 創建小鎮或 [J] 加入小鎮。",
+    "加入現有小鎮，或創建小鎮成為說書人。進入小鎮後可透過選單新增座位。",
   "intro.footer":
     "本專案為開源免費軟體，原始碼見 GitHub。與 Pandemonium Institute 無附屬關係。「Blood on the Clocktower」為 Steven Medway 與 The Pandemonium Institute 之商標。",
 
