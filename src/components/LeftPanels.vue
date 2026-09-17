@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="!session.isSpectator"
+    v-if="session.sessionId && !session.isSpectator"
     class="left-panels"
     :class="{ 'left-panels--collapsed': !expanded }"
     :style="expanded ? { width: panelWidth + 'px', maxWidth: panelWidth + 'px' } : null"

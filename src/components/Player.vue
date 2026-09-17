@@ -24,12 +24,6 @@
         aria-hidden="true"
       ></div>
       <div class="life" @click="toggleStatus()"></div>
-      <span
-        v-if="hasOpenPending && linkedMode"
-        class="pending-badge"
-        :title="$t('recorder.pendingSeatHint')"
-        >?</span
-      >
 
       <div
         class="night-order first"
@@ -989,27 +983,6 @@ li.move:not(.from) .player .overlay svg.move {
 
 .circle .player.battle-log-pending .token {
   filter: drop-shadow(0 0 6px rgba(255, 140, 60, 0.8));
-}
-
-.circle .pending-badge {
-  position: absolute;
-  top: -2%;
-  right: -2%;
-  z-index: 5;
-  width: calc(var(--seat-size, 14vh) * 0.216);
-  height: calc(var(--seat-size, 14vh) * 0.216);
-  border-radius: 50%;
-  background: rgba(200, 80, 0, 0.95);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(var(--seat-size, 14vh) * 0.14);
-  font-weight: bold;
-  line-height: 1;
-  text-align: center;
-  pointer-events: none;
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
 }
 
 .circle .shroud.preview-ghost:before {

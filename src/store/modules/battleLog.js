@@ -809,6 +809,11 @@ const actions = {
     if (!id) return;
     commit("removePendingFact", id);
   },
+  /** Drop local ST leftovers so joining a town never resurfaces seat pending UI. */
+  clearResidualOnJoin({ commit, dispatch }) {
+    commit("loadPendingFacts", []);
+    dispatch("clearPreviewEffects");
+  },
   resetForNewGame({ commit, dispatch }) {
     commit("clearLog");
     commit("loadGameMeta", {

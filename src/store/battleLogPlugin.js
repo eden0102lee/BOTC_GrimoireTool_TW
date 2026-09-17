@@ -25,6 +25,15 @@ function snapshotPlayer(player) {
 }
 
 export default (store) => {
+  // Joining a town as a player: clear local battle-log leftovers (pending/preview)
+  // so previous storyteller state cannot resurface seat "?" / pending cues.
+  store.subscribe((mutation, state) => {
+    if (mutation.type !== "session/setSessionId") return;
+    if (!mutation.payload) return;
+    if (!state.session.isSpectator) return;
+    store.dispatch("battleLog/clearResidualOnJoin");
+  });
+
   store.subscribe((mutation, state) => {
     if (mutation.type !== "players/update") return;
     const { player, property, value } = mutation.payload || {};

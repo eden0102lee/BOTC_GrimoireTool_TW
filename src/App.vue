@@ -22,7 +22,11 @@
     ></video>
     <div class="backdrop"></div>
     <transition name="blur">
-      <Intro v-if="!players.length"></Intro>
+      <Intro
+        v-if="!players.length && !session.sessionId"
+        @join-town="joinTown"
+        @create-town="createTown"
+      ></Intro>
       <TownInfo v-if="players.length && !session.nomination"></TownInfo>
       <Vote v-if="session.nomination"></Vote>
     </transition>
@@ -108,6 +112,12 @@ export default {
     }
   },
   methods: {
+    joinTown() {
+      this.$refs.menu.joinSession();
+    },
+    createTown() {
+      this.$refs.menu.hostSession();
+    },
     openModalFromQuery() {
       try {
         const params = new URLSearchParams(window.location.search || "");

@@ -2,7 +2,7 @@ export default {
   // Intro
   "intro.welcome": "歡迎使用 Blood on the Clocktower 的（非官方）線上魔典！",
   "intro.addPlayers":
-    "請透過右上角的選單或按 [A] 新增座位；按 [C] 創建小鎮或 [J] 加入小鎮。",
+    "加入現有小鎮，或創建小鎮成為說書人。進入小鎮後可透過選單新增座位。",
   "intro.footer":
     "本專案為開源免費軟體，原始碼見 GitHub。與 Pandemonium Institute 無附屬關係。「Blood on the Clocktower」為 Steven Medway 與 The Pandemonium Institute 之商標。",
 
@@ -404,7 +404,6 @@ export default {
   "recorder.writeSource": "寫入來源",
   "recorder.dismissPending": "移除提醒",
   "recorder.writeDeadVote": "寫入遺言票",
-  "recorder.pendingSeatHint": "此座位有尚未寫入戰報的操作",
   "recorder.addRole": "+角色",
   "recorder.pickRole": "選擇角色",
   "recorder.pendingDeath": "{name} 死亡？",
