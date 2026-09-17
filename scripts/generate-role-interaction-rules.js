@@ -470,6 +470,33 @@ const SPECIAL_RULES = {
     notes:
       "res 用 是/否；「始終將…視為惡魔」僅開局一次（另記／可選紀錄）",
   },
+  farmer: {
+    inputs: [
+      {
+        key: "target",
+        type: "alivePlayer",
+        alignment: "good",
+        label: "變成農夫的玩家",
+      },
+    ],
+    sentence: {
+      action: "變成",
+      template: "{actor}夜晚死亡 → {target} 變成農夫",
+    },
+    effects: [
+      {
+        id: "becomeFarmer",
+        type: "setRole",
+        targetFrom: "target",
+        roleId: "farmer",
+        optional: true,
+        defaultOn: true,
+        label: "目標變成農夫",
+      },
+    ],
+    notes:
+      "僅當農夫今晚死亡時紀錄（醉酒／中毒則略過）。利維坦／暴亂互剋時能力生效但農夫未死，仍可用此卡；勿選農夫本人。",
+  },
 };
 
 function applySpecialRule(rule) {

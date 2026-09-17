@@ -3363,15 +3363,26 @@
             {
               "key": "target",
               "type": "alivePlayer",
-              "label": "目標對象"
+              "alignment": "good",
+              "label": "變成農夫的玩家"
             }
           ],
           "sentence": {
-            "action": "殺害",
-            "template": "{actor} → {action} → 選擇 {target} → {target} 死亡"
+            "action": "變成",
+            "template": "{actor}夜晚死亡 → {target} 變成農夫"
           },
-          "effects": [],
-          "notes": "sheet:https://docs.google.com/spreadsheets/d/1RyPinE2xfHcllNpQ60pPSShaRAkmXHqv2ikxPRAjvdg/edit?gid=1544433985"
+          "effects": [
+            {
+              "id": "becomeFarmer",
+              "type": "setRole",
+              "targetFrom": "target",
+              "roleId": "farmer",
+              "optional": true,
+              "defaultOn": true,
+              "label": "目標變成農夫"
+            }
+          ],
+          "notes": "僅當農夫今晚死亡時紀錄（醉酒／中毒則略過）。利維坦／暴亂互剋時能力生效但農夫未死，仍可用此卡；勿選農夫本人。"
         }
       ]
     },

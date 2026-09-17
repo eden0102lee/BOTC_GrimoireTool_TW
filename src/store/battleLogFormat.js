@@ -477,6 +477,12 @@ export function buildNaturalRoleMessage(rule, { players, actorIndex, formData, e
     template === "{actor}死亡"
   ) {
     main = `${actor}死亡`;
+  } else if (roleId === "farmer" || template.includes("變成農夫")) {
+    // Farmer: 夜晚死亡 → 目標變成農夫
+    const t = labelForKey(players, fd, "target") || fd.target;
+    main = t
+      ? `${actor}夜晚死亡 → ${t} 變成農夫`
+      : `${actor}夜晚死亡`;
   } else if (
     roleId === "zombuul" &&
     (template.includes("第一次") || template.includes("仍存活"))
